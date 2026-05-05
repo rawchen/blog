@@ -1,0 +1,35 @@
+.admin-layout {
+  height: 100vh;
+}
+
+.header {
+  padding: 0 20px;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+}
+
+.trigger {
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.trigger:hover {
+  color: #1890ff;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.admin-content {
+  /*margin: 24px;*/
+  padding: 24px;
+  /*background: #fff;*/
+  border-radius: 8px;
+  overflow: auto;
+}

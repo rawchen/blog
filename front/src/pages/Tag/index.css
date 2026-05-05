@@ -1,0 +1,236 @@
+/* Tag Page Styles */
+.tag-page {
+  padding: 50px 20px 40px;
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+.tag-page .common-title {
+  font-size: 14px;
+  position: relative;
+  margin: 10px auto;
+  padding: 0 30px;
+  color: #5f5f5f;
+}
+
+.tag-page .common-title::before {
+  position: absolute;
+  top: 0;
+  left: 15px;
+  content: '#';
+  color: #eb5055;
+}
+
+.tag-page .post-list-item {
+  width: 49.9999%;
+  padding: 10px;
+}
+
+.tag-page .post-list-item-container {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding: 0;
+  border: 1px solid rgba(184, 197, 214, 0.2);
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.tag-page .post-list-item-container:hover {
+  transform: scale(1.03);
+}
+
+.tag-page .post-list-item-container .item-label {
+  background-color: #fff;
+  padding: 25px 20px 40px;
+}
+
+.tag-page .post-list-item-container .item-label .item-title {
+  line-height: normal;
+  margin-bottom: 10px;
+}
+
+.tag-page .post-list-item-container .item-label .item-title a {
+  font-size: 14px;
+  color: #313131;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tag-page .post-list-item-container .item-label .item-title a:hover {
+  color: #eb5055;
+}
+
+.tag-page .post-list-item-container .item-label .item-meta {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 0 15px 15px;
+  text-align: left;
+}
+
+.tag-page .post-list-item-container .item-label .item-meta .item-meta-date {
+  padding-bottom: 5px;
+  padding-left: 5px;
+  color: #5f5f5f;
+  font-size: 12px;
+}
+
+/* Tag Header */
+.tag-header {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.tag-header h1 {
+  font-size: 21px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #313131;
+}
+
+.tag-header h1::before {
+  content: '[';
+  color: #ea5055;
+  margin-right: 5px;
+}
+
+.tag-header h1::after {
+  content: ']';
+  color: #ea5055;
+  margin-left: 5px;
+}
+
+.tag-header p {
+  color: #5f5f5f;
+  font-size: 14px;
+}
+
+/* Tag Cloud */
+.tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.tag-cloud-item {
+  padding: 0 15px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-block;
+  margin: 4px 8px 0 0;
+  transition-duration: 0.4s;
+  letter-spacing: 0;
+  border-radius: 15px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.tag-cloud-item:nth-child(1n) {
+  border: 1px solid #6fa3ef;
+  background: #6fa3ef;
+}
+
+.tag-cloud-item:nth-child(2n) {
+  border: 1px solid #ff9800;
+  background: #ff9800;
+}
+
+.tag-cloud-item:nth-child(3n) {
+  border: 1px solid #46c47c;
+  background: #46c47c;
+}
+
+.tag-cloud-item:nth-child(4n) {
+  border: 1px solid #f9bb3c;
+  background: #f9bb3c;
+}
+
+.tag-cloud-item:nth-child(5n) {
+  border: 1px solid #bc99c4;
+  background: #bc99c4;
+}
+
+.tag-cloud-item:nth-child(6n) {
+  border: 1px solid #e8583d;
+  background: #e8583d;
+}
+
+.tag-cloud-item::before {
+  content: '#';
+}
+
+.tag-cloud-item:hover {
+  color: #5f5f5f;
+  border: 1px solid #f7f7f7;
+  background: #f7f7f7;
+}
+
+.tag-cloud-item.active {
+  box-shadow: 0 2px 8px rgba(235, 80, 85, 0.3);
+}
+
+/* Post Lists */
+.post-lists {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.post-lists-body {
+  display: block;
+}
+
+.post-list-item {
+  float: left;
+  height: auto;
+  align-items: center;
+}
+
+/* Loading & Empty States */
+.loading,
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+/* Responsive */
+@media (max-width: 880px) {
+  .tag-page {
+    padding: 30px 0 20px;
+  }
+}
+
+@media (max-width: 700px) {
+  .tag-page .post-list-item {
+    width: 100%;
+    padding: 10px 20px;
+  }
+}
+
+@media (max-width: 580px) {
+  .tag-page {
+    padding: 20px 0;
+  }
+
+  .tag-page .post-list-item:first-child {
+    padding-top: 0;
+  }
+}

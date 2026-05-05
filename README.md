@@ -1,156 +1,282 @@
-<p align="center">
-	<a href="" target="_blank">
-		<img src="https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/favicon-gif.gif" alt="Blog · Logo" style="width: 200px; height: 200px">
-	</a>
-</p>
-<p align="center">
-	<img src="https://img.shields.io/badge/JDK-1.8+-orange">
-	<img src="https://img.shields.io/badge/SpringBoot-2.2.7.RELEASE-brightgreen">
-	<img src="https://img.shields.io/badge/MyBatis-3.5.5-red">
-	<img src="https://img.shields.io/badge/Vue-2.6.11-brightgreen">
-    <img src="https://img.shields.io/badge/Redis-3.2.100-brightgreen">
-	<img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Frawchen%2FBlog&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false">
-</p>
+# 博客系统 - Spring Boot + React 前后端分离项目
 
+一个基于 Spring Boot 和 React 的现代化个人博客系统，采用前后端分离架构，支持RBAC权限管理。
 
+## 📋 项目简介
 
+本项目是从原有的 Typecho PHP 博客系统重构而来的完整前后端分离博客系统，保留了原有功能的同时，采用了更现代的技术栈和架构设计。
 
+### ✨ 主要特性
 
-## 简介
+- 🔐 **完善的权限系统**：基于RBAC模型的权限管理，支持用户、角色、权限三级管理
+- 🎨 **现代化UI**：前台采用简洁优雅的设计，后台使用Ant Design Pro风格
+- 📝 **Markdown支持**：文章支持Markdown格式，代码高亮显示
+- 💬 **评论系统**：支持评论回复、审核、点赞等功能
+- 🔍 **全文搜索**：支持文章标题、内容、标签搜索
+- 📱 **响应式设计**：完美适配PC端和移动端
+- 🚀 **JWT认证**：使用JWT实现无状态认证，支持Token刷新
+- 📊 **Swagger文档**：自动生成API接口文档
 
-前后端分离Blog系统，基于 Spring Boot + Vue 前后端分离博客系统
+## 🛠 技术栈
 
-自用博客，长期维护，欢迎勘误。此项目本是学习过程中的产物，参考了许多优秀的教程和项目。
+### 后端技术
 
+| 技术 | 版本 | 说明 |
+|------|------|------|
+| JDK | 1.8+ | Java开发环境 |
+| Spring Boot | 2.7.18 | 应用框架 |
+| MyBatis-Plus | 3.5.3.1 | ORM框架 |
+| MySQL | 5.7+ | 数据库 |
+| Spring Security | - | 安全框架 |
+| JWT | 0.11.5 | Token认证 |
+| Knife4j | 3.0.3 | API文档工具 |
+| Lombok | - | 简化代码 |
+| Hutool | 5.8.18 | 工具库 |
 
-> [https://blog.rawchen.com](https://blog.rawchen.com)
->
-> [https://admin.rawchen.com](https://admin.rawchen.com)
+### 前端技术
 
-## 后端
+| 技术 | 版本 | 说明 |
+|------|------|------|
+| React | 18.2.0 | 前端框架 |
+| Vite | 5.0.8 | 构建工具 |
+| React Router | 6.20.0 | 路由管理 |
+| Redux Toolkit | 2.0.1 | 状态管理 |
+| Ant Design | 5.12.0 | UI组件库(后台) |
+| Axios | 1.6.2 | HTTP客户端 |
+| Day.js | 1.11.10 | 日期处理 |
 
-1. 核心框架：[Spring Boot](https://github.com/spring-projects/spring-boot)
-2. 安全框架：[Spring Security](https://github.com/spring-projects/spring-security)
-3. Token 认证：[jjwt](https://github.com/jwtk/jjwt)
-4. 持久层框架：[MyBatis](https://github.com/mybatis/spring-boot-starter)
-5. 分页插件：[PageHelper](https://github.com/pagehelper/Mybatis-PageHelper)
-6. NoSQL缓存：[Redis](https://github.com/redis/redis)
-7. Markdown 转 HTML：[commonmark-java](https://github.com/commonmark/commonmark-java)
-8. 离线 IP 地址库：[ip2region](https://github.com/lionsoul2014/ip2region)
-9. 定时任务：[quartz](https://github.com/quartz-scheduler/quartz)
-10. UserAgent 解析：[yauaa](https://github.com/nielsbasjes/yauaa)
+## 📁 项目结构
 
-
-
-邮件模板参考自[Typecho-CommentToMail-Template](https://github.com/MisakaTAT/Typecho-CommentToMail-Template)
-
-基于 JDK8 开发，8以上要添加依赖：
-
-```xml
-<dependency>
-    <groupId>javax.xml.bind</groupId>
-    <artifactId>jaxb-api</artifactId>
-    <version>2.3.0</version>
-</dependency>
+```
+blog/
+│   # 前端
+├── front/          
+│   ├── src/
+│   │   ├── api/         # API接口
+│   │   ├── components/  # 公共组件
+│   │   ├── pages/       # 页面组件
+│   │   ├── router/      # 路由配置
+│   │   ├── store/       # Redux状态管理
+│   │   └── utils/       # 工具函数
+│   ├── package.json
+│   └── vite.config.js
+│
+│   # 后端
+├── src/main/java/com/rawchen/blog/
+│   ├── config/      # 配置类
+│   ├── controller/  # 控制器层
+│   ├── entity/      # 实体类
+│   ├── dto/         # 数据传输对象
+│   ├── vo/          # 视图对象
+│   ├── mapper/      # Mapper接口
+│   ├── service/     # 服务层
+│   ├── common/      # 公共类
+│   ├── exception/   # 异常处理
+│   └── security/    # 安全相关
+├── pom.xml
+│
+├── sql/                 # 数据库脚本
+│   ├── schema.sql       # 表结构
+│   └── data.sql         # 初始数据
+│
+└── docs/                # 文档
+    └── API文档.md
 ```
 
+## 🚀 快速开始
 
+### 环境要求
 
-## 前端
+- JDK 1.8+
+- Node.js 16+
+- MySQL 5.7+
+- Maven 3.6+
 
-核心框架：Vue2.x、Vue Router、Vuex
+### 安装步骤
 
-Vue 项目基于 @vue/cli4.x 构建
+#### 1. 克隆项目
 
-JS 依赖及参考的 css：[axios](https://github.com/axios/axios)、[moment](https://github.com/moment/moment)、[nprogress](https://github.com/rstacruz/nprogress)、[v-viewer](https://github.com/fengyuanchen/viewerjs)、[prismjs](https://github.com/PrismJS/prism)、[APlayer](https://github.com/DIYgod/APlayer)、[MetingJS](https://github.com/metowolf/MetingJS)、[lodash](https://github.com/lodash/lodash)、[mavonEditor](https://github.com/hinesboy/mavonEditor)、[echarts](https://github.com/apache/echarts)、[tocbot](https://github.com/tscanlin/tocbot)、[iCSS](https://github.com/chokcoco/iCSS)
+```bash
+git clone https://github.com/rawchen/blog.git
+```
 
+#### 2. 导入数据库
 
+```bash
+# 创建数据库
+CREATE DATABASE blog DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 
-### 后台 UI
+# 导入表结构和初始数据
+mysql -u root -p blog < sql/schema.sql
+mysql -u root -p blog < sql/data.sql
+```
 
-[Element UI](https://github.com/ElemeFE/element)：后台 CMS 部分完全基于 Element UI 开发
+#### 3. 配置后端
 
+修改 `blog/src/main/resources/application-dev.yml`:
 
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/blog?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: your_password
+```
 
-### 前台 UI
+#### 4. 启动后端
 
-[Semantic UI](https://semantic-ui.com/)：主要使用，页面布局样式，语义化的 css，该框架 Vue 版的开发完成度不高，见 [Semantic UI Vue](https://semantic-ui-vue.github.io/#/)
+```bash
+cd blog
+mvn clean install
+mvn spring-boot:run
+```
 
-[Element UI](https://github.com/ElemeFE/element)：部分使用，一些小组件，弥补了 Semantic UI 的不足，便于快速实现效果
+后端启动成功后，访问：
+- API文档: http://localhost:9999/api/doc.html
+- 后端接口: http://localhost:9999/api
 
-文章排版：基于 [typo.css](https://github.com/sofish/typo.css) 修改
+#### 5. 启动前端
 
+**前台展示 & 后台管理：**
 
+```bash
+cd front
+pnpm i
+pnpm run dev
+```
 
-## 快速开始
+- 访问: http://localhost:3000
+- 访问: http://localhost:3000/admin
 
-1. 创建 MySQL 数据库`blog`，并运行`blog.sql`初始化表数据
-2. 修改配置信息`blog-api/src/main/resources/application-dev.properties`
-3. 安装 Redis 并启动
-4. 启动后端SpringBoot服务
-5. 分别在`blog-cms`和`blog-view`目录下执行`npm install`安装依赖
-6. 分别在`blog-cms`和`blog-view`目录下执行`npm run serve`启动前后台页面
+## 📝 默认账号
 
+- 管理员账号: `admin`
+- 管理员密码: `admin123`
 
+## 💽 一键部署（服务器）
+```bash
+./remote_deploy.sh
+```
 
-## 注意事项
+## 📚 核心功能
 
-- 本人使用的 MySQL 版本为5.5.61
-- 数据库中默认用户名密码为`admin`，`admin`，因为是个人博客，没打算做修改密码的页面，可在`util.HashUtils`下的`main`方法手动生成密码存入数据库
-- 注意修改`application-dev.properties`的配置信息
-  - Redis 若没有密码，留空即可
-  - 注意修改`token.secretKey`，否则无法保证 token 安全性
+### 后台管理
 
+- ✅ 仪表盘数据统计
+- ✅ 文章管理（增删改查、发布、草稿）
+- ✅ 分类管理
+- ✅ 标签管理
+- ✅ 评论管理（审核、删除）
+- ✅ 用户管理（状态管理、密码重置）
+- ✅ 角色权限管理
 
+### 前台展示
 
-## 隐藏功能
+- ✅ 文章列表（分页、分类筛选）
+- ✅ 文章详情（Markdown渲染、代码高亮）
+- ✅ 文章搜索
+- ✅ 分类/标签归档
+- ✅ 评论功能
+- ✅ 文章点赞、浏览量统计
 
-- 在前台访问`/login`路径登录后，可以以博主身份（带有博主标识）回复评论，且不需要填写昵称和邮箱即可提交
-- 在 Markdown 中加入`<meting-js server="netease" type="song" id="歌曲id" theme="#25CCF7"></meting-js>` 可以在文章中添加 [APlayer](https://github.com/DIYgod/APlayer) 音乐播放器，`netease`为网易云音乐，其它配置及具体用法参考 [MetingJS](https://github.com/metowolf/MetingJS)
-- 提供了两种隐藏文字效果：在 Markdown 中使用`@@`包住文字，文字会被渲染成“黑幕”效果，鼠标悬浮在上面时才会显示；使用`%%`包住文字，文字会被“蓝色覆盖层”遮盖，只有鼠标选中状态才会反色显示。例如：`@@隐藏文字@@`，`%%隐藏文字%%`
-- 大部分个性化配置可以在后台“站点设置”中修改
+## 🔒 权限说明
 
+系统采用RBAC（基于角色的访问控制）模型：
 
+- 用户（User）：系统使用者
+- 角色（Role）：权限集合
+- 权限（Permission）：具体的操作权限
 
-## 项目截图
+### 默认角色
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/01.png)
+1. **超级管理员(ROLE_ADMIN)**：拥有所有权限
+2. **普通用户(ROLE_USER)**：拥有基本内容管理权限
+3. **访客(ROLE_GUEST)**：只能浏览内容
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/02.png)
+## 📖 API文档
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/03.png)
+启动后端后，访问 http://localhost:9999/api/doc.html 查看完整的API文档。
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/04.png)
+### 主要接口
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/05.png)
+#### 认证相关
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/06.png)
+- `POST /api/auth/login` - 用户登录
+- `POST /api/auth/register` - 用户注册
+- `POST /api/auth/refresh` - 刷新Token
+- `GET /api/auth/info` - 获取当前用户信息
+- `POST /api/auth/logout` - 退出登录
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/07.png)
+#### 文章相关
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/08.png)
+- `GET /api/article/list` - 获取文章列表（前台）
+- `GET /api/article/detail/{id}` - 获取文章详情
+- `GET /api/article/admin/list` - 获取文章列表（后台）
+- `POST /api/article/admin` - 创建文章
+- `PUT /api/article/admin` - 更新文章
+- `DELETE /api/article/admin/{id}` - 删除文章
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/09.png)
+#### 分类标签
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/10.png)
+- `GET /api/category/list` - 获取分类列表
+- `GET /api/tag/list` - 获取标签列表
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/11.png)
+#### 评论相关
 
-![](https://cdn.jsdelivr.net/gh/rawchen/JsDelivr/static/blog/screenshot/12.png)
+- `GET /api/comment/list/{articleId}` - 获取评论列表
+- `POST /api/comment/submit` - 提交评论
+- `PUT /api/comment/admin/audit/{id}` - 审核评论
 
+## 🔧 配置说明
 
+### JWT配置
 
-## Stargazers
+```yaml
+jwt:
+  secret: rawchen-blog-jwt-secret-key-2026-very-long-secret-key-for-security
+  expiration: 7200000           # Access Token过期时间（毫秒）
+  refresh-expiration: 604800000 # Refresh Token过期时间（毫秒）
+  token-prefix: Bearer
+  header: Authorization
+```
 
-[![](https://reporoster.com/stars/rawchen/blog)](https://github.com/rawchen/blog/stargazers)
+### OSS配置
 
-## Forkers
+```yaml
+aliyun:
+  oss:
+    access-key-id: xxx
+    access-key-secret: xxx
+    role-arn: acs:ram::xxx:role/xxx
+    endpoint: oss-cn-xxx.aliyuncs.com
+    bucket-name: xxx
+    custom-domain: 
+    sts-expiration: 3600
+    upload-folder: blog
+```
 
-[![](https://reporoster.com/forks/rawchen/blog)](https://github.com/rawchen/blog/network/members)
+### DeepSeek AI配置
 
+```yaml
+deepseek:
+  api-key: sk-xxx
+  base-url: https://api.deepseek.com
+  chat-model: deepseek-chat
+```
 
-## 如何贡献
+### 跨域配置
 
-Fork 项目到你自己仓库，本地拉取你 fork 的项目并部署修改。
-提交本地仓库更改，推送到你 fork 的项目仓库中。
-在我的项目发起 Pull requests，我看到后将考虑合并到主分支。
+系统已配置允许所有域名跨域访问，生产环境请根据实际情况修改 `CorsConfig.java`。
+
+## 📄 License
+
+MIT License
+
+## 🙏 致谢
+
+感谢以下开源项目：
+
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [React](https://react.dev/)
+- [Ant Design](https://ant.design/)
+- [MyBatis-Plus](https://baomidou.com/)

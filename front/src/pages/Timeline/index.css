@@ -1,0 +1,285 @@
+/* Timeline Page Styles */
+.timeline-page {
+  padding: 50px 20px 40px;
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+/* Stats Card */
+.stats-card {
+  background: #fff;
+  padding: 30px;
+  margin-bottom: 30px;
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.stats-card fieldset {
+  border: 2px dashed #d5d5d5;
+  border-radius: 5px;
+  padding: 20px;
+  margin: 0;
+}
+
+.stats-card legend {
+  background: #eb5055;
+  color: #fff;
+  padding: 5px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.archives-count {
+  width: 100%;
+  text-align: center;
+  color: #666;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.archives-count-item {
+  padding: 0.8em 0;
+  width: 20%;
+  min-width: 100px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.archives-count-item:hover {
+  background: #e8e8e8;
+}
+
+.archives-count-item code {
+  display: block;
+  font-size: 2em;
+  color: #707070;
+  background: transparent !important;
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 600;
+}
+
+.archives-count-item span {
+  font-size: 14px;
+  color: #999;
+}
+
+/* Header */
+.timeline-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.timeline-header h1 {
+  font-size: 21px;
+  font-weight: 600;
+  color: #313131;
+}
+
+.timeline-header h1::before {
+  content: '[';
+  color: #ea5055;
+  margin-right: 5px;
+}
+
+.timeline-header h1::after {
+  content: ']';
+  color: #ea5055;
+  margin-left: 5px;
+}
+
+/* Year Section */
+.year-section {
+  clear: both;
+  margin-bottom: 30px;
+}
+
+.year-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #eb5055;
+  padding: 10px 0;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+  position: relative;
+}
+
+.year-title::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 80px;
+  height: 2px;
+  background: #eb5055;
+}
+
+/* Month Section */
+.month-section {
+  margin-bottom: 25px;
+}
+
+.month-title {
+  font-size: 14px;
+  color: #5f5f5f;
+  padding: 8px 15px;
+  margin-bottom: 15px;
+  background: #f7f7f7;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.month-title::before {
+  content: '# ';
+  color: #eb5055;
+}
+
+/* Time List */
+.time-list {
+  position: relative;
+  padding-left: 20px;
+}
+
+.time-list::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, #eb5055, #f0f0f0);
+}
+
+.time-item {
+  position: relative;
+  padding: 10px 0 10px 20px;
+  transition: transform 0.3s;
+}
+
+.time-item::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  background: #eb5055;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.3s;
+}
+
+.time-item:hover::before {
+  transform: translateY(-50%) scale(1.3);
+}
+
+.time-item:hover {
+  transform: translateX(5px);
+}
+
+.time-item a {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.time-date {
+  min-width: 80px;
+  font-size: 13px;
+  color: #999;
+  font-family: 'Josefin Sans', sans-serif;
+}
+
+.time-title {
+  flex: 1;
+  font-size: 14px;
+  color: #313131;
+  transition: color 0.3s;
+}
+
+.time-item:hover .time-title {
+  color: #eb5055;
+}
+
+/* Post Lists ( Alternative Style ) */
+.post-lists {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+
+.post-lists-body {
+  display: block;
+}
+
+.post-list-item {
+  float: left;
+  width: 50%;
+  padding: 10px;
+}
+
+.post-list-item-container {
+  border: 1px solid rgba(184, 197, 214, 0.2);
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s;
+}
+
+.post-list-item-container:hover {
+  transform: scale(1.02);
+}
+
+.post-list-item-container .item-label {
+  padding: 15px 20px;
+}
+
+.post-list-item-container .item-title {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.post-list-item-container .item-title a {
+  color: #313131;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.post-list-item-container .item-title a:hover {
+  color: #eb5055;
+}
+
+.post-list-item-container .item-meta {
+  font-size: 12px;
+  color: #999;
+}
+
+/* Empty */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .archives-count-item {
+    width: 33.33%;
+  }
+
+  .post-list-item {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .archives-count-item {
+    width: 50%;
+  }
+}

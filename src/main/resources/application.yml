@@ -1,0 +1,78 @@
+server:
+  port: 9999
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: blog
+  profiles:
+    active: dev
+  # 解决 Spring Boot 2.6+ 与 Springfox/Knife4j 的兼容性问题
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+  # Jackson配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false
+
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+# MyBatis Plus配置
+mybatis-plus:
+  # Mapper XML文件位置
+  mapper-locations: classpath:mapper/*.xml
+  # 实体类扫描路径
+  type-aliases-package: com.rawchen.blog.entity
+  configuration:
+    # 开启驼峰命名转换
+    map-underscore-to-camel-case: true
+    # 打印SQL日志
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 主键类型 AUTO 自增 INPUT 用户输入 ID_WORKER 全局唯一ID UUID 全局唯一UUID
+      id-type: AUTO
+      # 逻辑删除配置
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      # 字段策略
+      insert-strategy: not_null
+      update-strategy: not_null
+
+# JWT配置
+jwt:
+  # 密钥（生产环境请使用随机字符串）
+  secret: rawchen-blog-jwt-secret-key-2026-very-long-secret-key-for-security
+  # Access Token 过期时间（单位：毫秒）默认2小时
+  expiration: 7200000
+  # Refresh Token 过期时间（单位：毫秒）默认7天
+  refresh-expiration: 604800000
+  # Token前缀
+  token-prefix: Bearer
+  # Token请求头名称
+  header: Authorization
+
+# Knife4j配置
+knife4j:
+  enable: true
+  setting:
+    language: zh-CN
+    swagger-model-name: 实体类列表
+
+# 日志配置
+logging:
+  level:
+    com.rawchen.blog: debug
+    com.rawchen.blog.mapper: debug
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n'

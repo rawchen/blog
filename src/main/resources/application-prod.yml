@@ -1,0 +1,29 @@
+# 生产环境配置
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/blog?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: blog_user
+    password: ${DB_PASSWORD}
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 50
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+# 生产环境关闭Swagger
+springfox:
+  documentation:
+    enabled: false
+
+knife4j:
+  enable: false
+  production: true
+
+# 日志级别
+logging:
+  level:
+    com.rawchen.blog: info

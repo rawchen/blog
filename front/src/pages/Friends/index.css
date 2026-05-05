@@ -1,0 +1,233 @@
+/* Friends Page Styles (友链) */
+.friends-page {
+  background-color: #fff;
+  box-shadow: 0 0 55px 0 rgb(0 0 0 / 3%);
+  max-width: 970px;
+  margin: 0 auto;
+  padding: 30px 25px 20px;
+}
+
+.friends-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.friends-header h1 {
+  font-size: 21px;
+  font-weight: 600;
+  color: #313131;
+  margin-bottom: 10px;
+}
+
+.friends-header h1::before {
+  content: '[';
+  color: #ea5055;
+  margin-right: 5px;
+}
+
+.friends-header h1::after {
+  content: ']';
+  color: #ea5055;
+  margin-left: 5px;
+}
+
+.friends-header p {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Post Data */
+.friends-meta {
+  font-size: 12px;
+  color: #5f5f5f;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.friends-meta i {
+  margin: 0 5px;
+  color: #eb5055;
+}
+
+/* Post Content for Description */
+.friends-content {
+  padding: 20px 0;
+  margin-bottom: 30px;
+  border-bottom: 1px dashed #e0e0e0;
+}
+
+.friends-content p {
+  font-size: 16px;
+  line-height: 2;
+  color: #313131;
+}
+
+/* Friends List */
+.friends-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 -5px;
+  overflow: hidden;
+}
+
+.friends-list li {
+  float: left;
+  width: 33.33%;
+  list-style: none;
+  padding: 0 5px;
+  margin-bottom: 10px;
+}
+
+/* Friend Card */
+.friend-card {
+  display: block;
+  position: relative;
+  background: #fff;
+  padding: 26px 15px 26px 75px;
+  margin: 5px;
+  border-radius: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: #313131;
+  min-height: 90px;
+}
+
+.friend-card:hover {
+  box-shadow: 0 3px 0px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Friend Avatar */
+.friend-avatar {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.friend-card:hover .friend-avatar {
+  transform: translateY(-50%) rotate(360deg);
+  transition: transform 0.8s ease;
+}
+
+/* Friend Info */
+.friend-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #313131;
+  margin-bottom: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.friend-desc {
+  font-size: 13px;
+  color: #999;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Hidden/Inactive Friends */
+.friend-card.hidden {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.friend-card.hidden .friend-name,
+.friend-card.hidden .friend-desc {
+  color: #ccc;
+}
+
+/* Apply Link */
+.apply-section {
+  margin-top: 40px;
+  padding: 30px;
+  background: #f9f9f9;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.apply-section h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #313131;
+}
+
+.apply-section p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.apply-btn {
+  display: inline-block;
+  padding: 10px 30px;
+  background: linear-gradient(to right, #fa7a46, #ff5656);
+  color: #fff;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.3s;
+}
+
+.apply-btn:hover {
+  opacity: 0.8;
+  color: #fff;
+}
+
+/* Empty State */
+.friends-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.friends-empty i {
+  font-size: 48px;
+  margin-bottom: 15px;
+  color: #ddd;
+}
+
+/* Loading */
+.friends-loading {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .friends-list li {
+    width: 50%;
+  }
+
+  .friend-card {
+    padding: 20px 15px 20px 65px;
+  }
+}
+
+@media (max-width: 480px) {
+  .friends-list li {
+    width: 100%;
+  }
+
+  .friend-card {
+    padding: 15px 15px 15px 60px;
+  }
+
+  .friend-avatar {
+    left: 10px;
+    width: 35px;
+    height: 35px;
+  }
+}

@@ -1,0 +1,86 @@
+.table-of-contents {
+  position: sticky;
+  top: 80px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+
+.toc-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.toc-title i {
+  margin-right: 8px;
+  color: #1890ff;
+}
+
+.toc-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.toc-item {
+  margin: 0;
+  padding: 4px 0;
+}
+
+.toc-item a {
+  display: block;
+  color: #666;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.3s;
+  word-break: break-word;
+}
+
+.toc-item a:hover {
+  color: #1890ff;
+}
+
+.toc-item.active > a {
+  color: #1890ff;
+  font-weight: 500;
+}
+
+.toc-level-2 {
+  padding-left: 0;
+}
+
+.toc-level-3 {
+  padding-left: 12px;
+}
+
+.toc-level-4 {
+  padding-left: 24px;
+}
+
+.toc-level-5 {
+  padding-left: 36px;
+}
+
+.toc-level-6 {
+  padding-left: 48px;
+}
+
+/* Scrollbar for TOC */
+.table-of-contents::-webkit-scrollbar {
+  width: 4px;
+}
+
+.table-of-contents::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 2px;
+}
+
+.table-of-contents::-webkit-scrollbar-thumb:hover {
+  background: #ccc;
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog</title>
+    <script>
+      try {
+        var cached = localStorage.getItem('site_config')
+        if (cached) {
+          var data = JSON.parse(cached)
+          // 标题
+          if (data.siteName) document.title = data.siteName
+          // Favicon
+          if (data.siteFavicon) {
+            var link = document.querySelector("link[rel*='icon']") || document.createElement('link')
+            link.rel = 'icon'
+            link.href = data.siteFavicon
+            document.head.appendChild(link)
+          }
+          // Description
+          if (data.siteDescription) {
+            var metaDesc = document.querySelector('meta[name="description"]')
+            if (!metaDesc) {
+              metaDesc = document.createElement('meta')
+              metaDesc.name = 'description'
+              document.head.appendChild(metaDesc)
+            }
+            metaDesc.content = data.siteDescription
+          }
+          // Keywords
+          if (data.siteKeywords) {
+            var metaKeywords = document.querySelector('meta[name="keywords"]')
+            if (!metaKeywords) {
+              metaKeywords = document.createElement('meta')
+              metaKeywords.name = 'keywords'
+              document.head.appendChild(metaKeywords)
+            }
+            metaKeywords.content = data.siteKeywords
+          }
+        }
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+    // 全局 Toast 函数
+    function showToast(message) {
+      var existing = document.querySelector('.global-toast');
+      if (existing) existing.remove();
+      var toast = document.createElement('div');
+      toast.className = 'global-toast';
+      toast.textContent = message;
+      toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.6);padding:10px 20px;background:rgba(0,0,0,0.6);color:#fff;border-radius:2px;font-size:14px;z-index:99999;transition:transform 0.3s,opacity 0.3s;opacity:0;';
+      document.body.appendChild(toast);
+      setTimeout(function() { toast.style.transform = 'translate(-50%,-50%) scale(1)'; toast.style.opacity = '1'; }, 10);
+      setTimeout(function() { toast.style.transform = 'translate(-50%,-50%) scale(0.6)'; toast.style.opacity = '0.6'; setTimeout(function() { toast.remove(); }, 300); }, 3000);
+    }
+
+    // 打字机效果
+    var yephy = function (r) {
+      function t() { return b[Math.floor(Math.random() * b.length)] }
+      function e() { return String.fromCharCode(94 * Math.random() + 33) }
+      function n(r) {
+        for (var n = document.createDocumentFragment(), i = 0; r > i; i++) {
+          var l = document.createElement("span");
+          l.textContent = e(), l.style.color = t(), n.appendChild(l)
+        }
+        return n
+      }
+      function i() {
+        var t = o[c.skillI];
+        c.step ? c.step-- : (c.step = g, c.prefixP < l.length ? (c.prefixP >= 0 && (c.text += l[c.prefixP]), c.prefixP++) : "forward" === c.direction ? c.skillP < t.length ? (c.text += t[c.skillP], c.skillP++) : c.delay ? c.delay-- : (c.direction = "backward", c.delay = a) : c.skillP > 0 ? (c.text = c.text.slice(0, -1), c.skillP--) : (c.skillI = (c.skillI + 1) % o.length, c.direction = "forward")), r.textContent = c.text, r.appendChild(n(c.prefixP < l.length ? Math.min(s, s + c.prefixP) : Math.min(s, t.length - c.skillP))), setTimeout(i, d)
+      }
+      var l = "喜欢什么就去做吧！",
+      o = ["后端开发", "极简化", "写博客", "去看海", "户外运动", "摄影"].map(function (r) { return r + "." }),
+      a = 2, g = 1, s = 5, d = 75,
+      b = ["rgb(110,64,170)", "rgb(150,61,179)", "rgb(191,60,175)", "rgb(228,65,157)", "rgb(254,75,131)", "rgb(255,94,99)", "rgb(255,120,71)", "rgb(251,150,51)", "rgb(226,183,47)", "rgb(198,214,60)", "rgb(175,240,91)", "rgb(127,246,88)", "rgb(82,246,103)", "rgb(48,239,130)", "rgb(29,223,163)", "rgb(26,199,194)", "rgb(35,171,216)", "rgb(54,140,225)", "rgb(76,110,219)", "rgb(96,84,200)"],
+      c = { text: "", prefixP: -s, skillI: 0, skillP: 0, direction: "forward", delay: a, step: g };
+      i()
+    };
+
+    // 复制提示
+    document.body.oncopy = function() {
+      showToast('复制成功，若要转载请务必保留本文链接！');
+    };
+
+    // 禁用F12
+    document.addEventListener('keydown', function(e) {
+      if (e.keyCode === 123 || e.key === 'F12') {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        showToast("F12被禁用");
+        return false;
+      }
+    }, true);
+    </script>
+  </body>
+</html>

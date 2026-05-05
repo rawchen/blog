@@ -1,0 +1,42 @@
+# 开发环境配置
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/blog?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: your_password
+    # Hikari连接池配置
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+# 阿里云OSS配置
+aliyun:
+  oss:
+    access-key-id: xxx
+    access-key-secret: xxx
+    role-arn: acs:ram::xxx:role/xxx
+    endpoint: oss-cn-xxx.aliyuncs.com
+    bucket-name: xxx
+    custom-domain:
+    sts-expiration: 3600
+    upload-folder: blog
+
+# DeepSeek AI配置
+deepseek:
+  api-key: sk-xxx
+  base-url: https://api.deepseek.com
+  chat-model: deepseek-chat
+
+# 开发环境开启Swagger
+springfox:
+  documentation:
+    enabled: true
+
+knife4j:
+  enable: true

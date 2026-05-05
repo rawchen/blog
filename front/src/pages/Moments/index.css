@@ -1,0 +1,217 @@
+/* Moments Page Styles (朋友圈) */
+.moments-page {
+  background-color: #f3f3f3;
+  max-width: 970px;
+  margin: 0 auto;
+  padding: 50px 20px;
+}
+
+.moments-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.moments-header h1 {
+  font-size: 21px;
+  font-weight: 600;
+  color: #313131;
+  margin-bottom: 10px;
+}
+
+.moments-header h1::before {
+  content: '[';
+  color: #ea5055;
+  margin-right: 5px;
+}
+
+.moments-header h1::after {
+  content: ']';
+  color: #ea5055;
+  margin-left: 5px;
+}
+
+.moments-meta {
+  font-size: 12px;
+  color: #5f5f5f;
+}
+
+/* Comment Container Style for Moments */
+.moments-container {
+  background-color: #f3f3f3;
+}
+
+.moments-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Moment Item - Using comment-rss style */
+.moment-item {
+  border: 1px solid rgba(184, 197, 214, 0.2);
+  border-radius: 3px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  margin-bottom: 20px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.moment-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.moment-link {
+  display: block;
+  color: #3f7895;
+  text-decoration: none;
+  position: relative;
+}
+
+.moment-view {
+  padding: 20px;
+}
+
+/* Moment Title */
+.moment-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #3a3a3a;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+/* Moment Content */
+.moment-content {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.8;
+  margin-bottom: 15px;
+}
+
+.moment-content p {
+  margin: 0;
+}
+
+/* Moment Footer */
+.moment-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed #eee;
+}
+
+/* Moment Author */
+.moment-author {
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  color: #3a3a3a;
+}
+
+.moment-author img {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.moment-author .site-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+}
+
+.moment-author .author-name {
+  font-weight: 500;
+}
+
+/* Moment Time */
+.moment-time {
+  font-size: 12px;
+  color: #999;
+}
+
+/* Moment Image */
+.moment-image {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 5px;
+  margin-top: 15px;
+  object-fit: cover;
+}
+
+/* Pagination */
+.moments-pagination {
+  margin-top: 30px;
+}
+
+.pagination-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  gap: 5px;
+}
+
+.pagination-item a,
+.pagination-item span {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 5px;
+  color: #666;
+  text-decoration: none;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.pagination-item a:hover {
+  background: #ffdcde;
+  color: #ff9f9f;
+}
+
+.pagination-item.current a {
+  background: #ff808e;
+  color: #fff;
+}
+
+.pagination-item.disabled span {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Empty State */
+.moments-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  background: #fff;
+  border-radius: 3px;
+}
+
+.moments-empty i {
+  font-size: 48px;
+  margin-bottom: 15px;
+  color: #ddd;
+}
+
+/* Loading */
+.moments-loading {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .moments-page {
+    padding: 30px 15px;
+  }
+
+  .moment-view {
+    padding: 15px;
+  }
+}

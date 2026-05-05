@@ -1,0 +1,252 @@
+/* Markdown Body Styles */
+.markdown-body {
+  font-size: 16px;
+  line-height: 1.8;
+  /*color: #333;*/
+  word-wrap: break-word;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.markdown-body h1 {
+  font-size: 2em;
+  /* border-bottom: 1px solid #eaecef; */
+  /* padding-bottom: 0.3em; */
+}
+
+.markdown-body h2 {
+  font-size: 1.5em;
+  /* border-bottom: 1px solid #eaecef; */
+  /* padding-bottom: 0.3em; */
+}
+
+.markdown-body h3 { font-size: 1.25em; }
+.markdown-body h4 { font-size: 1em; }
+.markdown-body h5 { font-size: 0.875em; }
+.markdown-body h6 { font-size: 0.85em; color: #6a737d; }
+
+.markdown-body p {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.markdown-body a {
+  color: #1890ff;
+  text-decoration: none;
+}
+
+/*.markdown-body a:hover {*/
+/*  text-decoration: underline;*/
+/*}*/
+
+.markdown-body img {
+  max-width: 100%;
+  box-sizing: content-box;
+  background-color: #fff;
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding-left: 2em;
+}
+
+.markdown-body li {
+  margin: 4px 0;
+}
+
+.markdown-body blockquote {
+  margin: 0 0 16px;
+  padding: 0 1em;
+  color: #383d42;
+  border-left: 0.25em solid #dfe2e5;
+}
+
+
+.markdown-body blockquote p {
+  /*margin: 0;*/
+  white-space: pre-line;
+}
+
+.markdown-body table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 16px;
+  overflow: auto;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+  padding: 8px 13px;
+  border: 1px solid #dfe2e5;
+}
+
+.markdown-body table th {
+  font-weight: 600;
+  background: #f6f8fa;
+}
+
+.markdown-body table tr {
+  background-color: #fff;
+  border-top: 1px solid #c6cbd1;
+}
+
+.markdown-body table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+.markdown-body hr {
+  height: 0.25em;
+  padding: 0;
+  margin: 24px 0;
+  background-color: #e1e4e8;
+  border: 0;
+}
+
+/* Code Styles */
+.markdown-body pre {
+  position: relative;
+  padding: 16px;
+  padding-top: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #2d2d2d;
+  border-radius: 6px;
+  margin: 0 0 16px;
+}
+
+.markdown-body pre:hover .code-block-actions {
+  opacity: 1;
+}
+
+.markdown-body code {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(27, 31, 35, 0.05);
+  border-radius: 3px;
+}
+
+.markdown-body pre code {
+  display: block;
+  padding: 0;
+  background-color: transparent;
+  border-radius: 0;
+  white-space: pre;
+}
+
+.markdown-body .inline-code {
+  padding: 0.2em 0.4em;
+  /* background-color: #f0f0f0; */
+  background: linear-gradient(to right, #ffc3aa, #ff8d8d);
+  border-radius: 5px;
+  font-family: Consolas,'Microsoft YaHei', Monaco, Andale Mono, Ubuntu Mono, monospace;
+}
+
+/* 代码块操作按钮 */
+.code-block-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.code-block-lang {
+  color: #666;
+  font-size: 12px;
+}
+
+.code-block-copy {
+  padding: 4px 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.code-block-copy:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+/* Task List */
+.markdown-body ul.contains-task-list {
+  list-style: none;
+  padding-left: 1.5em;
+}
+
+.markdown-body .task-list-item {
+  list-style-type: none;
+}
+
+.markdown-body .task-list-item-checkbox {
+  margin-right: 8px;
+}
+
+/* Prism.js Theme 覆盖 */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #828282 !important;
+}
+
+.token.annotation {
+  color: #f92672 !important;
+}
+
+.token.class-name {
+  color: #66d9ef !important;
+}
+
+.hljs-operator {
+  color: #f92672 !important;
+}
+
+.hljs-literal {
+  color: #f92672 !important;
+}
+
+.hljs-title.class_ {
+  color: #66d9ef !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .markdown-body {
+    font-size: 15px;
+  }
+
+  .markdown-body pre {
+    padding: 12px;
+    overflow-x: auto;
+  }
+
+  .markdown-body table {
+    display: block;
+    width: 100%;
+    overflow: auto;
+  }
+}

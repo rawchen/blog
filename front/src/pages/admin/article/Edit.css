@@ -1,0 +1,89 @@
+.article-edit-container {
+  display: flex;
+  gap: 16px;
+  height: calc(100vh - 120px);
+  min-height: 600px;
+}
+
+.article-edit-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.article-edit-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.article-edit-card .ant-card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.article-edit-card .ant-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-editor-item {
+  flex: 1;
+  margin-bottom: 0 !important;
+}
+
+.content-editor-item .ant-form-item-control {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-editor-item .ant-form-item-control-input {
+  flex: 1;
+  display: flex;
+  /*flex-direction: column;*/
+}
+
+.content-editor-item .ant-form-item-control-input-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.article-edit-sidebar {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.sidebar-card {
+  position: sticky;
+  /*top: 16px;*/
+}
+
+.sidebar-card .ant-form-item {
+  margin-bottom: 16px;
+}
+
+.sidebar-card .ant-card-body {
+  padding: 16px;
+}
+
+/* 响应式布局 */
+@media (max-width: 992px) {
+  .article-edit-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .article-edit-sidebar {
+    width: 100%;
+  }
+
+  .sidebar-card {
+    position: static;
+  }
+}

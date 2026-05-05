@@ -1,0 +1,51 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  font-family: 'Josefin Sans', 'PingFang SC', sans-serif;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 0 auto;
+  color: #313131;
+  text-rendering: geometricPrecision;
+  background-color: #f3f3f3;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* 全局 Toast */
+.global-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border-radius: 2px;
+  font-size: 14px;
+  z-index: 99999;
+  opacity: 0;
+  transition: transform 0.3s, opacity 0.3s;
+  pointer-events: none;
+}
+
+blockquote, dl, ol, p, pre, table, ul {
+  margin: 20px 0;
+  vertical-align: baseline;
+}
+
+.svg-inline--fa {
+  vertical-align: -0.2em;
+}

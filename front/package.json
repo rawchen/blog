@@ -1,0 +1,44 @@
+{
+  "name": "blog",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm install --prefer-offline && vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^5.2.6",
+    "@fortawesome/fontawesome-svg-core": "^7.2.0",
+    "@fortawesome/free-brands-svg-icons": "^7.2.0",
+    "@fortawesome/free-regular-svg-icons": "^7.2.0",
+    "@fortawesome/free-solid-svg-icons": "^7.2.0",
+    "@fortawesome/react-fontawesome": "^3.3.1",
+    "@reduxjs/toolkit": "^2.0.1",
+    "ali-oss": "^6.21.0",
+    "antd": "^5.12.0",
+    "axios": "^1.6.2",
+    "dayjs": "^1.11.10",
+    "headroom.js": "^0.12.0",
+    "highlight.js": "^11.9.0",
+    "marked": "^11.1.0",
+    "md5": "^2.3.0",
+    "prismjs": "^1.30.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^10.1.0",
+    "react-redux": "^9.0.4",
+    "react-router-dom": "^6.20.0",
+    "redux": "^5.0.0",
+    "rehype-highlight": "^7.0.2",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8"
+  }
+}

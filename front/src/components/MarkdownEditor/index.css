@@ -1,0 +1,250 @@
+.md-editor-container {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.md-editor-container:focus-within {
+  border-color: #4096ff;
+  box-shadow: 0 0 0 2px rgba(5, 145, 255, 0.1);
+}
+
+.md-editor-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #d9d9d9;
+  background: #fafafa;
+}
+
+.md-editor-modes {
+  display: flex;
+}
+
+.mode-segment {
+  display: flex;
+  position: relative;
+  background: #e8e8e8;
+  border-radius: 6px;
+  padding: 2px;
+}
+
+.mode-slider {
+  position: absolute;
+  top: 2px;
+  width: 32px;
+  height: calc(100% - 4px);
+  background: #4096ff;
+  border-radius: 4px;
+  transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.mode-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 24px;
+  cursor: pointer;
+  color: #595959;
+  transition: color 0.2s;
+  position: relative;
+  z-index: 1;
+  border-radius: 4px;
+}
+
+.mode-item:hover {
+  color: #1890ff;
+}
+
+.mode-item.active {
+  color: #fff;
+}
+
+.md-editor-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.md-editor-body {
+  display: flex;
+  overflow: hidden;
+}
+
+.md-editor-pane {
+  flex: 1;
+  overflow: hidden;
+  /*display: flex;*/
+}
+
+.md-editor-pane-left {
+  border-right: 1px solid #d9d9d9;
+}
+
+.md-editor-pane-right {
+  overflow-y: auto;
+}
+
+.md-editor-textarea {
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  border: none;
+  outline: none;
+  resize: none;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  background: #fff;
+  color: #333;
+}
+
+.md-editor-textarea:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.md-editor-textarea::placeholder {
+  color: #bfbfbf;
+}
+
+.md-editor-preview {
+  padding: 12px 16px;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.md-editor-preview-empty {
+  color: #bfbfbf;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* Markdown 预览样式 */
+.md-editor-preview h1,
+.md-editor-preview h2,
+.md-editor-preview h3,
+.md-editor-preview h4,
+.md-editor-preview h5,
+.md-editor-preview h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.md-editor-preview h1 {
+  font-size: 2em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid #eaecef;
+}
+
+.md-editor-preview h2 {
+  font-size: 1.5em;
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid #eaecef;
+}
+
+.md-editor-preview h3 {
+  font-size: 1.25em;
+}
+
+.md-editor-preview h4 {
+  font-size: 1em;
+}
+
+.md-editor-preview p {
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.md-editor-preview a {
+  color: #1890ff;
+  text-decoration: none;
+}
+
+.md-editor-preview a:hover {
+  text-decoration: underline;
+}
+
+.md-editor-preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.md-editor-preview ul,
+.md-editor-preview ol {
+  padding-left: 2em;
+  margin-bottom: 16px;
+}
+
+.md-editor-preview li {
+  margin-bottom: 4px;
+}
+
+.md-editor-preview blockquote {
+  padding: 0 1em;
+  margin: 0 0 16px 0;
+  color: #6a737d;
+  border-left: 0.25em solid #dfe2e5;
+}
+
+.md-editor-preview code {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(27, 31, 35, 0.05);
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+}
+
+.md-editor-preview pre {
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.md-editor-preview pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+.md-editor-preview table {
+  border-spacing: 0;
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.md-editor-preview table th,
+.md-editor-preview table td {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+
+.md-editor-preview table th {
+  font-weight: 600;
+  background: #f6f8fa;
+}
+
+.md-editor-preview table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+.md-editor-preview hr {
+  height: 0.25em;
+  padding: 0;
+  margin: 24px 0;
+  background-color: #e1e4e8;
+  border: 0;
+}
