@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Api(tags = "配置管理")
 @RestController
-@RequestMapping("/config")
+@RequestMapping("/api/config")
 public class ConfigController {
 
     @Autowired

@@ -38,7 +38,7 @@ import java.util.Map;
 @Api(tags = "文章管理")
 @Slf4j
 @RestController
-@RequestMapping("/article")
+@RequestMapping("/api/article")
 public class ArticleController {
 
     @Autowired

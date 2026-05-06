@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Api(tags = "文件上传")
 @RestController
-@RequestMapping("/upload")
+@RequestMapping("/api/upload")
 public class UploadController {
 
     @Autowired

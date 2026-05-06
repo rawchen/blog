@@ -19,7 +19,7 @@ import java.util.List;
  */
 @Api(tags = "统计管理")
 @RestController
-@RequestMapping("/stat")
+@RequestMapping("/api/stat")
 public class StatController {
 
     @Autowired

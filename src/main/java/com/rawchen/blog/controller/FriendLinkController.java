@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Api(tags = "友链管理")
 @RestController
-@RequestMapping("/friend-link")
+@RequestMapping("/api/friend-link")
 public class FriendLinkController {
 
     @Autowired

@@ -20,7 +20,7 @@ import javax.validation.Valid;
  */
 @Api(tags = "认证管理")
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired

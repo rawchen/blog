@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/oss")
+@RequestMapping("/api/oss")
 public class FileUploadOssController {
 
     @Autowired

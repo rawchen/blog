@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Api(tags = "标签管理")
 @RestController
-@RequestMapping("/tag")
+@RequestMapping("/api/tag")
 public class TagController {
 
     @Autowired

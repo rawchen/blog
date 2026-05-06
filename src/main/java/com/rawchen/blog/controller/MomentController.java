@@ -21,7 +21,7 @@ import javax.validation.Valid;
  */
 @Api(tags = "朋友圈管理")
 @RestController
-@RequestMapping("/moment")
+@RequestMapping("/api/moment")
 public class MomentController {
 
     @Autowired

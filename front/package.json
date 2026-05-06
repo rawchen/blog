@@ -5,8 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm install --prefer-offline && vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "pnpm install --prefer-offline && rm -rf node_modules/.vite-temp && vite build",
+    "build:prod": "pnpm install --prefer-offline && rm -rf node_modules/.vite-temp && cross-env BUILD_MODE=prod vite build",
+    "lint": "pnpm install --prefer-offline && eslint .",
+    "preview": "pnpm install --prefer-offline && vite preview",
+    "install-deps": "pnpm install --prefer-offline",
+    "clean": "rm -rf node_modules .pnpm-store pnpm-lock.yaml && pnpm store prune"
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.6",
@@ -39,6 +43,7 @@
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1",
+    "cross-env": "^10.1.0",
     "vite": "^5.0.8"
   }
 }
