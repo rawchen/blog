@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 评论控制器
@@ -37,9 +38,9 @@ public class CommentController {
     }
 
     @ApiOperation("获取最近评论")
-    @GetMapping("/recent")
-    public R<List<CommentVO>> getRecentComments(
-            @RequestParam(defaultValue = "10") Integer limit) {
+    @PostMapping("/latest-comment")
+    public R<List<CommentVO>> getRecentComments(@RequestBody Map<String, Object> params) {
+        Integer limit = params.get("limit") != null ? Integer.valueOf(params.get("limit").toString()) : 10;
         return R.ok(commentService.getRecentComments(limit));
     }
 

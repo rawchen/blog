@@ -99,6 +99,11 @@ public interface ArticleService {
     List<ArticleVO> getRelatedArticles(Long articleId, Integer limit);
 
     /**
+     * 最新文章
+     */
+    List<ArticleVO> getRecentArticles(Integer limit);
+
+    /**
      * 保存草稿
      */
     Long saveDraft(ArticleDTO articleDTO);

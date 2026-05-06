@@ -524,6 +524,22 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public List<ArticleVO> getRecentArticles(Integer limit) {
+        if (limit == null || limit <= 0) {
+            limit = 5;
+        }
+
+        List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
+                .eq(Article::getStatus, 1)
+                .orderByDesc(Article::getPublishTime)
+                .last("LIMIT " + limit));
+
+        return articles.stream()
+                .map(this::convertToVO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Long saveDraft(ArticleDTO articleDTO) {
         Article article = new Article();

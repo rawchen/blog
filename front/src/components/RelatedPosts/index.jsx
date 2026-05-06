@@ -30,7 +30,7 @@ function RelatedPosts({ articleId, limit = 5 }) {
       <ul className="related-posts-list">
         {articles.map(article => (
           <li key={article.id} className="related-posts-item">
-            <Link to={`/article/${article.id}`}>
+            <Link to={`/${article.id}`}>
               {article.coverImage && (
                 <img
                   src={article.coverImage}

@@ -1,28 +1,16 @@
 import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import { getFriendLinkList } from '../../api/friendLink'
-import { getSiteConfig } from '../../api/config'
 import './index.css'
 
 function FriendsPage() {
   const [friends, setFriends] = useState([])
   const [loading, setLoading] = useState(true)
-  const [siteConfig, setSiteConfig] = useState({})
+  const siteConfig = useSelector(state => state.siteConfig.data) || {}
 
   useEffect(() => {
     fetchFriends()
-    fetchSiteConfig()
   }, [])
-
-  const fetchSiteConfig = async () => {
-    try {
-      const res = await getSiteConfig()
-      if (res.code === 200) {
-        setSiteConfig(res.data || {})
-      }
-    } catch (e) {
-      console.error('加载站点配置失败', e)
-    }
-  }
 
   const fetchFriends = async () => {
     setLoading(true)

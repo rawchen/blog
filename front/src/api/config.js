@@ -2,7 +2,7 @@ import request from '../utils/request'
 
 // 获取站点配置（公开）
 export function getSiteConfig() {
-  return request({ url: '/config/site', method: 'get' })
+  return request({ url: '/config/site-config', method: 'get' })
 }
 
 // 获取所有配置（后台）

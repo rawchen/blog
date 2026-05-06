@@ -45,13 +45,13 @@ public class ArticleController {
     private ArticleService articleService;
 
     @ApiOperation("分页查询文章列表（前台）")
-    @GetMapping("/list")
-    public R<PageResult<ArticleVO>> getArticleList(
-            @RequestParam(defaultValue = "1") Long current,
-            @RequestParam(defaultValue = "10") Long size,
-            @RequestParam(required = false) Long categoryId,
-            @RequestParam(required = false) Long tagId,
-            @RequestParam(required = false) String keyword) {
+    @PostMapping("/article-list")
+    public R<PageResult<ArticleVO>> getArticleList(@RequestBody Map<String, Object> params) {
+        Long current = params.get("current") != null ? Long.valueOf(params.get("current").toString()) : 1L;
+        Long size = params.get("size") != null ? Long.valueOf(params.get("size").toString()) : 10L;
+        Long categoryId = params.get("categoryId") != null ? Long.valueOf(params.get("categoryId").toString()) : null;
+        Long tagId = params.get("tagId") != null ? Long.valueOf(params.get("tagId").toString()) : null;
+        String keyword = params.get("keyword") != null ? params.get("keyword").toString() : null;
         return R.ok(articleService.getArticleList(current, size, categoryId, tagId, keyword));
     }
 
@@ -120,6 +120,13 @@ public class ArticleController {
             @PathVariable Long id,
             @RequestParam(defaultValue = "5") Integer limit) {
         return R.ok(articleService.getRelatedArticles(id, limit));
+    }
+
+    @ApiOperation("最新文章")
+    @PostMapping("/latest-article")
+    public R<List<ArticleVO>> getRecentArticles(@RequestBody Map<String, Object> params) {
+        Integer limit = params.get("limit") != null ? Integer.valueOf(params.get("limit").toString()) : 5;
+        return R.ok(articleService.getRecentArticles(limit));
     }
 
     // ========== 后台管理接口 ==========

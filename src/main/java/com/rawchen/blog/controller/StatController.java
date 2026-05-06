@@ -26,7 +26,7 @@ public class StatController {
     private StatService statService;
 
     @ApiOperation("获取站点统计")
-    @GetMapping("/site")
+    @GetMapping("/site-stat")
     public R<SiteStatVO> getSiteStat() {
         return R.ok(statService.getSiteStat());
     }

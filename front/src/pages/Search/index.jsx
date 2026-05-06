@@ -104,7 +104,7 @@ function SearchPage() {
                   {results.map((article, index) => (
                     <div key={article.id} className="post-list-item">
                       <div className={`post-list-item-container ${getBgColor(index)}`}>
-                        <Link to={`/article/${article.id}`}>
+                        <Link to={`/${article.id}`}>
                           <div className="item-label">
                             <div className="item-title">
                               <a>{article.title}</a>

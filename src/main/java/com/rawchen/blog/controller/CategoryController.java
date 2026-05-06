@@ -26,7 +26,7 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @ApiOperation("获取分类列表")
-    @GetMapping("/list")
+    @GetMapping("/category-list")
     public R<List<CategoryVO>> getCategoryList() {
         return R.ok(categoryService.getCategoryList());
     }

@@ -2,7 +2,7 @@ import request from '../utils/request'
 
 // 获取站点统计
 export function getSiteStat() {
-  return request({ url: '/stat/site', method: 'get' })
+  return request({ url: '/stat/site-stat', method: 'get' })
 }
 
 // 获取访问趋势

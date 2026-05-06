@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useParams, useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { getArticleList } from '../../api/article'
-import { getSiteConfig } from '../../api/config'
 import Pagination from '../../components/Pagination'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClock, faTags, faComment, faEye } from '@fortawesome/free-solid-svg-icons'
@@ -21,40 +21,34 @@ function formatDate(datetime) {
 }
 
 function Home() {
+  const { page } = useParams()
+  const navigate = useNavigate()
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
-  const [current, setCurrent] = useState(1)
+  const [current, setCurrent] = useState(parseInt(page) || 1)
   const [size] = useState(10)
   const [total, setTotal] = useState(0)
-  const [siteDescription, setSiteDescription] = useState('')
+  const siteConfig = useSelector(state => state.siteConfig.data) || {}
   const typingRef = useRef(null)
+
+  useEffect(() => {
+    const pageNum = parseInt(page) || 1
+    if (pageNum !== current) {
+      setCurrent(pageNum)
+    }
+  }, [page])
 
   useEffect(() => {
     fetchArticles()
   }, [current])
 
   useEffect(() => {
-    loadSiteConfig()
-  }, [])
-
-  useEffect(() => {
     // 初始化打字机效果
-    if (typingRef.current && window.yephy && siteDescription) {
-      typingRef.current.textContent = siteDescription
+    if (typingRef.current && window.yephy && siteConfig.siteDescription) {
+      typingRef.current.textContent = siteConfig.siteDescription
       window.yephy(typingRef.current)
     }
-  }, [siteDescription])
-
-  const loadSiteConfig = async () => {
-    try {
-      const res = await getSiteConfig()
-      if (res.code === 200) {
-        setSiteDescription(res.data?.siteDescription || '')
-      }
-    } catch (e) {
-      console.error('加载站点配置失败', e)
-    }
-  }
+  }, [siteConfig.siteDescription])
 
   const fetchArticles = async () => {
     setLoading(true)
@@ -67,8 +61,12 @@ function Home() {
     }
   }
 
-  const handlePageChange = (page) => {
-    setCurrent(page)
+  const handlePageChange = (pageNum) => {
+    if (pageNum === 1) {
+      navigate('/')
+    } else {
+      navigate(`/page/${pageNum}`)
+    }
   }
 
   if (loading) return <div className="loading">加载中...</div>
@@ -90,7 +88,7 @@ function Home() {
           </div>
           <div className="item-meta" style={{ fontFamily: "'Josefin Sans', 'Noto Serif SC', sans-serif", fontWeight: 'bold', fontSize: '15px' }}>
             <p
-                id="typing-text">{siteDescription}</p>
+                id="typing-text">{siteConfig.siteDescription}</p>
           </div>
           <div className="item-meta" style={{ fontSize: '15px' }}>
             <div className="social-list">
@@ -115,14 +113,14 @@ function Home() {
       {articles.map((article, index) => (
           <div key={article.id} className="post-onelist-item">
             <div className="post-onelist-item-container">
-            <Link to={`/article/${article.id}`}>
+            <Link to={`/${article.id}`}>
               <div
                 className={`onelist-item-thumb ${getRandomBgColor()}`}
                 style={{ backgroundImage: `url(${article.coverImage || 'https://cdn.rawchen.com/cover.jpg'})` }}
               />
             </Link>
             <div className="item-title">
-              <Link to={`/article/${article.id}`}>{article.title}</Link>
+              <Link to={`/${article.id}`}>{article.title}</Link>
             </div>
             <div className="item-meta">
               <span className="meta-item">
@@ -137,7 +135,7 @@ function Home() {
               </span>
               <span className="meta-item">
                 <FontAwesomeIcon icon={faComment} />
-                <Link to={`/article/${article.id}#comments`}>{article.commentCount || 0} 评论</Link>
+                <Link to={`/${article.id}#comments`}>{article.commentCount || 0} 评论</Link>
               </span>
               <span className="meta-item">
                 <FontAwesomeIcon icon={faEye} />

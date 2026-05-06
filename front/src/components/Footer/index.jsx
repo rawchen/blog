@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {faGithubAlt, faTelegram, faWeibo, faTwitter} from '@fortawesome/free-brands-svg-icons'
 import {faEnvelope, faComments, faRss, faComment, faGlobe, faEarthAsia} from '@fortawesome/free-solid-svg-icons'
-import { getSiteConfig } from '../../api/config'
-import { getArticleList } from '../../api/article'
+import { getRecentArticles } from '../../api/article'
 import { getRecentComments } from '../../api/comment'
 import { getSiteStat } from '../../api/stat'
 import './index.css'
@@ -85,14 +85,13 @@ function startTypewriter(element) {
 }
 
 function Footer() {
-  const [siteConfig, setSiteConfig] = useState({})
+  const siteConfig = useSelector(state => state.siteConfig.data) || {}
   const [recentArticles, setRecentArticles] = useState([])
   const [recentComments, setRecentComments] = useState([])
   const [siteStat, setSiteStat] = useState({})
   const descriptionRef = useRef(null)
 
   useEffect(() => {
-    loadSiteConfig()
     loadRecentArticles()
     loadRecentComments()
     loadSiteStat()
@@ -104,22 +103,11 @@ function Footer() {
     }
   }, [])
 
-  const loadSiteConfig = async () => {
-    try {
-      const res = await getSiteConfig()
-      if (res.code === 200) {
-        setSiteConfig(res.data || {})
-      }
-    } catch (e) {
-      console.error('加载站点配置失败', e)
-    }
-  }
-
   const loadRecentArticles = async () => {
     try {
-      const res = await getArticleList({ current: 1, size: 5 })
+      const res = await getRecentArticles({ limit: 8 })
       if (res.code === 200) {
-        setRecentArticles(res.data?.records || [])
+        setRecentArticles(res.data || [])
       }
     } catch (e) {
       console.error('加载最新文章失败', e)
@@ -128,7 +116,7 @@ function Footer() {
 
   const loadRecentComments = async () => {
     try {
-      const res = await getRecentComments({ limit: 5 })
+      const res = await getRecentComments({ limit: 8 })
       if (res.code === 200) {
         setRecentComments(res.data || [])
       }
@@ -281,7 +269,7 @@ function Footer() {
               {recentArticles.length > 0 ? (
                 recentArticles.map(article => (
                   <li key={article.id}>
-                    <Link to={`/article/${article.id}`}>
+                    <Link to={`/${article.id}`}>
                       {article.title}
                     </Link>
                   </li>
@@ -299,7 +287,7 @@ function Footer() {
               {recentComments.length > 0 ? (
                 recentComments.map(comment => (
                   <li key={comment.id}>
-                    <Link to={`/article/${comment.articleId}`}>
+                    <Link to={`/${comment.articleId}`}>
                       <span className="comment-author">{comment.nickname}:</span>
                       <span className="comment-content">
                         {comment.content.length > 30

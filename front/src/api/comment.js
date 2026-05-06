@@ -6,8 +6,8 @@ export function getCommentList(articleId, params) {
 }
 
 // 获取最近评论
-export function getRecentComments(params) {
-  return request({ url: '/comment/recent', method: 'get', params })
+export function getRecentComments(data) {
+  return request({ url: '/comment/latest-comment', method: 'post', data })
 }
 
 // 提交评论

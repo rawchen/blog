@@ -28,7 +28,7 @@ public class ConfigController {
     private ConfigService configService;
 
     @ApiOperation("获取站点配置（公开）")
-    @GetMapping("/site")
+    @GetMapping("/site-config")
     public R<SiteConfigVO> getSiteConfig() {
         return R.ok(configService.getSiteConfig());
     }

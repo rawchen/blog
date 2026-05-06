@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Link, useLocation } from 'react-router-dom'
-import { getSiteConfig } from '../../api/config'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { getCategoryList } from '../../api/category'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch, faUser } from '@fortawesome/free-solid-svg-icons'
@@ -9,14 +9,14 @@ import './index.css'
 
 function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [siteConfig, setSiteConfig] = useState({})
+  const siteConfig = useSelector(state => state.siteConfig.data) || {}
   const [categories, setCategories] = useState([])
   const headerRef = useRef(null)
   const headroomRef = useRef(null)
   const location = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
-    loadSiteConfig()
     loadCategories()
   }, [])
 
@@ -38,17 +38,6 @@ function Header() {
   useEffect(() => {
     setMobileMenuOpen(false)
   }, [location])
-
-  const loadSiteConfig = async () => {
-    try {
-      const res = await getSiteConfig()
-      if (res.code === 200) {
-        setSiteConfig(res.data || {})
-      }
-    } catch (e) {
-      console.error('加载站点配置失败', e)
-    }
-  }
 
   const loadCategories = async () => {
     try {

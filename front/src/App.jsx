@@ -30,11 +30,11 @@ import Setting from './pages/admin/Setting'
 // 路由守卫
 function PrivateRoute({ children }) {
   const { isAuthenticated } = useSelector(state => state.auth)
-  
+
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" replace />
   }
-  
+
   return children
 }
 
@@ -44,14 +44,17 @@ function App() {
       {/* 前台路由 */}
       <Route path="/" element={<WebLayout />}>
         <Route index element={<Home />} />
-        <Route path="article/:id" element={<ArticleDetail />} />
+        <Route path="page/:page" element={<Home />} />
+        <Route path="category" element={<CategoryPage />} />
         <Route path="category/:id" element={<CategoryPage />} />
+        <Route path="tag" element={<TagPage />} />
         <Route path="tag/:id" element={<TagPage />} />
         <Route path="archive" element={<Archive />} />
         <Route path="search" element={<SearchPage />} />
         <Route path="timeline" element={<TimelinePage />} />
         <Route path="moments" element={<MomentsPage />} />
         <Route path="friends" element={<FriendsPage />} />
+        <Route path=":id" element={<ArticleDetail />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
 

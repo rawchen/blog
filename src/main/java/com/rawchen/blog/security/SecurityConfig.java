@@ -66,35 +66,49 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 // 放行接口
                 .antMatchers(
+                        // API接口
+                        "/tag",
                         "/api/auth/login",
                         "/api/auth/register",
                         "/api/auth/refresh",
+                        "/api/article/**",
+                        "/api/category/**",
+                        "/api/tag/**",
+                        "/api/comment/**",
+                        "/api/upload/**",
+                        "/api/config/**",
+                        "/api/friend-link/**",
+                        "/api/stat/**",
+                        "/feed",
+                        "/sitemap.xml",
+                        // Swagger文档
                         "/doc.html",
                         "/webjars/**",
                         "/swagger-resources/**",
                         "/v2/api-docs/**",
+                        // 静态资源
                         "/favicon.ico",
-                        "/api/article/list",
-                        "/api/article/detail/**",
-                        "/api/article/view/**",
-                        "/api/article/*/related",
-                        "/api/category/**",
-                        "/api/tag/**",
-                        "/api/comment/list/**",
-                        "/api/comment/recent",
-                        "/api/comment/submit",
-                        "/api/upload/**",
-                        "/api/config/site",
-                        "/api/friend-link/list",
-                        "/api/stat/site",
-                        "/feed",
-                        "/sitemap.xml",
-                        "/",
-                        "/index.html",
                         "/assets/**",
                         "/*.png",
                         "/*.jpg",
-                        "/*.ico"
+                        "/*.ico",
+                        "/logo.png",
+                        "/logo-footer.png",
+                        // 前端路由页面
+                        "/",
+                        "/index.html",
+                        "/*",
+                        "/page/**",
+                        "/category",
+                        "/category/**",
+                        "/tag",
+                        "/tag/**",
+                        "/archive",
+                        "/search",
+                        "/timeline",
+                        "/moments",
+                        "/friends",
+                        "/admin/login"
                 ).permitAll()
                 // 其他请求需要认证
                 .anyRequest().authenticated()

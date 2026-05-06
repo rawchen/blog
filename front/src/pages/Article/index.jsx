@@ -177,7 +177,7 @@ function ArticleDetail() {
           <div className="padd">
             {article.prevArticle && (
               <div className="next-prev">
-                <Link to={`/article/${article.prevArticle.id}`} title={article.prevArticle.title}>
+                <Link to={`/${article.prevArticle.id}`} title={article.prevArticle.title}>
                   <div className="card">
                     <div className="card-img">
                       <img
@@ -199,7 +199,7 @@ function ArticleDetail() {
             )}
             {article.nextArticle && (
               <div className="next-prev">
-                <Link to={`/article/${article.nextArticle.id}`} title={article.nextArticle.title}>
+                <Link to={`/${article.nextArticle.id}`} title={article.nextArticle.title}>
                   <div className="card">
                     <div className="card-img">
                       <img
@@ -267,12 +267,12 @@ function ArticleDetail() {
           <div className="bottom-bar-items right">
             {article.nextArticle && (
               <span className="bottom-bar-item">
-                <Link to={`/article/${article.nextArticle.id}`}>下一篇 &rarr;</Link>
+                <Link to={`/${article.nextArticle.id}`}>下一篇 &rarr;</Link>
               </span>
             )}
             {article.prevArticle && (
               <span className="bottom-bar-item">
-                <Link to={`/article/${article.prevArticle.id}`}>&larr; 上一篇</Link>
+                <Link to={`/${article.prevArticle.id}`}>&larr; 上一篇</Link>
               </span>
             )}
             <span className="bottom-bar-item">

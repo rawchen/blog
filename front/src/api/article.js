@@ -1,8 +1,8 @@
 import request from '../utils/request'
 
 // 前台接口
-export function getArticleList(params) {
-  return request({ url: '/article/list', method: 'get', params })
+export function getArticleList(data) {
+  return request({ url: '/article/article-list', method: 'post', data })
 }
 
 export function getArticleDetail(id, password) {
@@ -44,6 +44,11 @@ export function getRecommendArticles(params) {
 // 相关文章(根据标签)
 export function getRelatedArticles(id, params) {
   return request({ url: `/article/${id}/related`, method: 'get', params })
+}
+
+// 最新文章
+export function getRecentArticles(data) {
+  return request({ url: '/article/latest-article', method: 'post', data })
 }
 
 // 后台接口
