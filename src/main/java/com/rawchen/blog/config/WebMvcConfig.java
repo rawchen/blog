@@ -28,6 +28,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler(urlPrefix + "/**")
                 .addResourceLocations("file:" + uploadPath + "/");
 
+        // Knife4j/Swagger 静态资源
+        registry.addResourceHandler("doc.html")
+                .addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
+
         // SPA 路由支持：对于非静态资源的请求，返回 index.html
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/")

@@ -19,7 +19,7 @@ public class BlogApplication {
         SpringApplication.run(BlogApplication.class, args);
         System.out.println("====================================");
         System.out.println("博客系统启动成功!");
-        System.out.println("API文档地址: http://localhost:9999/api/doc.html");
+        System.out.println("API文档地址: http://localhost:9999/doc.html");
         System.out.println("====================================");
     }
 }

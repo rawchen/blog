@@ -132,8 +132,7 @@ mvn spring-boot:run
 ```
 
 后端启动成功后，访问：
-- API文档: http://localhost:9999/api/doc.html
-- 后端接口: http://localhost:9999/api
+- API文档: http://localhost:9999/doc.html
 
 #### 5. 启动前端
 
@@ -145,8 +144,8 @@ pnpm i
 pnpm run dev
 ```
 
-- 访问: http://localhost:3000
-- 访问: http://localhost:3000/admin
+- 博客: http://localhost:3000
+- 管理: http://localhost:3000/admin
 
 ## 📝 默认账号
 
@@ -195,7 +194,7 @@ pnpm run dev
 
 ## 📖 API文档
 
-启动后端后，访问 http://localhost:9999/api/doc.html 查看完整的API文档。
+启动后端后，访问 http://localhost:9999/doc.html 查看完整的API文档。
 
 ### 主要接口
 
