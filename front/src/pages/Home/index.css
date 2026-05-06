@@ -288,10 +288,10 @@
   line-height: 17px;
   word-break: break-all;
   color: #313131;
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  /*display: block;*/
+  /*overflow: hidden;*/
+  /*white-space: nowrap;*/
+  /*text-overflow: ellipsis;*/
 }
 
 .post-list-item-container .item-label .item-title a:hover {
@@ -403,17 +403,6 @@
   border: 1px solid #f7f7f7;
   outline-style: none;
   background: #f7f7f7;
-}
-
-/* Loading & Empty States */
-.loading,
-.empty {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999;
-  font-size: 16px;
-  background: #fff;
-  border-radius: 8px;
 }
 
 /* Pagination */

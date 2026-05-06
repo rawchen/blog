@@ -1,6 +1,6 @@
 /* Archive Page Styles */
 .archive-page {
-  padding: 50px 20px 40px;
+  padding: 120px 20px 40px;
   max-width: 940px;
   margin: 0 auto;
 }
@@ -82,10 +82,10 @@
 .archive-page .post-list-item-container .item-label .item-title a {
   font-size: 14px;
   line-height: 1.5;
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  /*display: block;*/
+  /*overflow: hidden;*/
+  /*white-space: nowrap;*/
+  /*text-overflow: ellipsis;*/
   color: #313131;
 }
 
@@ -115,6 +115,7 @@
   text-align: center;
   color: #666;
   margin-bottom: 30px;
+  background-color: #ffffff94;
 }
 
 .archives-count .archives-count-item {
@@ -135,7 +136,7 @@
 }
 
 .archives-count .archives-count-item:hover {
-  background: #e8e8e8;
+  background: #2b2b2b;
 }
 
 /* Archive Header */
@@ -194,27 +195,16 @@
   color: #eb5055;
 }
 
-/* Loading & Empty States */
-.loading,
-.empty {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999;
-  font-size: 16px;
-  background: #fff;
-  border-radius: 8px;
-}
-
 /* Responsive */
 @media (max-width: 880px) {
   .archive-page {
-    padding: 30px 0 20px;
+    padding: 100px 0 20px;
   }
 }
 
 @media (max-width: 580px) {
   .archive-page {
-    padding: 20px 0;
+    padding: 90px 0;
   }
 
   .archive-page .post-list-item {

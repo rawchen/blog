@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { getArticleList } from '../../api/article'
 import { getTagList } from '../../api/tag'
 import './index.css'
@@ -17,14 +19,14 @@ function TagPage() {
   const [tags, setTags] = useState([])
   const [currentTag, setCurrentTag] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [total, setTotal] = useState(0)
 
   useEffect(() => {
     fetchTags()
   }, [])
 
   useEffect(() => {
-    if (id) fetchArticles()
-    else setLoading(false)
+    fetchArticles()
   }, [id])
 
   const fetchTags = async () => {
@@ -39,27 +41,41 @@ function TagPage() {
   const fetchArticles = async () => {
     setLoading(true)
     try {
-      const res = await getArticleList({ current: 1, size: 20, tagId: id })
+      const params = { current: 1, size: 20 }
+      if (id) params.tagId = id
+      const res = await getArticleList(params)
       setArticles(res.data.records || [])
-      const tag = tags.find(t => t.id === parseInt(id))
-      setCurrentTag(tag)
+      setTotal(res.data.total || 0)
+      if (id) {
+        const tag = tags.find(t => t.id === parseInt(id))
+        setCurrentTag(tag)
+      } else {
+        setCurrentTag(null)
+      }
     } finally {
       setLoading(false)
     }
   }
 
-  if (loading) return <div className="loading">加载中...</div>
-
   return (
     <div className="tag-page">
       {/* Header */}
       <div className="tag-header">
-        <h1>{currentTag?.tagName || '标签文章'}</h1>
-        {currentTag?.description && <p>{currentTag.description}</p>}
+        <h1>
+          {currentTag?.tagName || '全部标签'}
+          <span className="tag-count">{currentTag ? currentTag.articleCount || 0 : total} 篇</span>
+        </h1>
+        {/*{currentTag?.description && <p>{currentTag.description}</p>}*/}
       </div>
 
       {/* Tag Cloud */}
       <div className="tag-cloud">
+        <Link
+          to="/tag"
+          className={`tag-cloud-item ${!id ? 'active' : ''}`}
+        >
+          全部标签
+        </Link>
         {tags.map((tag, index) => (
           <Link
             key={tag.id}
@@ -74,32 +90,32 @@ function TagPage() {
       {/* Article List */}
       <div className="post-lists">
         <div className="post-lists-body clearfix">
-          {articles.map(article => (
-            <div key={article.id} className="post-list-item">
-              <div className="post-list-item-container">
-                <Link to={`/${article.id}`}>
-                  <div className="item-label">
-                    <div className="item-title">
-                      <a>{article.title}</a>
-                    </div>
-                    <div className="item-meta clearfix">
-                      <div
-                        className={`item-meta-ico bg-ico-${getRandomBgIco()}`}
-                        style={{
-                          background: 'url(/images/bg-ico.png) no-repeat',
-                          backgroundSize: '40px auto'
-                        }}
-                      />
-                      <div className="item-meta-date">
-                        <i className="fa fa-clock-o" aria-hidden="true"></i>
-                        {article.publishTime || article.createTime}
+          {loading ? (
+            <div className="list-loading">
+              <FontAwesomeIcon icon={faSpinner} spin />
+              <span> 加载中...</span>
+            </div>
+          ) : (
+            articles.map(article => (
+              <div key={article.id} className="post-list-item">
+                <div className="post-list-item-container">
+                  <Link to={`/${article.id}`}>
+                    <div className="item-label">
+                      <div className="item-title">
+                        <a>{article.title}</a>
+                      </div>
+                      <div className="item-meta clearfix">
+                        <div className="item-meta-date">
+                          <i className="fa fa-clock-o" aria-hidden="true"></i>
+                          {article.publishTime || article.createTime}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 

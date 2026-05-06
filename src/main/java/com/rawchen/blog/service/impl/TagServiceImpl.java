@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.entity.Tag;
+import com.rawchen.blog.mapper.ArticleTagMapper;
 import com.rawchen.blog.mapper.TagMapper;
 import com.rawchen.blog.service.TagService;
 import com.rawchen.blog.vo.TagVO;
@@ -27,6 +28,9 @@ public class TagServiceImpl implements TagService {
 
     @Autowired
     private TagMapper tagMapper;
+
+    @Autowired
+    private ArticleTagMapper articleTagMapper;
 
     @Override
     public List<TagVO> getTagList() {
@@ -91,6 +95,9 @@ public class TagServiceImpl implements TagService {
     private TagVO convertToVO(Tag tag) {
         TagVO vo = new TagVO();
         BeanUtils.copyProperties(tag, vo);
+        // 统计该标签下已发布文章数量
+        Long count = articleTagMapper.countPublishedArticlesByTagId(tag.getId());
+        vo.setArticleCount(count != null ? count.intValue() : 0);
         return vo;
     }
 }

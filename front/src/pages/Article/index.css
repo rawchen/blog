@@ -741,17 +741,6 @@
   background-color: #4caf50;
 }
 
-/* Loading & Empty States */
-.loading,
-.empty {
-  text-align: center;
-  padding: 60px 20px;
-  color: #999;
-  font-size: 16px;
-  background: #fff;
-  border-radius: 8px;
-}
-
 /* Responsive */
 @media (max-width: 1350px) {
     .post-header-thumb {

@@ -245,10 +245,10 @@
 
 .post-list-item-container .item-title a {
   color: #313131;
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  /*display: block;*/
+  /*overflow: hidden;*/
+  /*white-space: nowrap;*/
+  /*text-overflow: ellipsis;*/
 }
 
 .post-list-item-container .item-title a:hover {

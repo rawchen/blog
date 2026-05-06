@@ -26,6 +26,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryMapper categoryMapper;
 
+    @Autowired
+    private ArticleMapper articleMapper;
+
     @Override
     public List<CategoryVO> getCategoryList() {
         List<Category> categories = categoryMapper.selectList(new LambdaQueryWrapper<Category>()
@@ -65,6 +68,11 @@ public class CategoryServiceImpl implements CategoryService {
     private CategoryVO convertToVO(Category category) {
         CategoryVO vo = new CategoryVO();
         BeanUtils.copyProperties(category, vo);
+        // 统计该分类下已发布文章数量
+        Long count = articleMapper.selectCount(new LambdaQueryWrapper<com.rawchen.blog.entity.Article>()
+                .eq(com.rawchen.blog.entity.Article::getCategoryId, category.getId())
+                .eq(com.rawchen.blog.entity.Article::getStatus, 1));
+        vo.setArticleCount(count != null ? count.intValue() : 0);
         return vo;
     }
 }

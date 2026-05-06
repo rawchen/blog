@@ -1,6 +1,6 @@
 /* Tag Page Styles */
 .tag-page {
-  padding: 50px 20px 40px;
+  padding: 120px 20px 40px;
   max-width: 940px;
   margin: 0 auto;
 }
@@ -55,10 +55,10 @@
 .tag-page .post-list-item-container .item-label .item-title a {
   font-size: 14px;
   color: #313131;
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  /*display: block;*/
+  /*overflow: hidden;*/
+  /*white-space: nowrap;*/
+  /*text-overflow: ellipsis;*/
 }
 
 .tag-page .post-list-item-container .item-label .item-title a:hover {
@@ -83,17 +83,18 @@
 
 /* Tag Header */
 .tag-header {
-  margin-bottom: 30px;
+  /*margin-bottom: 30px;*/
   padding: 20px;
   background: #fff;
-  border-radius: 3px;
+  border-radius: 3px 3px 0 0;
+  border-bottom: 1px solid rgb(245 245 245);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .tag-header h1 {
   font-size: 21px;
   font-weight: 600;
-  margin-bottom: 10px;
+  /*margin-bottom: 10px;*/
   color: #313131;
 }
 
@@ -109,6 +110,13 @@
   margin-left: 5px;
 }
 
+.tag-header .tag-count {
+  font-size: 14px;
+  color: #5f5f5f;
+  margin-left: 10px;
+  font-weight: normal;
+}
+
 .tag-header p {
   color: #5f5f5f;
   font-size: 14px;
@@ -122,11 +130,12 @@
   margin-bottom: 30px;
   padding: 20px;
   background: #fff;
-  border-radius: 3px;
+  border-radius: 0 0 3px 3px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .tag-cloud-item {
+  position: relative;
   padding: 0 15px;
   font-size: 13px;
   font-weight: 600;
@@ -137,6 +146,11 @@
   border-radius: 15px;
   color: #fff;
   cursor: pointer;
+}
+
+.tag-cloud-item:first-child {
+  border: 1px solid #141923;
+  background: #141923;
 }
 
 .tag-cloud-item:nth-child(1n) {
@@ -175,12 +189,25 @@
 
 .tag-cloud-item:hover {
   color: #5f5f5f;
-  border: 1px solid #f7f7f7;
+  /*border: 1px solid #f7f7f7;*/
   background: #f7f7f7;
 }
 
 .tag-cloud-item.active {
-  box-shadow: 0 2px 8px rgba(235, 80, 85, 0.3);
+  color: #fff;
+  box-shadow: 0 2px 8px rgb(121 121 121 / 30%);
+}
+
+.tag-cloud-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 18px;
+  left: 7%;
+  transform: translateX(-50%);
+  width: 9px;
+  height: 9px;
+  background: #eb5055;
+  border-radius: 50%;
 }
 
 /* Post Lists */
@@ -200,21 +227,20 @@
   align-items: center;
 }
 
-/* Loading & Empty States */
-.loading,
-.empty {
+.list-loading {
+  width: 100%;
   text-align: center;
-  padding: 60px 20px;
+  padding: 30px 20px;
   color: #999;
   font-size: 16px;
-  background: #fff;
+  /*background: #fff;*/
   border-radius: 8px;
 }
 
 /* Responsive */
 @media (max-width: 880px) {
   .tag-page {
-    padding: 30px 0 20px;
+    padding: 100px 0 20px;
   }
 }
 
@@ -227,7 +253,7 @@
 
 @media (max-width: 580px) {
   .tag-page {
-    padding: 20px 0;
+    padding: 90px 0;
   }
 
   .tag-page .post-list-item:first-child {

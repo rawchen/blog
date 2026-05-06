@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { getArticleList } from '../../api/article'
 import { getCategoryList } from '../../api/category'
 import './index.css'
-
-// Random background colors for icons
-const bgIcos = ['book', 'game', 'note', 'chat', 'code', 'image', 'web', 'link', 'design', 'lock']
-
-function getRandomBgIco() {
-  return bgIcos[Math.floor(Math.random() * bgIcos.length)]
-}
 
 function CategoryPage() {
   const { id } = useParams()
@@ -17,14 +12,14 @@ function CategoryPage() {
   const [categories, setCategories] = useState([])
   const [currentCategory, setCurrentCategory] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [total, setTotal] = useState(0)
 
   useEffect(() => {
     fetchCategories()
   }, [])
 
   useEffect(() => {
-    if (id) fetchArticles()
-    else setLoading(false)
+    fetchArticles()
   }, [id])
 
   const fetchCategories = async () => {
@@ -43,27 +38,43 @@ function CategoryPage() {
   const fetchArticles = async () => {
     setLoading(true)
     try {
-      const res = await getArticleList({ current: 1, size: 20, categoryId: id })
+      const params = { current: 1, size: 20 }
+      if (id) params.categoryId = id
+      const res = await getArticleList(params)
       setArticles(res.data.records || [])
-      const cat = categories.find(c => c.id === parseInt(id))
-      setCurrentCategory(cat)
+      setTotal(res.data.total || 0)
+      if (id) {
+        const cat = categories.find(c => c.id === parseInt(id))
+        setCurrentCategory(cat)
+      } else {
+        setCurrentCategory(null)
+      }
     } finally {
       setLoading(false)
     }
   }
 
-  if (loading) return <div className="loading">加载中...</div>
+  // if (loading) return <div className="loading">加载中...</div>
 
   return (
     <div className="category-page">
       {/* Header */}
       <div className="category-header">
-        <h1>{currentCategory?.categoryName || '分类文章'}</h1>
-        {currentCategory?.description && <p>{currentCategory.description}</p>}
+        <h1>
+          {currentCategory?.categoryName || '全部分类'}
+          <span className="category-count">{currentCategory ? currentCategory.articleCount || 0 : total} 篇{currentCategory?.description && <span>{currentCategory.description}</span>}</span>
+        </h1>
+
       </div>
 
       {/* Category List */}
       <div className="category-list">
+        <Link
+          to="/category"
+          className={`category-list-item ${!id ? 'active' : ''}`}
+        >
+          全部分类
+        </Link>
         {categories.map((cat, index) => (
           <Link
             key={cat.id}
@@ -78,32 +89,32 @@ function CategoryPage() {
       {/* Article List */}
       <div className="post-lists">
         <div className="post-lists-body clearfix">
-          {articles.map(article => (
-            <div key={article.id} className="post-list-item">
-              <div className="post-list-item-container">
-                <Link to={`/${article.id}`}>
-                  <div className="item-label">
-                    <div className="item-title">
-                      <a>{article.title}</a>
-                    </div>
-                    <div className="item-meta clearfix">
-                      <div
-                        className={`item-meta-ico bg-ico-${getRandomBgIco()}`}
-                        style={{
-                          background: 'url(/images/bg-ico.png) no-repeat',
-                          backgroundSize: '40px auto'
-                        }}
-                      />
-                      <div className="item-meta-date">
-                        <i className="fa fa-clock-o" aria-hidden="true"></i>
-                        {article.publishTime || article.createTime}
+          {loading ? (
+            <div className="list-loading">
+              <FontAwesomeIcon icon={faSpinner} spin />
+              {/*<span> 加载中...</span>*/}
+            </div>
+          ) : (
+            articles.map(article => (
+              <div key={article.id} className="post-list-item">
+                <div className="post-list-item-container">
+                  <Link to={`/${article.id}`}>
+                    <div className="item-label">
+                      <div className="item-title">
+                        <a>{article.title}</a>
+                      </div>
+                      <div className="item-meta clearfix">
+                        <div className="item-meta-date">
+                          <i className="fa fa-clock-o" aria-hidden="true"></i>
+                          {article.publishTime || article.createTime}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
 

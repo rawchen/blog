@@ -58,7 +58,7 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public PageResult<ArticleVO> getArticleList(Long current, Long size, Long categoryId, Long tagId, String keyword) {
         Page<Article> page = new Page<>(current, size);
-        
+
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Article::getStatus, 1) // 已发布
                 .orderByDesc(Article::getIsTop)
@@ -69,6 +69,26 @@ public class ArticleServiceImpl implements ArticleService {
             wrapper.eq(Article::getCategoryId, categoryId);
         }
 
+        // 标签筛选（通过关联表查询文章ID）
+        if (tagId != null) {
+            List<ArticleTag> articleTags = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>()
+                    .eq(ArticleTag::getTagId, tagId));
+            if (!CollectionUtils.isEmpty(articleTags)) {
+                List<Long> articleIds = articleTags.stream()
+                        .map(ArticleTag::getArticleId)
+                        .collect(Collectors.toList());
+                wrapper.in(Article::getId, articleIds);
+            } else {
+                // 该标签下没有文章，返回空结果
+                return PageResult.of(new Page<ArticleVO>()
+                        .setRecords(new ArrayList<>())
+                        .setCurrent(current)
+                        .setSize(size)
+                        .setTotal(0L)
+                        .setPages(0L));
+            }
+        }
+
         // 关键词搜索
         if (StringUtils.hasText(keyword)) {
             wrapper.and(w -> w.like(Article::getTitle, keyword)
@@ -77,7 +97,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
-        
+
         // 转换为VO
         List<ArticleVO> voList = articlePage.getRecords().stream()
                 .map(this::convertToVO)

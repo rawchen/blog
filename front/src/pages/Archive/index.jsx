@@ -53,7 +53,6 @@ function Archive() {
       {/* Header */}
       <div className="archive-header">
         <h1>文章归档</h1>
-        <p>共 {articles.length} 篇文章</p>
       </div>
 
       {/* Stats */}

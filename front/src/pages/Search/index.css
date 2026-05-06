@@ -101,7 +101,7 @@
 
 .tag-cloud-item {
   display: inline-block;
-  padding: 6px 16px;
+  padding: 0 15px;
   font-size: 13px;
   font-weight: 500;
   color: #fff;
@@ -139,6 +139,10 @@
   transform: scale(1.05);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   color: #fff;
+}
+
+.tag-cloud-item:first-child::before {
+  content: none;
 }
 
 .tag-cloud-item::before {
@@ -218,10 +222,10 @@
 
 .post-list-item-container .item-label .item-title a {
   color: #313131;
-  display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  /*display: block;*/
+  /*overflow: hidden;*/
+  /*white-space: nowrap;*/
+  /*text-overflow: ellipsis;*/
 }
 
 .post-list-item-container .item-label .item-title a:hover {
