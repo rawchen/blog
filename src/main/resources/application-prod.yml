@@ -14,6 +14,26 @@ spring:
       max-lifetime: 1800000
       connection-test-query: SELECT 1
 
+# 阿里云OSS配置
+aliyun:
+  oss:
+    enabled: false
+    access-key-id: xxx
+    access-key-secret: xxx
+    role-arn: acs:ram::xxx:role/xxx
+    endpoint: oss-cn-xxx.aliyuncs.com
+    bucket-name: xxx
+    custom-domain:
+    sts-expiration: 3600
+    upload-folder: blog
+
+# DeepSeek AI配置
+deepseek:
+  enabled: false
+  api-key: ${DEEPSEEK_API_KEY}
+  base-url: https://api.deepseek.com
+  chat-model: deepseek-v4-flash
+
 # 生产环境关闭Swagger
 springfox:
   documentation:

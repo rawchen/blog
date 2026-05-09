@@ -1,9 +1,9 @@
 package com.rawchen.blog.controller;
 
 import cn.hutool.json.JSONUtil;
-import com.rawchen.blog.common.Constants;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.common.R;
+import com.rawchen.blog.config.DeepseekConfig;
 import com.rawchen.blog.dto.ArticleDTO;
 import com.rawchen.blog.entity.Article;
 import com.rawchen.blog.entity.ArticleVersion;
@@ -43,6 +43,9 @@ public class ArticleController {
 
     @Autowired
     private ArticleService articleService;
+
+    @Autowired
+    private DeepseekConfig deepseekConfig;
 
     @ApiOperation("分页查询文章列表（前台）")
     @PostMapping("/article-list")
@@ -249,7 +252,7 @@ public class ArticleController {
             userMsg.put("content", "请为以下文章生成一个摘要：\n\n" + truncatedContent);
             messages.add(userMsg);
 
-            URL url = new URL(Constants.DEEPSEEK_BASE_URL + "/chat/completions");
+            URL url = new URL(deepseekConfig.getBaseUrl() + "/chat/completions");
             HttpURLConnection conn = null;
             InputStream inputStream = null;
 
@@ -257,14 +260,14 @@ public class ArticleController {
                 conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
-                conn.setRequestProperty("Authorization", "Bearer " + Constants.DEEPSEEK_API_KEY);
+                conn.setRequestProperty("Authorization", "Bearer " + deepseekConfig.getApiKey());
                 conn.setDoOutput(true);
                 conn.setDoInput(true);
                 conn.setConnectTimeout(30000);
                 conn.setReadTimeout(60000);
 
                 Map<String, Object> body = new HashMap<>();
-                body.put("model", Constants.DEEPSEEK_CHAT_MODEL);
+                body.put("model", deepseekConfig.getChatModel());
                 body.put("messages", messages);
                 body.put("stream", false);
                 body.put("temperature", 0.7);
