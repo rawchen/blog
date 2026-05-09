@@ -24,11 +24,17 @@ import java.util.UUID;
 @Service
 public class UploadServiceImpl implements UploadService {
 
-    @Value("${upload.path:./uploads}")
+    // 上传路径，使用工作目录（jar包所在目录）
     private String uploadPath;
 
     @Value("${upload.url-prefix:/uploads}")
     private String urlPrefix;
+
+    @Value("${upload.path:uploads}")
+    public void setUploadPath(String path) {
+        // 使用工作目录作为基础路径
+        this.uploadPath = System.getProperty("user.dir") + "/" + path;
+    }
 
     // 允许的图片类型
     private static final List<String> ALLOWED_IMAGE_TYPES = Arrays.asList(

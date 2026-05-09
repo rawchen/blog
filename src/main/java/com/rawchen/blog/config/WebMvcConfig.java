@@ -16,11 +16,16 @@ import org.springframework.web.servlet.resource.PathResourceResolver;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Value("${upload.path:./uploads}")
     private String uploadPath;
 
     @Value("${upload.url-prefix:/uploads}")
     private String urlPrefix;
+
+    @Value("${upload.path:uploads}")
+    public void setUploadPath(String path) {
+        // 使用工作目录作为基础路径
+        this.uploadPath = System.getProperty("user.dir") + "/" + path;
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
