@@ -250,3 +250,26 @@
     overflow: auto;
   }
 }
+
+/* Fancybox 查看原图按钮样式 */
+.f-button__view-original {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.f-button__view-original:hover {
+  opacity: 1;
+}
+
+.f-button__view-original svg {
+  width: 20px;
+  height: 20px;
+}

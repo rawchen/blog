@@ -13,6 +13,7 @@ import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-json'
 import 'prismjs/components/prism-css'
 import 'prismjs/components/prism-markup'
+import useFancybox from '../../hooks/useFancybox'
 import './index.css'
 
 // 代码块组件
@@ -47,6 +48,12 @@ function CodeBlock({ className, children }) {
 }
 
 function MarkdownRenderer({ content, className = '' }) {
+  const [fancyboxRef] = useFancybox({
+    Thumbs: {
+      type: 'classic',
+    },
+  });
+
   // 生成目录数据
   const tocItems = useMemo(() => {
     if (!content) return []
@@ -97,15 +104,11 @@ function MarkdownRenderer({ content, className = '' }) {
         <a href={href} {...props}>{children}</a>
       )
     },
-    // 图片点击放大
+    // 图片点击放大（使用 fancybox）
     img: ({ src, alt, ...props }) => (
-      <img
-        src={src}
-        alt={alt}
-        {...props}
-        onClick={() => window.open(src, '_blank')}
-        style={{ cursor: 'pointer' }}
-      />
+      <a data-fancybox="article-gallery" href={src}>
+        <img src={src} alt={alt} {...props} />
+      </a>
     ),
     // pre 直接返回 children，避免嵌套
     pre: ({ children }) => children,
@@ -127,7 +130,7 @@ function MarkdownRenderer({ content, className = '' }) {
   if (!content) return null
 
   return (
-    <div className={`markdown-body ${className}`}>
+    <div ref={fancyboxRef} className={`markdown-body ${className}`}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw]}

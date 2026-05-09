@@ -54,7 +54,7 @@
       var toast = document.createElement('div');
       toast.className = 'global-toast';
       toast.textContent = message;
-      toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.6);padding:10px 20px;background:rgba(0,0,0,0.6);color:#fff;border-radius:2px;font-size:14px;z-index:99999;transition:transform 0.3s,opacity 0.3s;opacity:0;';
+      toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.6);padding:10px 20px;background:rgba(0,0,0,0.6);color:#fff;border-radius:2px;font-size:14px;z-index:2147483647;transition:transform 0.3s,opacity 0.3s;opacity:0;';
       document.body.appendChild(toast);
       setTimeout(function() { toast.style.transform = 'translate(-50%,-50%) scale(1)'; toast.style.opacity = '1'; }, 10);
       setTimeout(function() { toast.style.transform = 'translate(-50%,-50%) scale(0.6)'; toast.style.opacity = '0.6'; setTimeout(function() { toast.remove(); }, 300); }, 3000);
