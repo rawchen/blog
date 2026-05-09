@@ -5,9 +5,14 @@ export function getFriendLinkList() {
   return request({ url: '/friend-link/list', method: 'get' })
 }
 
+// 申请友链(前台)
+export function applyFriendLink(data) {
+  return request({ url: '/friend-link/apply', method: 'post', data })
+}
+
 // 后台管理接口
-export function getFriendLinkListAdmin(params) {
-  return request({ url: '/friend-link/admin/list', method: 'get', params })
+export function getFriendLinkPage(params) {
+  return request({ url: '/friend-link/admin/page', method: 'get', params })
 }
 
 export function getFriendLinkDetail(id) {
@@ -26,15 +31,11 @@ export function deleteFriendLink(id) {
   return request({ url: `/friend-link/admin/${id}`, method: 'delete' })
 }
 
-export function updateFriendLinkSort(data) {
-  return request({ url: '/friend-link/admin/sort', method: 'put', data })
+export function auditFriendLink(id, status) {
+  return request({ url: `/friend-link/admin/${id}/audit`, method: 'put', params: { status } })
 }
 
 // 检测友链状态
 export function checkFriendLinkStatus(id) {
-  return request({ url: `/friend-link/admin/check/${id}`, method: 'get' })
-}
-
-export function batchCheckFriendLinkStatus(ids) {
-  return request({ url: '/friend-link/admin/batch-check', method: 'post', data: { ids } })
+  return request({ url: `/friend-link/admin/check/${id}`, method: 'post' })
 }

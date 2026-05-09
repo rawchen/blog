@@ -1,5 +1,6 @@
 package com.rawchen.blog.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.dto.FriendLinkDTO;
 import com.rawchen.blog.entity.FriendLink;
@@ -33,32 +34,40 @@ public class FriendLinkController {
         return R.ok(friendLinkService.getFriendLinkList());
     }
 
+    @ApiOperation("申请友链（前台）")
+    @PostMapping("/apply")
+    public R<Long> applyFriendLink(@Valid @RequestBody FriendLinkDTO dto) {
+        return R.ok(friendLinkService.applyFriendLink(dto));
+    }
+
     // ========== 后台管理接口 ==========
 
-    @ApiOperation("获取友链列表（后台）")
-    @GetMapping("/admin/list")
-    @PreAuthorize("hasAuthority('content:friendlink:query')")
-    public R<List<FriendLinkVO>> getFriendLinkListAdmin() {
-        return R.ok(friendLinkService.getFriendLinkListAdmin());
+    @ApiOperation("获取友链分页列表（后台）")
+    @GetMapping("/admin/page")
+    @PreAuthorize("hasAuthority('content:friendLink')")
+    public R<Page<FriendLinkVO>> getFriendLinkPage(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return R.ok(friendLinkService.getFriendLinkPage(page, size));
     }
 
     @ApiOperation("根据ID获取友链")
     @GetMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:friendlink:query')")
+    @PreAuthorize("hasAuthority('content:friendLink')")
     public R<FriendLink> getFriendLinkById(@PathVariable Long id) {
         return R.ok(friendLinkService.getFriendLinkById(id));
     }
 
     @ApiOperation("添加友链")
     @PostMapping("/admin")
-    @PreAuthorize("hasAuthority('content:friendlink:add')")
+    @PreAuthorize("hasAuthority('content:friendLink')")
     public R<Long> addFriendLink(@Valid @RequestBody FriendLinkDTO dto) {
         return R.ok(friendLinkService.addFriendLink(dto));
     }
 
     @ApiOperation("更新友链")
     @PutMapping("/admin")
-    @PreAuthorize("hasAuthority('content:friendlink:edit')")
+    @PreAuthorize("hasAuthority('content:friendLink')")
     public R<Void> updateFriendLink(@Valid @RequestBody FriendLinkDTO dto) {
         friendLinkService.updateFriendLink(dto);
         return R.ok();
@@ -66,15 +75,23 @@ public class FriendLinkController {
 
     @ApiOperation("删除友链")
     @DeleteMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:friendlink:delete')")
+    @PreAuthorize("hasAuthority('content:friendLink')")
     public R<Void> deleteFriendLink(@PathVariable Long id) {
         friendLinkService.deleteFriendLink(id);
         return R.ok();
     }
 
+    @ApiOperation("审核友链")
+    @PutMapping("/admin/{id}/audit")
+    @PreAuthorize("hasAuthority('content:friendLink')")
+    public R<Void> auditFriendLink(@PathVariable Long id, @RequestParam Integer status) {
+        friendLinkService.auditFriendLink(id, status);
+        return R.ok();
+    }
+
     @ApiOperation("检测友链状态")
     @PostMapping("/admin/check/{id}")
-    @PreAuthorize("hasAuthority('content:friendlink:query')")
+    @PreAuthorize("hasAuthority('content:friendLink')")
     public R<Void> checkFriendLinkStatus(@PathVariable Long id) {
         friendLinkService.checkFriendLinkStatus(id);
         return R.ok();

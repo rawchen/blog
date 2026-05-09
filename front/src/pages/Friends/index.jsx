@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import { getFriendLinkList } from '../../api/friendLink'
+import { Modal, Form, Input, message } from 'antd'
+import { getFriendLinkList, applyFriendLink } from '../../api/friendLink'
 import './index.css'
 
 function FriendsPage() {
   const [friends, setFriends] = useState([])
   const [loading, setLoading] = useState(true)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [form] = Form.useForm()
   const siteConfig = useSelector(state => state.siteConfig.data) || {}
 
   useEffect(() => {
@@ -23,6 +27,25 @@ function FriendsPage() {
       console.error('加载友链失败', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleApply = () => {
+    form.resetFields()
+    setModalVisible(true)
+  }
+
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields()
+      setSubmitting(true)
+      await applyFriendLink(values)
+      message.success('申请已提交，请等待审核')
+      setModalVisible(false)
+    } catch (error) {
+      // error handled
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -92,13 +115,54 @@ function FriendsPage() {
           <br />
           3. 网站有一定的原创内容
         </p>
-        <a
-          className="apply-btn"
-          href={`mailto:${siteConfig.email || 'admin@rawchen.com'}?subject=申请友链`}
-        >
+        <button className="apply-btn" onClick={handleApply}>
           发送申请
-        </a>
+        </button>
       </div>
+
+      {/* Apply Modal */}
+      <Modal
+        title="申请友链"
+        open={modalVisible}
+        onOk={handleSubmit}
+        onCancel={() => setModalVisible(false)}
+        confirmLoading={submitting}
+        okText="提交申请"
+        cancelText="取消"
+      >
+        <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
+          <Form.Item
+            label="网站名称"
+            name="siteName"
+            rules={[{ required: true, message: '请输入网站名称' }]}
+          >
+            <Input placeholder="请输入网站名称" maxLength={50} />
+          </Form.Item>
+          <Form.Item
+            label="网站地址"
+            name="siteUrl"
+            rules={[
+              { required: true, message: '请输入网站地址' },
+              { pattern: /^https?:\/\/.*/, message: '请输入有效的网址' }
+            ]}
+          >
+            <Input placeholder="https://example.com" />
+          </Form.Item>
+          <Form.Item
+            label="图标链接"
+            name="logo"
+            rules={[{ required: true, message: '请输入图标链接' }]}
+          >
+            <Input placeholder="网站Logo图标链接" />
+          </Form.Item>
+          <Form.Item
+            label="网站描述"
+            name="description"
+          >
+            <Input.TextArea rows={3} placeholder="网站简介（选填）" maxLength={200} />
+          </Form.Item>
+        </Form>
+      </Modal>
     </div>
   )
 }

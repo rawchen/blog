@@ -25,6 +25,7 @@ import CategoryList from './pages/admin/Category'
 import TagList from './pages/admin/Tag'
 import CommentList from './pages/admin/Comment'
 import UserList from './pages/admin/User'
+import FriendLinkList from './pages/admin/FriendLink'
 import Setting from './pages/admin/Setting'
 
 // 路由守卫
@@ -76,6 +77,7 @@ function App() {
         <Route path="category" element={<CategoryList />} />
         <Route path="tag" element={<TagList />} />
         <Route path="comment" element={<CommentList />} />
+        <Route path="friend-link" element={<FriendLinkList />} />
         <Route path="user" element={<UserList />} />
         <Route path="setting" element={<Setting />} />
       </Route>

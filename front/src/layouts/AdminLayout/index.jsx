@@ -9,6 +9,7 @@ import {
   TagsOutlined,
   CommentOutlined,
   UserOutlined,
+  LinkOutlined,
   SettingOutlined,
   LogoutOutlined
 } from '@ant-design/icons'
@@ -33,6 +34,7 @@ function AdminLayout() {
     { key: '/admin/category', icon: <FolderOutlined />, label: '分类管理' },
     { key: '/admin/tag', icon: <TagsOutlined />, label: '标签管理' },
     { key: '/admin/comment', icon: <CommentOutlined />, label: '评论管理' },
+    { key: '/admin/friend-link', icon: <LinkOutlined />, label: '友链管理' },
     { key: '/admin/user', icon: <UserOutlined />, label: '用户管理' },
     { key: '/admin/setting', icon: <SettingOutlined />, label: '网站设置' }
   ]

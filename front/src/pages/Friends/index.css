@@ -1,10 +1,10 @@
 /* Friends Page Styles (友链) */
 .friends-page {
-  background-color: #fff;
+  background-color: #f9f9f9;
   box-shadow: 0 0 55px 0 rgb(0 0 0 / 3%);
   max-width: 970px;
   margin: 0 auto;
-  padding: 30px 25px 20px;
+  padding: 100px 25px 20px;
 }
 
 .friends-header {

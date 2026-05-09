@@ -1,5 +1,6 @@
 package com.rawchen.blog.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rawchen.blog.dto.FriendLinkDTO;
 import com.rawchen.blog.entity.FriendLink;
 import com.rawchen.blog.vo.FriendLinkVO;
@@ -19,9 +20,9 @@ public interface FriendLinkService {
     List<FriendLinkVO> getFriendLinkList();
 
     /**
-     * 获取友链列表（后台）
+     * 获取友链分页列表（后台）
      */
-    List<FriendLinkVO> getFriendLinkListAdmin();
+    Page<FriendLinkVO> getFriendLinkPage(int page, int size);
 
     /**
      * 根据ID获取友链
@@ -32,6 +33,11 @@ public interface FriendLinkService {
      * 添加友链
      */
     Long addFriendLink(FriendLinkDTO dto);
+
+    /**
+     * 申请友链（前台）
+     */
+    Long applyFriendLink(FriendLinkDTO dto);
 
     /**
      * 更新友链
@@ -47,4 +53,9 @@ public interface FriendLinkService {
      * 检测友链状态
      */
     void checkFriendLinkStatus(Long id);
+
+    /**
+     * 审核友链
+     */
+    void auditFriendLink(Long id, Integer status);
 }
