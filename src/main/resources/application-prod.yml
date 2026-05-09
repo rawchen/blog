@@ -17,7 +17,6 @@ spring:
 # 阿里云OSS配置
 aliyun:
   oss:
-    enabled: false
     access-key-id: xxx
     access-key-secret: xxx
     role-arn: acs:ram::xxx:role/xxx
@@ -29,7 +28,6 @@ aliyun:
 
 # DeepSeek AI配置
 deepseek:
-  enabled: false
   api-key: ${DEEPSEEK_API_KEY}
   base-url: https://api.deepseek.com
   chat-model: deepseek-v4-flash

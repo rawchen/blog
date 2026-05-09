@@ -16,11 +16,6 @@ import org.springframework.stereotype.Component;
 public class DeepseekConfig {
 
     /**
-     * 是否启用
-     */
-    private Boolean enabled;
-
-    /**
      * API Key
      */
     private String apiKey;

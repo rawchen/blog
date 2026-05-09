@@ -16,11 +16,6 @@ import org.springframework.stereotype.Component;
 public class OssConfig {
 
     /**
-     * 是否启用
-     */
-    private Boolean enabled;
-
-    /**
      * 主账号AccessKey ID
      */
     private String accessKeyId;

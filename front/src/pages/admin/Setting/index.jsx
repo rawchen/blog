@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Form, Input, Button, message, Spin, Card } from 'antd'
+import { Form, Input, Button, message, Spin, Card, Switch } from 'antd'
 import { getSiteConfig, updateConfigs } from '../../../api/config'
 
 // 字段映射：驼峰 -> 下划线
@@ -21,7 +21,9 @@ const camelToSnake = {
   wechatQrcode: 'wechat_qrcode',
   qqNumber: 'qq_number',
   statsUrl: 'stats_url',
-  trackingCode: 'tracking_code'
+  trackingCode: 'tracking_code',
+  ossEnabled: 'oss_enabled',
+  ossStyle: 'oss_style'
 }
 
 // 字段映射：下划线 -> 驼峰
@@ -32,6 +34,7 @@ const snakeToCamel = Object.fromEntries(
 function Setting() {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [ossEnabled, setOssEnabled] = useState(true)
   const [form] = Form.useForm()
 
   useEffect(() => {
@@ -46,9 +49,15 @@ function Setting() {
         // 驼峰转下划线填充表单
         const formValues = {}
         Object.entries(camelToSnake).forEach(([camelKey, snakeKey]) => {
-          formValues[snakeKey] = res.data[camelKey] || ''
+          let value = res.data[camelKey]
+          // oss_enabled 特殊处理为布尔值
+          if (camelKey === 'ossEnabled') {
+            value = value === true || value === 'true'
+          }
+          formValues[snakeKey] = value ?? ''
         })
         form.setFieldsValue(formValues)
+        setOssEnabled(formValues['oss_enabled'])
       }
     } catch (e) {
       console.error('加载配置失败', e)
@@ -61,6 +70,10 @@ function Setting() {
     setSaving(true)
     try {
       const values = await form.validateFields()
+      // 处理 oss_enabled 布尔值转字符串
+      if (values.oss_enabled !== undefined) {
+        values.oss_enabled = String(values.oss_enabled)
+      }
       // 直接发送下划线格式
       const configs = Object.entries(values)
         .filter(([_, v]) => v !== undefined && v !== '')
@@ -72,7 +85,12 @@ function Setting() {
       Object.entries(values).forEach(([key, value]) => {
         const camelKey = snakeToCamel[key]
         if (camelKey) {
-          cacheData[camelKey] = value
+          // ossEnabled 保持布尔值
+          if (camelKey === 'ossEnabled') {
+            cacheData[camelKey] = value === 'true'
+          } else {
+            cacheData[camelKey] = value
+          }
         }
       })
       localStorage.setItem('site_config', JSON.stringify(cacheData))
@@ -147,6 +165,13 @@ function Setting() {
           </Form.Item>
           <Form.Item label="跟踪代码" name="tracking_code">
             <Input.TextArea rows={3} placeholder='跟踪脚本代码，如：<script async defer src="https://umami.example.com/umami.js"></script>' />
+          </Form.Item>
+
+          <Form.Item label="开启OSS上传" name="oss_enabled" valuePropName="checked">
+            <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setOssEnabled(checked)} />
+          </Form.Item>
+          <Form.Item label="OSS图片处理样式" name="oss_style" style={{ display: ossEnabled ? 'block' : 'none' }}>
+            <Input placeholder="如：?x-oss-process=style/small" />
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 4, span: 16 }}>

@@ -13,6 +13,7 @@ import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
 import 'highlight.js/styles/monokai-sublime.min.css'
 import { getStsToken } from '../../api/oss'
+import { uploadImageLocal } from '../../api/config'
 import './index.css'
 
 // 动态导入 ali-oss
@@ -54,7 +55,7 @@ function MarkdownEditor({
   }, [mode])
 
   // 上传文件到OSS
-  const uploadToOSS = async (file) => {
+  const uploadToOSS = async (file, ossStyle) => {
     try {
       const OSSClient = await loadOSS()
       const res = await getStsToken()
@@ -89,11 +90,44 @@ function MarkdownEditor({
       } else {
         url = result.url || `https://${stsToken.bucketName}.${stsToken.endpoint}/${objectKey}`
       }
+      // 拼接OSS样式
+      if (ossStyle) {
+        url = url + ossStyle
+      }
       return { url, altText: `${randomStr}.${fileExt}` }
     } catch (error) {
       console.error('上传文件失败:', error)
       throw error
     }
+  }
+
+  // 上传文件到本地服务器
+  const uploadToLocal = async (file) => {
+    try {
+      const res = await uploadImageLocal(file)
+      // res.data 是相对路径如 /uploads/images/2025/05/09/xxx.png
+      // 需要拼接当前域名
+      const baseUrl = window.location.origin
+      const url = baseUrl + res.data
+      const fileName = res.data.split('/').pop()
+      return { url, altText: fileName }
+    } catch (error) {
+      console.error('本地上传失败:', error)
+      throw error
+    }
+  }
+
+  // 获取站点配置
+  const getSiteConfigCache = () => {
+    try {
+      const config = localStorage.getItem('site_config')
+      if (config) {
+        return JSON.parse(config)
+      }
+    } catch (e) {
+      console.error('获取站点配置失败', e)
+    }
+    return { ossEnabled: true, ossStyle: '' }
   }
 
   // 插入Markdown图片语法
@@ -124,8 +158,14 @@ function MarkdownEditor({
 
     setUploading(true)
     try {
-      const { url, altText } = await uploadToOSS(file)
-      insertImage(url, altText)
+      const siteConfig = getSiteConfigCache()
+      let result
+      if (siteConfig.ossEnabled === true || siteConfig.ossEnabled === 'true') {
+        result = await uploadToOSS(file, siteConfig.ossStyle || '')
+      } else {
+        result = await uploadToLocal(file)
+      }
+      insertImage(result.url, result.altText)
       message.success('图片上传成功')
     } catch (error) {
       message.error('图片上传失败: ' + error.message)

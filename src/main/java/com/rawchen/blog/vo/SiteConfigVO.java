@@ -103,4 +103,14 @@ public class SiteConfigVO implements Serializable {
      * 跟踪代码
      */
     private String trackingCode;
+
+    /**
+     * 是否开启OSS
+     */
+    private Boolean ossEnabled;
+
+    /**
+     * OSS图片处理样式
+     */
+    private String ossStyle;
 }
