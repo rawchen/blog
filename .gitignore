@@ -11,6 +11,7 @@ target/
 
 /log/
 /src/main/resources/static
+/uploads/
 
 ### Deployment ###
 /id_rsa.pem
