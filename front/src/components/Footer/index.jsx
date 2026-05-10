@@ -288,12 +288,13 @@ function Footer() {
                 recentComments.map(comment => (
                   <li key={comment.id}>
                     <Link to={`/${comment.articleId}`}>
-                      <span className="comment-author">{comment.nickname}:</span>
-                      <span className="comment-content">
-                        {comment.content.length > 30
-                          ? comment.content.substring(0, 30) + '...'
-                          : comment.content}
-                      </span>
+                      {comment.nickname} : {comment.content}
+                      {/*<span className="comment-author">{comment.nickname}:</span>*/}
+                      {/*<span className="comment-content">*/}
+                      {/*  {comment.content.length > 30*/}
+                      {/*    ? comment.content.substring(0, 30) + '...'*/}
+                      {/*    : comment.content}*/}
+                      {/*</span>*/}
                     </Link>
                   </li>
                 ))

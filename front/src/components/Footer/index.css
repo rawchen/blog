@@ -243,6 +243,11 @@
   color: #5f5f5f;
 }
 
+.footer-meta .meta-comments li a:hover {
+  border-bottom: 3px solid #cdcdcd;
+  color: black;
+}
+
 .footer-icon {
   font-size: 23px;
   transition: all 0.2s ease-in-out;

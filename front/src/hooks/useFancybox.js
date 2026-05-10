@@ -58,6 +58,7 @@ export default function useFancybox(options = {}) {
       currentOssStyle = getOssStyle();
 
       const fancyboxOptions = {
+        hideScrollbar: false,
         Carousel: {
           Thumbs: {
             type: 'classic',

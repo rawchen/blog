@@ -106,8 +106,8 @@ function MarkdownRenderer({ content, className = '' }) {
     },
     // 图片点击放大（使用 fancybox）
     img: ({ src, alt, ...props }) => (
-      <a data-fancybox="article-gallery" href={src}>
-        <img src={src} alt={alt} {...props} />
+      <a data-fancybox="article-gallery" draggable="false" href={src}>
+        <img src={src} alt={alt} draggable="false" {...props} />
       </a>
     ),
     // pre 直接返回 children，避免嵌套

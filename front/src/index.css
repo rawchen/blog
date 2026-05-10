@@ -5,7 +5,13 @@
 }
 
 html {
+  overflow-y: scroll;
   scrollbar-gutter: stable;
+}
+
+/* 小尺寸按钮字体 */
+.ant-btn-sm {
+  font-size: 12px;
 }
 
 body {

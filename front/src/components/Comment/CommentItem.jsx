@@ -74,7 +74,7 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain }) {
               ) : (
                 displayName
               )}
-              {isAuthor && <span style={{ color: '#eb5055', marginLeft: 5 }}>作者</span>}
+              {isAuthor && <span style={{ color: '#eb5055', marginLeft: 5 }}></span>}
             </span>
           </div>
           <div className="comment-content">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Button, Tag, message, Popconfirm } from 'antd'
+import { StopOutlined, PlayCircleOutlined, KeyOutlined } from '@ant-design/icons'
 import { getUserList, updateUserStatus, resetPassword } from '../../../api/user'
 
 function UserList() {
@@ -63,14 +64,16 @@ function UserList() {
       width: 200,
       render: (_, record) => (
         <>
-          <Button 
-            type="link" 
+          <Button
+            type="primary"
+            size="small"
+            icon={record.status === 1 ? <StopOutlined /> : <PlayCircleOutlined />}
             onClick={() => handleStatus(record.id, record.status === 1 ? 0 : 1)}
           >
             {record.status === 1 ? '禁用' : '启用'}
           </Button>
           <Popconfirm title="确定要重置密码吗?" onConfirm={() => handleResetPassword(record.id)}>
-            <Button type="link">重置密码</Button>
+            <Button type="primary" size="small" icon={<KeyOutlined />}>重置密码</Button>
           </Popconfirm>
         </>
       )

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Button, Tag, message, Popconfirm } from 'antd'
+import { CheckOutlined, CloseOutlined, DeleteOutlined } from '@ant-design/icons'
 import { getCommentListAdmin, auditComment, deleteComment } from '../../../api/comment'
 
 function CommentList() {
@@ -61,17 +62,17 @@ function CommentList() {
     { title: '时间', dataIndex: 'createTime', width: 180 },
     {
       title: '操作',
-      width: 200,
+      width: 220,
       render: (_, record) => (
         <>
           {record.status === 0 && (
             <>
-              <Button type="link" onClick={() => handleAudit(record.id, 1)}>通过</Button>
-              <Button type="link" danger onClick={() => handleAudit(record.id, 2)}>拒绝</Button>
+              <Button type="primary" size="small" icon={<CheckOutlined />} onClick={() => handleAudit(record.id, 1)}>通过</Button>
+              <Button type="primary" size="small" danger icon={<CloseOutlined />} onClick={() => handleAudit(record.id, 2)}>拒绝</Button>
             </>
           )}
           <Popconfirm title="确定要删除吗?" onConfirm={() => handleDelete(record.id)}>
-            <Button type="link" danger>删除</Button>
+            <Button type="primary" size="small" danger icon={<DeleteOutlined />}>删除</Button>
           </Popconfirm>
         </>
       )

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Button, Space, Tag, message, Popconfirm, Switch, Image } from 'antd'
+import { Table, Button, Space, Tag, message, Popconfirm, Switch, Image, Tooltip } from 'antd'
+import { ExportOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { getArticleListAdmin, deleteArticle, updateTopStatus, updateRecommendStatus } from '../../../api/article'
 
@@ -88,7 +89,7 @@ function ArticleList() {
     {
       title: '状态',
       dataIndex: 'status',
-      width: 80,
+      width: 50,
       render: (status) => {
         const statusMap = { 0: '草稿', 1: '已发布', 2: '回收站' }
         const colorMap = { 0: 'default', 1: 'success', 2: 'error' }
@@ -98,7 +99,7 @@ function ArticleList() {
     {
       title: '置顶',
       dataIndex: 'isTop',
-      width: 70,
+      width: 50,
       render: (isTop, record) => (
         <Switch
           checked={isTop === 1}
@@ -117,17 +118,25 @@ function ArticleList() {
         />
       )
     },
-    { title: '创建时间', dataIndex: 'createTime', width: 160 },
+    { title: '创建时间', dataIndex: 'createTime', width: 100 },
     {
       title: '操作',
-      width: 140,
+      width: 200,
       render: (_, record) => (
         <Space>
-          <Button type="link" onClick={() => navigate(`/admin/article/edit/${record.id}`)}>
+          <Tooltip title="在新窗口查看文章">
+            <Button
+              type="primary"
+              size="small"
+              icon={<ExportOutlined />}
+              onClick={() => window.open(`/${record.id}`, '_blank')}
+            />
+          </Tooltip>
+          <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => navigate(`/admin/article/edit/${record.id}`)}>
             编辑
           </Button>
           <Popconfirm title="确定要删除吗?" onConfirm={() => handleDelete(record.id)}>
-            <Button type="link" danger>删除</Button>
+            <Button type="primary" size="small" danger icon={<DeleteOutlined />}>删除</Button>
           </Popconfirm>
         </Space>
       )

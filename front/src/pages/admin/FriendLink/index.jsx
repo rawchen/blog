@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Button, Modal, Form, Input, Select, message, Tag, Popconfirm, Space } from 'antd'
+import { CheckOutlined, CloseOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { getFriendLinkPage, createFriendLink, updateFriendLink, deleteFriendLink, auditFriendLink } from '../../../api/friendLink'
 
 const statusMap = {
@@ -124,18 +125,18 @@ function FriendLinkList() {
     },
     {
       title: '操作',
-      width: 200,
+      width: 240,
       render: (_, record) => (
         <Space size="small">
           {record.status === 0 && (
             <>
-              <Button type="link" size="small" onClick={() => handleAudit(record.id, 1)}>通过</Button>
-              <Button type="link" size="small" danger onClick={() => handleAudit(record.id, 2)}>拒绝</Button>
+              <Button type="primary" size="small" icon={<CheckOutlined />} onClick={() => handleAudit(record.id, 1)}>通过</Button>
+              <Button type="primary" size="small" danger icon={<CloseOutlined />} onClick={() => handleAudit(record.id, 2)}>拒绝</Button>
             </>
           )}
-          <Button type="link" size="small" onClick={() => handleEdit(record)}>编辑</Button>
+          <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>编辑</Button>
           <Popconfirm title="确定要删除吗?" onConfirm={() => handleDelete(record.id)}>
-            <Button type="link" size="small" danger>删除</Button>
+            <Button type="primary" size="small" danger icon={<DeleteOutlined />}>删除</Button>
           </Popconfirm>
         </Space>
       )
