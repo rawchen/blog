@@ -41,7 +41,7 @@ body {
   pointer-events: none;
 }
 
-blockquote, dl, ol, p, pre, table, ul {
+blockquote, dl, ol, p, pre, ul {
   margin: 20px 0;
   vertical-align: baseline;
 }

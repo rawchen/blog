@@ -110,3 +110,13 @@ export function uploadArticleImage(file) {
 export function generateSummary(content) {
   return request({ url: '/article/admin/ai/summary', method: 'post', data: { content } })
 }
+
+// 更新文章置顶状态
+export function updateTopStatus(id, isTop) {
+  return request({ url: `/article/admin/${id}/top`, method: 'put', params: { isTop } })
+}
+
+// 更新文章推荐状态
+export function updateRecommendStatus(id, isRecommend) {
+  return request({ url: `/article/admin/${id}/recommend`, method: 'put', params: { isRecommend } })
+}

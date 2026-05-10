@@ -650,6 +650,28 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public void updateTopStatus(Long id, Integer isTop) {
+        Article article = articleMapper.selectById(id);
+        if (article == null) {
+            throw new BusinessException(ResultCode.ARTICLE_NOT_FOUND);
+        }
+        article.setIsTop(isTop);
+        articleMapper.updateById(article);
+        log.info("更新文章置顶状态: id={}, isTop={}", id, isTop);
+    }
+
+    @Override
+    public void updateRecommendStatus(Long id, Integer isRecommend) {
+        Article article = articleMapper.selectById(id);
+        if (article == null) {
+            throw new BusinessException(ResultCode.ARTICLE_NOT_FOUND);
+        }
+        article.setIsRecommend(isRecommend);
+        articleMapper.updateById(article);
+        log.info("更新文章推荐状态: id={}, isRecommend={}", id, isRecommend);
+    }
+
+    @Override
     public void saveArticleVersion(Article article, Long authorId) {
         if (!StringUtils.hasText(article.getContent())) {
             return;

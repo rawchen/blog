@@ -69,7 +69,7 @@ function App() {
           </PrivateRoute>
         }
       >
-        <Route index element={<Navigate to="/admin/dashboard" replace />} />
+        <Route index element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="article/list" element={<ArticleList />} />
         <Route path="article/add" element={<ArticleEdit />} />

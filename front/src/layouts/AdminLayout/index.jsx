@@ -1,17 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Layout, Menu, Dropdown, Avatar, message } from 'antd'
 import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   DashboardOutlined,
-  FileTextOutlined,
   FolderOutlined,
   TagsOutlined,
   CommentOutlined,
   UserOutlined,
   LinkOutlined,
   SettingOutlined,
-  LogoutOutlined
+  LogoutOutlined,
+  EditOutlined,
+  OrderedListOutlined,
+  BookOutlined
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -29,8 +31,16 @@ function AdminLayout() {
   const { userInfo } = useSelector(state => state.auth)
 
   const menuItems = [
-    { key: '/admin/dashboard', icon: <DashboardOutlined />, label: '仪表盘' },
-    { key: '/admin/article/list', icon: <FileTextOutlined />, label: '文章管理' },
+    { key: '/admin', icon: <DashboardOutlined />, label: '仪表盘' },
+    {
+      key: 'blog',
+      icon: <BookOutlined />,
+      label: '博客管理',
+      children: [
+        { key: '/admin/article/add', icon: <EditOutlined />, label: '写文章' },
+        { key: '/admin/article/list', icon: <OrderedListOutlined />, label: '文章管理' }
+      ]
+    },
     { key: '/admin/category', icon: <FolderOutlined />, label: '分类管理' },
     { key: '/admin/tag', icon: <TagsOutlined />, label: '标签管理' },
     { key: '/admin/comment', icon: <CommentOutlined />, label: '评论管理' },
@@ -38,6 +48,29 @@ function AdminLayout() {
     { key: '/admin/user', icon: <UserOutlined />, label: '用户管理' },
     { key: '/admin/setting', icon: <SettingOutlined />, label: '网站设置' }
   ]
+
+  // 获取当前选中的菜单key
+  const selectedKey = useMemo(() => {
+    const path = location.pathname
+    // 仪表盘
+    if (path === '/admin' || path === '/admin/dashboard') {
+      return '/admin'
+    }
+    // 编辑文章时选中文章管理
+    if (path.startsWith('/admin/article/edit/')) {
+      return '/admin/article/list'
+    }
+    return path
+  }, [location.pathname])
+
+  // 获取展开的子菜单keys
+  const openKeys = useMemo(() => {
+    const path = location.pathname
+    if (path.startsWith('/admin/article')) {
+      return ['blog']
+    }
+    return []
+  }, [location.pathname])
 
   const handleMenuClick = ({ key }) => navigate(key)
 
@@ -68,7 +101,8 @@ function AdminLayout() {
         <Menu
           theme="dark"
           mode="inline"
-          selectedKeys={[location.pathname]}
+          selectedKeys={[selectedKey]}
+          defaultOpenKeys={openKeys}
           items={menuItems}
           onClick={handleMenuClick}
         />

@@ -27,9 +27,9 @@
 }
 
 .admin-content {
-  /*margin: 24px;*/
-  padding: 24px;
-  /*background: #fff;*/
+  margin: 15px;
+  padding: 16px;
+  background: #fff;
   border-radius: 8px;
   overflow: auto;
 }

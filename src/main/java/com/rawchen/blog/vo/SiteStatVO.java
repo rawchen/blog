@@ -35,6 +35,11 @@ public class SiteStatVO implements Serializable {
     private Long tagCount;
 
     /**
+     * 用户总数
+     */
+    private Long userCount;
+
+    /**
      * 总浏览量
      */
     private Long totalViewCount;

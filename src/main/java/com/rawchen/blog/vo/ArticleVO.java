@@ -103,6 +103,11 @@ public class ArticleVO implements Serializable {
     private Integer allowComment;
 
     /**
+     * 状态 0-草稿 1-发布 2-回收站
+     */
+    private Integer status;
+
+    /**
      * 发布时间
      */
     private LocalDateTime publishTime;

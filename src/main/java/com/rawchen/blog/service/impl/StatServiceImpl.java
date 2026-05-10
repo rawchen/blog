@@ -3,6 +3,7 @@ package com.rawchen.blog.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.rawchen.blog.entity.Article;
 import com.rawchen.blog.entity.SiteStat;
+import com.rawchen.blog.entity.User;
 import com.rawchen.blog.mapper.*;
 import com.rawchen.blog.service.StatService;
 import com.rawchen.blog.vo.SiteStatVO;
@@ -40,6 +41,9 @@ public class StatServiceImpl implements StatService {
     @Autowired
     private SiteStatMapper siteStatMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @Override
     public SiteStatVO getSiteStat() {
         SiteStatVO vo = new SiteStatVO();
@@ -60,6 +64,10 @@ public class StatServiceImpl implements StatService {
         // 标签总数
         Long tagCount = tagMapper.selectCount(null);
         vo.setTagCount(tagCount);
+
+        // 用户总数
+        Long userCount = userMapper.selectCount(null);
+        vo.setUserCount(userCount);
 
         // 总浏览量
         Long totalViewCount = articleMapper.selectList(new LambdaQueryWrapper<Article>()

@@ -132,4 +132,14 @@ public interface ArticleService {
      * 保存文章版本
      */
     void saveArticleVersion(Article article, Long authorId);
+
+    /**
+     * 更新文章置顶状态
+     */
+    void updateTopStatus(Long id, Integer isTop);
+
+    /**
+     * 更新文章推荐状态
+     */
+    void updateRecommendStatus(Long id, Integer isRecommend);
 }

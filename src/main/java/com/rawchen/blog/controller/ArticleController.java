@@ -212,6 +212,22 @@ public class ArticleController {
         return R.ok();
     }
 
+    @ApiOperation("更新文章置顶状态")
+    @PutMapping("/admin/{id}/top")
+    @PreAuthorize("hasAuthority('content:article:edit')")
+    public R<Void> updateTopStatus(@PathVariable Long id, @RequestParam Integer isTop) {
+        articleService.updateTopStatus(id, isTop);
+        return R.ok();
+    }
+
+    @ApiOperation("更新文章推荐状态")
+    @PutMapping("/admin/{id}/recommend")
+    @PreAuthorize("hasAuthority('content:article:edit')")
+    public R<Void> updateRecommendStatus(@PathVariable Long id, @RequestParam Integer isRecommend) {
+        articleService.updateRecommendStatus(id, isRecommend);
+        return R.ok();
+    }
+
     @ApiOperation("AI生成文章摘要")
     @PostMapping("/admin/ai/summary")
     @PreAuthorize("hasAuthority('content:article:add')")
