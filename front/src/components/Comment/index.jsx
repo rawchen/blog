@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 import CommentItem from './CommentItem'
 import CommentForm from './CommentForm'
 import { getCommentList, submitComment } from '../../api/comment'
@@ -11,6 +12,8 @@ function CommentList({ articleId }) {
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const pageSize = 10
+  const siteConfig = useSelector(state => state.siteConfig.data) || {}
+  const gravatarDomain = siteConfig.gravatarDomain
 
   useEffect(() => {
     if (articleId) {
@@ -137,6 +140,7 @@ function CommentList({ articleId }) {
                   comment={comment}
                   onReply={handleReply}
                   depth={1}
+                  gravatarDomain={gravatarDomain}
                 />
               ))}
             </ol>

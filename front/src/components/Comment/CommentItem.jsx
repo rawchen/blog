@@ -3,9 +3,10 @@ import Md5 from 'md5'
 import './index.css'
 
 // 获取头像URL
-const getAvatarUrl = (email) => {
+const getAvatarUrl = (email, domain) => {
   const hash = email ? Md5(email.toLowerCase()) : 'default'
-  return `https://weavatar.com/avatar/${hash}?d=mp&s=80`
+  const gravatarDomain = domain || 'weavatar.com'
+  return `https://${gravatarDomain}/avatar/${hash}?d=mp`
 }
 
 // 格式化时间
@@ -25,7 +26,7 @@ const formatTime = (time) => {
   return date.toLocaleDateString('zh-CN')
 }
 
-function CommentItem({ comment, onReply, depth = 1 }) {
+function CommentItem({ comment, onReply, depth = 1, gravatarDomain }) {
   const {
     id,
     nickname,
@@ -42,7 +43,7 @@ function CommentItem({ comment, onReply, depth = 1 }) {
   } = comment
 
   const displayName = nickname || author || '游客'
-  const displayAvatar = avatar || getAvatarUrl(email)
+  const displayAvatar = avatar || getAvatarUrl(email, gravatarDomain)
   const isAuthor = userId && userId !== 0 // 文章作者
 
   const commentClass = [
@@ -118,6 +119,7 @@ function CommentItem({ comment, onReply, depth = 1 }) {
                 comment={child}
                 onReply={onReply}
                 depth={depth + 1}
+                gravatarDomain={gravatarDomain}
               />
             ))}
           </ol>

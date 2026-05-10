@@ -49,6 +49,7 @@ public class ConfigServiceImpl implements ConfigService {
     private static final String KEY_TRACKING_CODE = "tracking_code";
     private static final String KEY_OSS_ENABLED = "oss_enabled";
     private static final String KEY_OSS_STYLE = "oss_style";
+    private static final String KEY_GRAVATAR_DOMAIN = "gravatar_domain";
 
     @Override
     public SiteConfigVO getSiteConfig() {
@@ -74,6 +75,7 @@ public class ConfigServiceImpl implements ConfigService {
         vo.setTrackingCode(getConfigByKey(KEY_TRACKING_CODE));
         vo.setOssEnabled(Boolean.parseBoolean(getConfigByKey(KEY_OSS_ENABLED, "true")));
         vo.setOssStyle(getConfigByKey(KEY_OSS_STYLE));
+        vo.setGravatarDomain(getConfigByKey(KEY_GRAVATAR_DOMAIN));
 
         return vo;
     }

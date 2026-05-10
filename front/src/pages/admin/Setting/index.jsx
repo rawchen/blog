@@ -23,7 +23,8 @@ const camelToSnake = {
   statsUrl: 'stats_url',
   trackingCode: 'tracking_code',
   ossEnabled: 'oss_enabled',
-  ossStyle: 'oss_style'
+  ossStyle: 'oss_style',
+  gravatarDomain: 'gravatar_domain'
 }
 
 // 字段映射：下划线 -> 驼峰
@@ -172,6 +173,10 @@ function Setting() {
           </Form.Item>
           <Form.Item label="OSS图片处理样式" name="oss_style" style={{ display: ossEnabled ? 'block' : 'none' }}>
             <Input placeholder="如：?x-oss-process=style/small" />
+          </Form.Item>
+
+          <Form.Item label="Gravatar头像域名" name="gravatar_domain">
+            <Input placeholder="如：weavatar.com，为空则默认使用weavatar.com" />
           </Form.Item>
 
           <Form.Item wrapperCol={{ offset: 4, span: 16 }}>

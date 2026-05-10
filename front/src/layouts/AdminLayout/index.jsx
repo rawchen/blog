@@ -19,9 +19,17 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearAuth } from '../../store/modules/auth'
 import { logout } from '../../api/auth'
+import Md5 from 'md5'
 import './index.css'
 
 const { Header, Sider, Content } = Layout
+
+// 获取头像URL
+const getAvatarUrl = (email, domain) => {
+  const hash = email ? Md5(email.toLowerCase()) : 'default'
+  const gravatarDomain = domain || 'weavatar.com'
+  return `https://${gravatarDomain}/avatar/${hash}?d=mp`
+}
 
 function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false)
@@ -29,6 +37,11 @@ function AdminLayout() {
   const location = useLocation()
   const dispatch = useDispatch()
   const { userInfo } = useSelector(state => state.auth)
+  const siteConfig = useSelector(state => state.siteConfig.data) || {}
+  const gravatarDomain = siteConfig.gravatarDomain
+
+  // 获取用户头像，优先使用用户设置的头像，否则使用邮箱生成
+  const userAvatar = userInfo?.avatar || (userInfo?.email ? getAvatarUrl(userInfo.email, gravatarDomain) : null)
 
   const menuItems = [
     { key: '/admin', icon: <DashboardOutlined />, label: '仪表盘' },
@@ -116,7 +129,7 @@ function AdminLayout() {
           <div className="user-info">
             <Dropdown menu={{ items: userMenuItems }}>
               <div style={{ cursor: 'pointer' }}>
-                <Avatar icon={<UserOutlined />} src={userInfo?.avatar} />
+                <Avatar icon={<UserOutlined />} src={userAvatar} />
                 <span style={{ marginLeft: 8 }}>{userInfo?.nickname || userInfo?.username}</span>
               </div>
             </Dropdown>
