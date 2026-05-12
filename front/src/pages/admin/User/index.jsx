@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Button, Tag, message, Popconfirm } from 'antd'
+import { Table, Button, Tag, message, Popconfirm, Space } from 'antd'
 import { StopOutlined, PlayCircleOutlined, KeyOutlined } from '@ant-design/icons'
 import { getUserList, updateUserStatus, resetPassword } from '../../../api/user'
 
@@ -63,7 +63,7 @@ function UserList() {
       title: '操作',
       width: 200,
       render: (_, record) => (
-        <>
+        <Space>
           <Button
             type="primary"
             size="small"
@@ -75,7 +75,7 @@ function UserList() {
           <Popconfirm title="确定要重置密码吗?" onConfirm={() => handleResetPassword(record.id)}>
             <Button type="primary" size="small" icon={<KeyOutlined />}>重置密码</Button>
           </Popconfirm>
-        </>
+        </Space>
       )
     }
   ]

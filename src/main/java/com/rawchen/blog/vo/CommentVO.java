@@ -40,6 +40,8 @@ public class CommentVO implements Serializable {
 
     private String ipAddress;
 
+    private String userAgent;
+
     private Integer likeCount;
 
     private Integer status;

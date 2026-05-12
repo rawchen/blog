@@ -57,4 +57,14 @@ public class CommentDTO implements Serializable {
     @NotBlank(message = "评论内容不能为空")
     @Size(min = 1, max = 1000, message = "评论内容长度必须在1-1000个字符之间")
     private String content;
+
+    /**
+     * IP地址
+     */
+    private String ipAddress;
+
+    /**
+     * 用户代理
+     */
+    private String userAgent;
 }

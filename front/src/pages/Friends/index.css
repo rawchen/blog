@@ -170,6 +170,7 @@
 }
 
 .apply-btn {
+  cursor: pointer;
   display: inline-block;
   padding: 10px 30px;
   background: linear-gradient(to right, #fa7a46, #ff5656);

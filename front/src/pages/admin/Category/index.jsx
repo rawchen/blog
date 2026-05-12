@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Button, Modal, Form, Input, message, Popconfirm } from 'antd'
+import { Table, Button, Modal, Form, Input, message, Popconfirm, Space } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { getCategoryList, createCategory, updateCategory, deleteCategory } from '../../../api/category'
 
@@ -73,12 +73,12 @@ function CategoryList() {
       title: '操作',
       width: 180,
       render: (_, record) => (
-        <>
+        <Space>
           <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>编辑</Button>
           <Popconfirm title="确定要删除吗?" onConfirm={() => handleDelete(record.id)}>
             <Button type="primary" size="small" danger icon={<DeleteOutlined />}>删除</Button>
           </Popconfirm>
-        </>
+        </Space>
       )
     }
   ]

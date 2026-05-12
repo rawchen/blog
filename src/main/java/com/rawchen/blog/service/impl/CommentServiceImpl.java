@@ -11,6 +11,7 @@ import com.rawchen.blog.entity.User;
 import com.rawchen.blog.mapper.CommentMapper;
 import com.rawchen.blog.mapper.UserMapper;
 import com.rawchen.blog.service.CommentService;
+import com.rawchen.blog.service.ConfigService;
 import com.rawchen.blog.vo.CommentVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -41,34 +42,85 @@ public class CommentServiceImpl implements CommentService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private ConfigService configService;
+
+    @Autowired
+    private HttpServletRequest request;
+
+    /**
+     * 获取客户端IP地址
+     */
+    private String getClientIp() {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        // 多个代理时取第一个IP
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
+        }
+        return ip;
+    }
+
     @Override
     public PageResult<CommentVO> getCommentList(Long articleId, Long current, Long size) {
+        // 查询顶级评论（分页）
         Page<Comment> page = new Page<>(current, size);
 
         LambdaQueryWrapper<Comment> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Comment::getArticleId, articleId)
                 .eq(Comment::getStatus, 1)
-                .eq(Comment::getParentId, 0) // 只查询父评论
+                .eq(Comment::getParentId, 0)
                 .orderByDesc(Comment::getCreateTime);
 
         Page<Comment> commentPage = commentMapper.selectPage(page, wrapper);
 
-        // 转换为VO
+        // 一次性查出该文章所有已审核的非顶级评论
+        List<Comment> allReplies = commentMapper.selectList(new LambdaQueryWrapper<Comment>()
+                .eq(Comment::getArticleId, articleId)
+                .eq(Comment::getStatus, 1)
+                .ne(Comment::getParentId, 0)
+                .orderByAsc(Comment::getCreateTime));
+
+        // 构建id到VO的映射
+        Map<Long, CommentVO> allVoMap = allReplies.stream()
+                .map(this::convertToVO)
+                .collect(Collectors.toMap(CommentVO::getId, v -> v));
+
+        // 转换顶级评论并构建映射
         List<CommentVO> voList = commentPage.getRecords().stream()
                 .map(this::convertToVO)
                 .collect(Collectors.toList());
+        Map<Long, CommentVO> rootVoMap = voList.stream()
+                .collect(Collectors.toMap(CommentVO::getId, v -> v));
 
-        // 查询子评论
-        for (CommentVO vo : voList) {
-            List<Comment> children = commentMapper.selectList(new LambdaQueryWrapper<Comment>()
-                    .eq(Comment::getParentId, vo.getId())
-                    .eq(Comment::getStatus, 1)
-                    .orderByAsc(Comment::getCreateTime));
+        // 合并到总映射
+        allVoMap.putAll(rootVoMap);
 
-            List<CommentVO> childVOs = children.stream()
-                    .map(this::convertToVO)
-                    .collect(Collectors.toList());
-            vo.setChildren(childVOs);
+        // 构建树形结构：将每个评论添加到其父评论的children中
+        for (CommentVO vo : allVoMap.values()) {
+            if (vo.getParentId() != null && vo.getParentId() != 0) {
+                CommentVO parent = allVoMap.get(vo.getParentId());
+                if (parent != null) {
+                    if (parent.getChildren() == null) {
+                        parent.setChildren(new ArrayList<>());
+                    }
+                    parent.getChildren().add(vo);
+                }
+            }
         }
 
         return PageResult.of(new Page<CommentVO>()
@@ -124,8 +176,14 @@ public class CommentServiceImpl implements CommentService {
         // 过滤HTML标签
         comment.setContent(HtmlUtil.cleanHtmlTag(commentDTO.getContent()));
 
-        // 默认待审核
-        comment.setStatus(0);
+        // 设置IP地址和User-Agent
+        comment.setIpAddress(getClientIp());
+        comment.setUserAgent(request.getHeader("User-Agent"));
+
+        // 根据配置决定是否需要审核
+        String commentEnabled = configService.getConfigByKey("comment_enabled", "false");
+        boolean needAudit = "true".equalsIgnoreCase(commentEnabled) || "1".equals(commentEnabled);
+        comment.setStatus(needAudit ? 0 : 1);
         comment.setLikeCount(0);
 
         commentMapper.insert(comment);
@@ -176,8 +234,14 @@ public class CommentServiceImpl implements CommentService {
         // 过滤HTML标签
         comment.setContent(HtmlUtil.cleanHtmlTag(commentDTO.getContent()));
 
-        // 默认待审核
-        comment.setStatus(0);
+        // 设置IP地址和User-Agent
+        comment.setIpAddress(getClientIp());
+        comment.setUserAgent(request.getHeader("User-Agent"));
+
+        // 根据配置决定是否需要审核
+        String commentEnabled = configService.getConfigByKey("comment_enabled", "false");
+        boolean needAudit = "true".equalsIgnoreCase(commentEnabled) || "1".equals(commentEnabled);
+        comment.setStatus(needAudit ? 0 : 1);
         comment.setLikeCount(0);
 
         commentMapper.insert(comment);

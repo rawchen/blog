@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import './index.css'
 
-function CommentForm({ onSubmit, replyTo, getBrowserInfo }) {
+function CommentForm({ onSubmit, replyTo, getUserAgent }) {
   const [form, setForm] = useState({
     nickname: '',
     email: '',
@@ -39,10 +39,10 @@ function CommentForm({ onSubmit, replyTo, getBrowserInfo }) {
 
     setSubmitting(true)
     try {
-      const browserInfo = getBrowserInfo()
+      const userAgent = getUserAgent()
       const data = {
         ...form,
-        ...browserInfo
+        userAgent
       }
 
       // 保存用户信息

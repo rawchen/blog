@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Form, Input, Button, message, Spin, Card, Switch } from 'antd'
+import { Form, Input, Button, message, Spin, Card, Switch, Row, Col } from 'antd'
 import { getSiteConfig, updateConfigs } from '../../../api/config'
 
 // 字段映射：驼峰 -> 下划线
@@ -24,7 +24,8 @@ const camelToSnake = {
   trackingCode: 'tracking_code',
   ossEnabled: 'oss_enabled',
   ossStyle: 'oss_style',
-  gravatarDomain: 'gravatar_domain'
+  gravatarDomain: 'gravatar_domain',
+  commentEnabled: 'comment_enabled'
 }
 
 // 字段映射：下划线 -> 驼峰
@@ -36,6 +37,7 @@ function Setting() {
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [ossEnabled, setOssEnabled] = useState(true)
+  const [commentEnabled, setCommentEnabled] = useState(false)
   const [form] = Form.useForm()
 
   useEffect(() => {
@@ -51,14 +53,15 @@ function Setting() {
         const formValues = {}
         Object.entries(camelToSnake).forEach(([camelKey, snakeKey]) => {
           let value = res.data[camelKey]
-          // oss_enabled 特殊处理为布尔值
-          if (camelKey === 'ossEnabled') {
+          // 布尔值字段特殊处理
+          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled') {
             value = value === true || value === 'true'
           }
           formValues[snakeKey] = value ?? ''
         })
         form.setFieldsValue(formValues)
         setOssEnabled(formValues['oss_enabled'])
+        setCommentEnabled(formValues['comment_enabled'])
       }
     } catch (e) {
       console.error('加载配置失败', e)
@@ -71,9 +74,12 @@ function Setting() {
     setSaving(true)
     try {
       const values = await form.validateFields()
-      // 处理 oss_enabled 布尔值转字符串
+      // 处理布尔值字段转字符串
       if (values.oss_enabled !== undefined) {
         values.oss_enabled = String(values.oss_enabled)
+      }
+      if (values.comment_enabled !== undefined) {
+        values.comment_enabled = String(values.comment_enabled)
       }
       // 直接发送下划线格式
       const configs = Object.entries(values)
@@ -86,8 +92,8 @@ function Setting() {
       Object.entries(values).forEach(([key, value]) => {
         const camelKey = snakeToCamel[key]
         if (camelKey) {
-          // ossEnabled 保持布尔值
-          if (camelKey === 'ossEnabled') {
+          // 布尔值字段保持布尔值
+          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled') {
             cacheData[camelKey] = value === 'true'
           } else {
             cacheData[camelKey] = value
@@ -103,90 +109,96 @@ function Setting() {
   }
 
   return (
-    <Card title="网站设置">
+    <Form
+      form={form}
+      labelCol={{ span: 6 }}
+      wrapperCol={{ span: 18 }}
+      onFinish={handleSave}
+    >
       <Spin spinning={loading}>
-        <Form
-          form={form}
-          labelCol={{ span: 4 }}
-          wrapperCol={{ span: 16 }}
-          onFinish={handleSave}
-        >
-          <Form.Item label="站点名称" name="site_name">
-            <Input placeholder="请输入站点名称" />
-          </Form.Item>
-          <Form.Item label="站点描述" name="site_description">
-            <Input.TextArea rows={2} placeholder="请输入站点描述" />
-          </Form.Item>
-          <Form.Item label="站点关键词" name="site_keywords">
-            <Input placeholder="多个关键词用逗号分隔" />
-          </Form.Item>
-          <Form.Item label="站点Logo" name="site_logo">
-            <Input placeholder="Logo图片URL" />
-          </Form.Item>
-          <Form.Item label="页脚Logo" name="site_footer_logo">
-            <Input placeholder="页脚Logo图片URL" />
-          </Form.Item>
-          <Form.Item label="站点Favicon" name="site_favicon">
-            <Input placeholder="Favicon图标URL" />
-          </Form.Item>
-          <Form.Item label="页脚信息" name="footer_info">
-            <Input.TextArea rows={2} placeholder="页脚显示的额外信息" />
-          </Form.Item>
-          <Form.Item label="备案号" name="site_icp">
-            <Input placeholder="如：粤ICP备12345678号" />
-          </Form.Item>
-
-          <Form.Item label="GitHub链接" name="github_url">
-            <Input placeholder="GitHub主页URL" />
-          </Form.Item>
-          <Form.Item label="电报链接" name="telegram_url">
-            <Input placeholder="Telegram链接URL" />
-          </Form.Item>
-          <Form.Item label="微博链接" name="weibo_url">
-            <Input placeholder="微博主页URL" />
-          </Form.Item>
-          <Form.Item label="知乎链接" name="zhihu_url">
-            <Input placeholder="知乎主页URL" />
-          </Form.Item>
-          <Form.Item label="推特链接" name="twitter_url">
-            <Input placeholder="Twitter主页URL" />
-          </Form.Item>
-          <Form.Item label="邮箱" name="email">
-            <Input placeholder="联系邮箱" />
-          </Form.Item>
-          <Form.Item label="微信二维码" name="wechat_qrcode">
-            <Input placeholder="微信二维码图片URL" />
-          </Form.Item>
-          <Form.Item label="QQ号" name="qq_number">
-            <Input placeholder="QQ号码" />
-          </Form.Item>
-
-          <Form.Item label="统计链接" name="stats_url">
-            <Input placeholder="统计查看链接，如 https://umami.example.com" />
-          </Form.Item>
-          <Form.Item label="跟踪代码" name="tracking_code">
-            <Input.TextArea rows={3} placeholder='跟踪脚本代码，如：<script async defer src="https://umami.example.com/umami.js"></script>' />
-          </Form.Item>
-
-          <Form.Item label="开启OSS上传" name="oss_enabled" valuePropName="checked">
-            <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setOssEnabled(checked)} />
-          </Form.Item>
-          <Form.Item label="OSS图片处理样式" name="oss_style" style={{ display: ossEnabled ? 'block' : 'none' }}>
-            <Input placeholder="如：?x-oss-process=style/small" />
-          </Form.Item>
-
-          <Form.Item label="Gravatar头像域名" name="gravatar_domain">
-            <Input placeholder="如：weavatar.com，为空则默认使用weavatar.com" />
-          </Form.Item>
-
-          <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-            <Button type="primary" htmlType="submit" loading={saving}>
-              保存设置
-            </Button>
-          </Form.Item>
-        </Form>
+        <Row gutter={24}>
+          <Col span={12}>
+            <Card title="网站基础设置">
+              <Form.Item label="站点名称" name="site_name">
+                <Input placeholder="请输入站点名称" />
+              </Form.Item>
+              <Form.Item label="站点描述" name="site_description">
+                <Input.TextArea rows={2} placeholder="请输入站点描述" />
+              </Form.Item>
+              <Form.Item label="站点关键词" name="site_keywords">
+                <Input placeholder="多个关键词用逗号分隔" />
+              </Form.Item>
+              <Form.Item label="站点Logo" name="site_logo">
+                <Input placeholder="Logo图片URL" />
+              </Form.Item>
+              <Form.Item label="页脚Logo" name="site_footer_logo">
+                <Input placeholder="页脚Logo图片URL" />
+              </Form.Item>
+              <Form.Item label="站点Favicon" name="site_favicon">
+                <Input placeholder="Favicon图标URL" />
+              </Form.Item>
+              <Form.Item label="页脚信息" name="footer_info">
+                <Input.TextArea rows={2} placeholder="页脚显示的额外信息" />
+              </Form.Item>
+              <Form.Item label="备案号" name="site_icp">
+                <Input placeholder="如：粤ICP备12345678号" />
+              </Form.Item>
+              <Form.Item label="GitHub链接" name="github_url">
+                <Input placeholder="GitHub主页URL" />
+              </Form.Item>
+              <Form.Item label="电报链接" name="telegram_url">
+                <Input placeholder="Telegram链接URL" />
+              </Form.Item>
+              <Form.Item label="微博链接" name="weibo_url">
+                <Input placeholder="微博主页URL" />
+              </Form.Item>
+              <Form.Item label="知乎链接" name="zhihu_url">
+                <Input placeholder="知乎主页URL" />
+              </Form.Item>
+              <Form.Item label="推特链接" name="twitter_url">
+                <Input placeholder="Twitter主页URL" />
+              </Form.Item>
+              <Form.Item label="邮箱" name="email">
+                <Input placeholder="联系邮箱" />
+              </Form.Item>
+              <Form.Item label="微信二维码" name="wechat_qrcode">
+                <Input placeholder="微信二维码图片URL" />
+              </Form.Item>
+              <Form.Item label="QQ号" name="qq_number">
+                <Input placeholder="QQ号码" />
+              </Form.Item>
+            </Card>
+          </Col>
+          <Col span={12}>
+            <Card title="系统设置">
+              <Form.Item label="统计链接" name="stats_url">
+                <Input placeholder="统计查看链接，如 https://umami.example.com" />
+              </Form.Item>
+              <Form.Item label="跟踪代码" name="tracking_code">
+                <Input.TextArea rows={3} placeholder='跟踪脚本代码，如：<script async defer src="https://umami.example.com/umami.js"></script>' />
+              </Form.Item>
+              <Form.Item label="开启OSS上传" name="oss_enabled" valuePropName="checked">
+                <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setOssEnabled(checked)} />
+              </Form.Item>
+              <Form.Item label="OSS图片处理样式" name="oss_style" style={{ display: ossEnabled ? 'block' : 'none' }}>
+                <Input placeholder="如：?x-oss-process=style/small" />
+              </Form.Item>
+              <Form.Item label="Gravatar头像域名" name="gravatar_domain">
+                <Input placeholder="如：weavatar.com，为空则默认使用weavatar.com" />
+              </Form.Item>
+              <Form.Item label="开启评论审核" name="comment_enabled" valuePropName="checked">
+                <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setCommentEnabled(checked)} />
+              </Form.Item>
+            </Card>
+          </Col>
+        </Row>
+        <div style={{ marginTop: 24, textAlign: 'center' }}>
+          <Button type="primary" htmlType="submit" loading={saving}>
+            保存设置
+          </Button>
+        </div>
       </Spin>
-    </Card>
+    </Form>
   )
 }
 

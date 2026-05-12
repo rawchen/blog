@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { message } from 'antd'
 import CommentItem from './CommentItem'
 import CommentForm from './CommentForm'
 import { getCommentList, submitComment } from '../../api/comment'
@@ -24,35 +25,12 @@ function CommentList({ articleId }) {
   const fetchComments = async () => {
     try {
       const res = await getCommentList(articleId, { current: page, size: pageSize })
-      // 将扁平列表转换为树形结构
-      const treeData = buildTree(res.data?.records || [])
-      setComments(treeData)
+      // 后端已返回树形结构，直接使用
+      setComments(res.data?.records || [])
       setTotal(res.data?.total || 0)
     } finally {
       setLoading(false)
     }
-  }
-
-  // 构建树形结构
-  const buildTree = (items) => {
-    const map = {}
-    const roots = []
-
-    // 先建立id到item的映射
-    items.forEach(item => {
-      map[item.id] = { ...item, children: [] }
-    })
-
-    // 构建树
-    items.forEach(item => {
-      if (item.parentId && item.parentId !== 0 && map[item.parentId]) {
-        map[item.parentId].children.push(map[item.id])
-      } else {
-        roots.push(map[item.id])
-      }
-    })
-
-    return roots
   }
 
   const handleSubmit = async (data) => {
@@ -65,8 +43,10 @@ function CommentList({ articleId }) {
       })
       setReplyTo(null)
       fetchComments()
+      message.success('发送评论成功')
       return true
     } catch (error) {
+      message.error('发送评论失败')
       return false
     }
   }
@@ -81,28 +61,9 @@ function CommentList({ articleId }) {
     setReplyTo(null)
   }
 
-  // 获取浏览器和操作系统信息
-  const getBrowserInfo = () => {
-    const ua = navigator.userAgent
-    let browser = 'Unknown'
-    let os = 'Unknown'
-
-    // 检测操作系统
-    if (ua.includes('Windows NT 10')) os = 'Windows 11'
-    else if (ua.includes('Windows')) os = 'Windows'
-    else if (ua.includes('Mac')) os = 'macOS'
-    else if (ua.includes('Linux')) os = 'Linux'
-    else if (ua.includes('Android')) os = 'Android'
-    else if (ua.includes('iPhone') || ua.includes('iPad')) os = 'iOS'
-
-    // 检测浏览器
-    if (ua.includes('Chrome') && !ua.includes('Edg')) browser = 'Chrome'
-    else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari'
-    else if (ua.includes('Firefox')) browser = 'Firefox'
-    else if (ua.includes('Edg')) browser = 'Edge'
-    else if (ua.includes('Opera') || ua.includes('OPR')) browser = 'Opera'
-
-    return { browser, os, agent: ua }
+  // 获取用户代理信息
+  const getUserAgent = () => {
+    return navigator.userAgent
   }
 
   if (loading) return null
@@ -126,7 +87,7 @@ function CommentList({ articleId }) {
           <CommentForm
             onSubmit={handleSubmit}
             replyTo={replyTo}
-            getBrowserInfo={getBrowserInfo}
+            getUserAgent={getUserAgent}
           />
         </div>
 
