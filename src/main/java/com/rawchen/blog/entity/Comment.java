@@ -72,21 +72,6 @@ public class Comment extends BaseEntity {
     private String userAgent;
 
     /**
-     * 浏览器代理
-     */
-    private String agent;
-
-    /**
-     * 操作系统
-     */
-    private String os;
-
-    /**
-     * 浏览器
-     */
-    private String browser;
-
-    /**
      * 点赞数
      */
     private Integer likeCount;
