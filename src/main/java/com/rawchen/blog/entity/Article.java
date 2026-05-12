@@ -102,4 +102,23 @@ public class Article extends BaseEntity {
      * 发布时间
      */
     private LocalDateTime publishTime;
+
+    /**
+     * 文章类型: post-文章, about-关于, friend-友链, music-音乐, down-下载, search-搜索, archive-分类
+     */
+    @TableField("type")
+    private ArticleType type = ArticleType.POST;
+
+    /**
+     * 文章类型枚举
+     */
+    public enum ArticleType {
+        POST,       // 文章
+        ABOUT,      // 关于
+        FRIEND,     // 友链
+        MUSIC,      // 音乐
+        DOWN,       // 下载
+        SEARCH,     // 搜索
+        ARCHIVE     // 分类
+    }
 }

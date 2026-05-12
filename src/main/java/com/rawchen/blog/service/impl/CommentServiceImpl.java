@@ -169,7 +169,6 @@ public class CommentServiceImpl implements CommentService {
                 comment.setUserId(user.getId());
                 comment.setNickname(user.getNickname());
                 comment.setEmail(user.getEmail());
-                comment.setAvatar(user.getAvatar());
             }
         }
 
@@ -227,7 +226,6 @@ public class CommentServiceImpl implements CommentService {
                 comment.setUserId(user.getId());
                 comment.setNickname(user.getNickname());
                 comment.setEmail(user.getEmail());
-                comment.setAvatar(user.getAvatar());
             }
         }
 

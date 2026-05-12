@@ -52,11 +52,6 @@ public class Comment extends BaseEntity {
     private String website;
 
     /**
-     * 头像
-     */
-    private String avatar;
-
-    /**
      * 评论内容
      */
     private String content;
