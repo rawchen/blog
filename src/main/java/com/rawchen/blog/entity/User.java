@@ -2,8 +2,8 @@ package com.rawchen.blog.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -13,16 +13,11 @@ import java.time.LocalDateTime;
  * @author RawChen
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("sys_user")
-public class User implements Serializable {
+public class User extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * 用户ID
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
 
     /**
      * 用户名
@@ -75,20 +70,15 @@ public class User implements Serializable {
     private Integer status;
 
     /**
-     * 是否删除 0-否 1-是
+     * 角色: ADMIN-超管, STAFF-管理员
      */
-    @TableLogic
-    private Integer isDeleted;
+    @TableField("role")
+    private UserRole role = UserRole.STAFF;
 
     /**
-     * 创建时间
+     * 用户角色枚举
      */
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
+    public enum UserRole {
+        ADMIN, STAFF
+    }
 }

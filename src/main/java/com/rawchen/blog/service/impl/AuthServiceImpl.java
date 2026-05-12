@@ -6,7 +6,6 @@ import com.rawchen.blog.dto.LoginDTO;
 import com.rawchen.blog.dto.RegisterDTO;
 import com.rawchen.blog.entity.User;
 import com.rawchen.blog.exception.BusinessException;
-import com.rawchen.blog.mapper.PermissionMapper;
 import com.rawchen.blog.mapper.UserMapper;
 import com.rawchen.blog.security.JwtTokenUtil;
 import com.rawchen.blog.service.AuthService;
@@ -19,13 +18,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * 认证服务实现
@@ -40,9 +35,6 @@ public class AuthServiceImpl implements AuthService {
     private UserMapper userMapper;
 
     @Autowired
-    private PermissionMapper permissionMapper;
-
-    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
@@ -51,20 +43,12 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
-
     @Override
     public LoginVO login(LoginDTO loginDTO) {
         // 认证
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword())
         );
-
-        // 生成Token
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String accessToken = jwtTokenUtil.generateAccessToken(userDetails);
-        String refreshToken = jwtTokenUtil.generateRefreshToken(userDetails);
 
         // 获取用户信息
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
@@ -74,20 +58,19 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(ResultCode.USER_DISABLED);
         }
 
+        // 生成Token
+        String token = jwtTokenUtil.generateToken(user);
+
         // 构建返回对象
         LoginVO loginVO = new LoginVO();
-        loginVO.setAccessToken(accessToken);
-        loginVO.setRefreshToken(refreshToken);
+        loginVO.setToken(token);
         loginVO.setExpiresIn(jwtTokenUtil.getExpirationSeconds());
 
         // 用户信息
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
+        userVO.setRole(user.getRole().name());
         loginVO.setUserInfo(userVO);
-
-        // 权限列表
-        List<String> permissions = permissionMapper.selectPermissionsByUserId(user.getId());
-        loginVO.setPermissions(permissions);
 
         log.info("用户登录成功: {}", user.getUsername());
         return loginVO;
@@ -121,48 +104,11 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
         user.setEmail(registerDTO.getEmail());
         user.setNickname(registerDTO.getNickname() != null ? registerDTO.getNickname() : registerDTO.getUsername());
+        user.setRole(User.UserRole.STAFF);
         user.setStatus(1);
-        
+
         userMapper.insert(user);
         log.info("用户注册成功: {}", user.getUsername());
-    }
-
-    @Override
-    public LoginVO refreshToken(String refreshToken) {
-        // 验证Refresh Token
-        if (!jwtTokenUtil.isRefreshToken(refreshToken)) {
-            throw new BusinessException(ResultCode.REFRESH_TOKEN_INVALID);
-        }
-
-        String username = jwtTokenUtil.getUsernameFromToken(refreshToken);
-        if (username == null) {
-            throw new BusinessException(ResultCode.TOKEN_INVALID);
-        }
-
-        // 查询用户
-        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, username));
-
-        if (user == null || user.getStatus() == 0) {
-            throw new BusinessException(ResultCode.USER_NOT_FOUND);
-        }
-
-        // 生成新的Token
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        String newAccessToken = jwtTokenUtil.generateAccessToken(userDetails);
-        String newRefreshToken = jwtTokenUtil.generateRefreshToken(userDetails);
-
-        // 构建返回对象
-        LoginVO loginVO = new LoginVO();
-        loginVO.setAccessToken(newAccessToken);
-        loginVO.setRefreshToken(newRefreshToken);
-        loginVO.setExpiresIn(jwtTokenUtil.getExpirationSeconds());
-
-        UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(user, userVO);
-        loginVO.setUserInfo(userVO);
-
-        return loginVO;
     }
 
     @Override
@@ -172,16 +118,11 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(ResultCode.UNAUTHORIZED);
         }
 
-        String username = authentication.getName();
-        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, username));
-
-        if (user == null) {
-            throw new BusinessException(ResultCode.USER_NOT_FOUND);
-        }
+        User user = (User) authentication.getPrincipal();
 
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(user, userVO);
+        userVO.setRole(user.getRole().name());
         return userVO;
     }
 

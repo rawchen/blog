@@ -31,7 +31,7 @@ public class UserController {
 
     @ApiOperation("分页查询用户列表")
     @GetMapping("/admin/list")
-    @PreAuthorize("hasAuthority('system:user:query')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<PageResult<User>> getUserList(
             @RequestParam(defaultValue = "1") Long current,
             @RequestParam(defaultValue = "10") Long size,
@@ -59,7 +59,7 @@ public class UserController {
 
     @ApiOperation("更新用户状态")
     @PutMapping("/admin/status/{id}")
-    @PreAuthorize("hasAuthority('system:user:edit')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> updateUserStatus(@PathVariable Long id, @RequestParam Integer status) {
         User user = userMapper.selectById(id);
         if (user == null) {
@@ -72,7 +72,7 @@ public class UserController {
 
     @ApiOperation("重置用户密码")
     @PutMapping("/admin/reset-password/{id}")
-    @PreAuthorize("hasAuthority('system:user:edit')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<String> resetPassword(@PathVariable Long id) {
         User user = userMapper.selectById(id);
         if (user == null) {
@@ -81,5 +81,22 @@ public class UserController {
         user.setPassword(passwordEncoder.encode("123456"));
         userMapper.updateById(user);
         return R.ok("密码已重置为: 123456");
+    }
+
+    @ApiOperation("更新用户角色")
+    @PutMapping("/admin/role/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public R<Void> updateUserRole(@PathVariable Long id, @RequestParam String role) {
+        User user = userMapper.selectById(id);
+        if (user == null) {
+            return R.fail("用户不存在");
+        }
+        try {
+            user.setRole(User.UserRole.valueOf(role));
+            userMapper.updateById(user);
+            return R.ok();
+        } catch (IllegalArgumentException e) {
+            return R.fail("无效的角色: " + role);
+        }
     }
 }

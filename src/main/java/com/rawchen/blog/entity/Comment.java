@@ -2,9 +2,7 @@ package com.rawchen.blog.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
 
 /**
  * 评论实体
@@ -12,16 +10,11 @@ import java.time.LocalDateTime;
  * @author RawChen
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("blog_comment")
-public class Comment implements Serializable {
+public class Comment extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * 评论ID
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
 
     /**
      * 文章ID
@@ -79,6 +72,21 @@ public class Comment implements Serializable {
     private String userAgent;
 
     /**
+     * 浏览器代理
+     */
+    private String agent;
+
+    /**
+     * 操作系统
+     */
+    private String os;
+
+    /**
+     * 浏览器
+     */
+    private String browser;
+
+    /**
      * 点赞数
      */
     private Integer likeCount;
@@ -87,22 +95,4 @@ public class Comment implements Serializable {
      * 状态 0-待审核 1-已发布 2-垃圾评论
      */
     private Integer status;
-
-    /**
-     * 是否删除 0-否 1-是
-     */
-    @TableLogic
-    private Integer isDeleted;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
 }

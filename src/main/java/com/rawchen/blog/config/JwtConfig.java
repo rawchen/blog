@@ -20,14 +20,9 @@ public class JwtConfig {
     private String secret;
 
     /**
-     * Access Token过期时间（毫秒）- 1个月
+     * Token过期时间（毫秒）- 1个月
      */
     private Long expiration = 2592000000L;
-
-    /**
-     * Refresh Token过期时间（毫秒）
-     */
-    private Long refreshExpiration = 604800000L;
 
     /**
      * Token前缀

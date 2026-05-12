@@ -1,11 +1,11 @@
 package com.rawchen.blog.security;
 
 import com.rawchen.blog.config.JwtConfig;
+import com.rawchen.blog.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -35,36 +35,38 @@ public class JwtTokenUtil {
     }
 
     /**
-     * 生成Access Token
+     * 生成Token
      */
-    public String generateAccessToken(UserDetails userDetails) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("type", "access");
-        return generateToken(claims, userDetails.getUsername(), jwtConfig.getExpiration());
+        claims.put("userId", user.getId());
+        claims.put("role", user.getRole().name());
+        return createToken(claims, user.getUsername());
     }
 
     /**
-     * 生成Refresh Token
+     * 生成Token（指定用户名和角色）
      */
-    public String generateRefreshToken(UserDetails userDetails) {
+    public String generateToken(String username, Long userId, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("type", "refresh");
-        return generateToken(claims, userDetails.getUsername(), jwtConfig.getRefreshExpiration());
+        claims.put("userId", userId);
+        claims.put("role", role);
+        return createToken(claims, username);
     }
 
     /**
      * 生成Token
      */
-    private String generateToken(Map<String, Object> claims, String subject, Long expiration) {
+    private String createToken(Map<String, Object> claims, String subject) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expiration);
+        Date expiryDate = new Date(now.getTime() + jwtConfig.getExpiration());
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
-                .signWith(secretKey, SignatureAlgorithm.HS512)
+                .claims(claims)
+                .subject(subject)
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(secretKey)
                 .compact();
     }
 
@@ -73,11 +75,7 @@ public class JwtTokenUtil {
      */
     public String getUsernameFromToken(String token) {
         try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+            Claims claims = getAllClaimsFromToken(token);
             return claims.getSubject();
         } catch (Exception e) {
             log.error("从Token获取用户名失败: {}", e.getMessage());
@@ -86,13 +84,52 @@ public class JwtTokenUtil {
     }
 
     /**
-     * 验证Token是否有效
+     * 从Token中获取用户ID
      */
-    public boolean validateToken(String token, UserDetails userDetails) {
-        String username = getUsernameFromToken(token);
-        return username != null 
-                && username.equals(userDetails.getUsername()) 
-                && !isTokenExpired(token);
+    public Long getUserIdFromToken(String token) {
+        try {
+            Claims claims = getAllClaimsFromToken(token);
+            return claims.get("userId", Long.class);
+        } catch (Exception e) {
+            log.error("从Token获取用户ID失败: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 从Token中获取角色
+     */
+    public String getRoleFromToken(String token) {
+        try {
+            Claims claims = getAllClaimsFromToken(token);
+            return claims.get("role", String.class);
+        } catch (Exception e) {
+            log.error("从Token获取角色失败: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 获取Token过期时间
+     */
+    public Date getExpirationDateFromToken(String token) {
+        try {
+            Claims claims = getAllClaimsFromToken(token);
+            return claims.getExpiration();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * 获取所有Claims
+     */
+    private Claims getAllClaimsFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     /**
@@ -100,11 +137,7 @@ public class JwtTokenUtil {
      */
     public boolean isTokenExpired(String token) {
         try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+            Claims claims = getAllClaimsFromToken(token);
             return claims.getExpiration().before(new Date());
         } catch (ExpiredJwtException e) {
             return true;
@@ -115,18 +148,17 @@ public class JwtTokenUtil {
     }
 
     /**
-     * 判断是否为Refresh Token
+     * 验证Token是否有效
      */
-    public boolean isRefreshToken(String token) {
+    public boolean validateToken(String token) {
         try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
+            Jwts.parser()
+                    .verifyWith(secretKey)
                     .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-            Object type = claims.get("type");
-            return "refresh".equals(type);
-        } catch (Exception e) {
+                    .parseSignedClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("Token验证失败: {}", e.getMessage());
             return false;
         }
     }

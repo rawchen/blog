@@ -22,8 +22,6 @@ request.interceptors.request.use(
 // 处理认证失败，跳转登录页
 const handleAuthExpired = () => {
   store.dispatch(clearAuth())
-  localStorage.removeItem('token')
-  localStorage.removeItem('refreshToken')
   window.location.href = '/admin/login'
 }
 

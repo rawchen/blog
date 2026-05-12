@@ -17,13 +17,25 @@ public class ArticleTag implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
+    /**
+     * 主键ID
+     */
+    @TableId(type = IdType.AUTO)
     private Long id;
 
+    /**
+     * 文章ID
+     */
     private Long articleId;
 
+    /**
+     * 标签ID
+     */
     private Long tagId;
 
+    /**
+     * 创建时间
+     */
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 }

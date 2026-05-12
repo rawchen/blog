@@ -63,7 +63,7 @@ public class ConfigController {
 
     @ApiOperation("删除配置")
     @DeleteMapping("/{key}")
-    @PreAuthorize("hasAuthority('system:config:delete')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> deleteConfig(@PathVariable String key) {
         configService.deleteConfig(key);
         return R.ok();

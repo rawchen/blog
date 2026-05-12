@@ -3,7 +3,6 @@ package com.rawchen.blog.vo;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * 登录返回VO
@@ -16,14 +15,9 @@ public class LoginVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Access Token
+     * Token
      */
-    private String accessToken;
-
-    /**
-     * Refresh Token
-     */
-    private String refreshToken;
+    private String token;
 
     /**
      * Token类型
@@ -31,7 +25,7 @@ public class LoginVO implements Serializable {
     private String tokenType = "Bearer";
 
     /**
-     * Access Token过期时间（秒）
+     * Token过期时间（秒）
      */
     private Long expiresIn;
 
@@ -39,14 +33,4 @@ public class LoginVO implements Serializable {
      * 用户信息
      */
     private UserVO userInfo;
-
-    /**
-     * 用户权限列表
-     */
-    private List<String> permissions;
-
-    /**
-     * 用户角色列表
-     */
-    private List<String> roles;
 }

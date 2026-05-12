@@ -136,7 +136,6 @@ public class ArticleController {
 
     @ApiOperation("分页查询文章列表（后台）")
     @GetMapping("/admin/list")
-    @PreAuthorize("hasAuthority('content:article:query')")
     public R<PageResult<ArticleVO>> getArticleListAdmin(
             @RequestParam(defaultValue = "1") Long current,
             @RequestParam(defaultValue = "10") Long size,
@@ -147,21 +146,18 @@ public class ArticleController {
 
     @ApiOperation("根据ID获取文章")
     @GetMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:article:query')")
     public R<ArticleEditVO> getArticleById(@PathVariable Long id) {
         return R.ok(articleService.getArticleEditById(id));
     }
 
     @ApiOperation("创建文章")
     @PostMapping("/admin")
-    @PreAuthorize("hasAuthority('content:article:add')")
     public R<Long> createArticle(@Valid @RequestBody ArticleDTO articleDTO) {
         return R.ok(articleService.createArticle(articleDTO));
     }
 
     @ApiOperation("更新文章")
     @PutMapping("/admin")
-    @PreAuthorize("hasAuthority('content:article:edit')")
     public R<Void> updateArticle(@Valid @RequestBody ArticleDTO articleDTO) {
         articleService.updateArticle(articleDTO);
         return R.ok();
@@ -169,7 +165,7 @@ public class ArticleController {
 
     @ApiOperation("删除文章")
     @DeleteMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:article:delete')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> deleteArticle(@PathVariable Long id) {
         articleService.deleteArticle(id);
         return R.ok();
@@ -177,7 +173,7 @@ public class ArticleController {
 
     @ApiOperation("批量删除文章")
     @PostMapping("/admin/batch-delete")
-    @PreAuthorize("hasAuthority('content:article:delete')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> batchDeleteArticles(@RequestBody List<Long> ids) {
         articleService.batchDeleteArticles(ids);
         return R.ok();
@@ -185,28 +181,24 @@ public class ArticleController {
 
     @ApiOperation("保存草稿")
     @PostMapping("/admin/draft")
-    @PreAuthorize("hasAuthority('content:article:add')")
     public R<Long> saveDraft(@Valid @RequestBody ArticleDTO articleDTO) {
         return R.ok(articleService.saveDraft(articleDTO));
     }
 
     @ApiOperation("获取草稿")
     @GetMapping("/admin/draft/{articleId}")
-    @PreAuthorize("hasAuthority('content:article:query')")
     public R<Article> getDraft(@PathVariable Long articleId) {
         return R.ok(articleService.getDraft(articleId));
     }
 
     @ApiOperation("获取文章版本历史")
     @GetMapping("/admin/{id}/versions")
-    @PreAuthorize("hasAuthority('content:article:query')")
     public R<List<ArticleVersion>> getArticleVersions(@PathVariable Long id) {
         return R.ok(articleService.getArticleVersions(id));
     }
 
     @ApiOperation("恢复文章版本")
     @PostMapping("/admin/{articleId}/restore/{versionId}")
-    @PreAuthorize("hasAuthority('content:article:edit')")
     public R<Void> restoreArticleVersion(@PathVariable Long articleId, @PathVariable Long versionId) {
         articleService.restoreArticleVersion(articleId, versionId);
         return R.ok();
@@ -214,7 +206,6 @@ public class ArticleController {
 
     @ApiOperation("更新文章置顶状态")
     @PutMapping("/admin/{id}/top")
-    @PreAuthorize("hasAuthority('content:article:edit')")
     public R<Void> updateTopStatus(@PathVariable Long id, @RequestParam Integer isTop) {
         articleService.updateTopStatus(id, isTop);
         return R.ok();
@@ -222,7 +213,6 @@ public class ArticleController {
 
     @ApiOperation("更新文章推荐状态")
     @PutMapping("/admin/{id}/recommend")
-    @PreAuthorize("hasAuthority('content:article:edit')")
     public R<Void> updateRecommendStatus(@PathVariable Long id, @RequestParam Integer isRecommend) {
         articleService.updateRecommendStatus(id, isRecommend);
         return R.ok();
@@ -230,7 +220,6 @@ public class ArticleController {
 
     @ApiOperation("AI生成文章摘要")
     @PostMapping("/admin/ai/summary")
-    @PreAuthorize("hasAuthority('content:article:add')")
     public R<String> generateSummary(@RequestBody Map<String, Object> request) {
         try {
             String content = (String) request.get("content");

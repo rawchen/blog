@@ -39,21 +39,18 @@ public class MomentController {
 
     @ApiOperation("根据ID获取动态")
     @GetMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:moment:query')")
     public R<Moment> getMomentById(@PathVariable Long id) {
         return R.ok(momentService.getMomentById(id));
     }
 
     @ApiOperation("添加动态")
     @PostMapping("/admin")
-    @PreAuthorize("hasAuthority('content:moment:add')")
     public R<Long> addMoment(@Valid @RequestBody MomentDTO dto) {
         return R.ok(momentService.addMoment(dto));
     }
 
     @ApiOperation("从RSS订阅拉取")
     @PostMapping("/admin/fetch")
-    @PreAuthorize("hasAuthority('content:moment:add')")
     public R<Void> fetchFromRss(@RequestParam String rssUrl) {
         momentService.fetchFromRss(rssUrl);
         return R.ok();
@@ -61,7 +58,7 @@ public class MomentController {
 
     @ApiOperation("删除动态")
     @DeleteMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:moment:delete')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> deleteMoment(@PathVariable Long id) {
         momentService.deleteMoment(id);
         return R.ok();

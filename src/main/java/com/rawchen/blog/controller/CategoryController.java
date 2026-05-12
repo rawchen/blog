@@ -35,21 +35,18 @@ public class CategoryController {
 
     @ApiOperation("根据ID获取分类")
     @GetMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:category:query')")
     public R<Category> getCategoryById(@PathVariable Long id) {
         return R.ok(categoryService.getCategoryById(id));
     }
 
     @ApiOperation("创建分类")
     @PostMapping("/admin")
-    @PreAuthorize("hasAuthority('content:category:add')")
     public R<Long> createCategory(@RequestBody Category category) {
         return R.ok(categoryService.createCategory(category));
     }
 
     @ApiOperation("更新分类")
     @PutMapping("/admin")
-    @PreAuthorize("hasAuthority('content:category:edit')")
     public R<Void> updateCategory(@RequestBody Category category) {
         categoryService.updateCategory(category);
         return R.ok();
@@ -57,7 +54,7 @@ public class CategoryController {
 
     @ApiOperation("删除分类")
     @DeleteMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:category:delete')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return R.ok();

@@ -2,8 +2,8 @@ package com.rawchen.blog.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -12,16 +12,11 @@ import java.time.LocalDateTime;
  * @author RawChen
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("blog_article")
-public class Article implements Serializable {
+public class Article extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * 文章ID
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
 
     /**
      * 标题
@@ -107,22 +102,4 @@ public class Article implements Serializable {
      * 发布时间
      */
     private LocalDateTime publishTime;
-
-    /**
-     * 是否删除 0-否 1-是
-     */
-    @TableLogic
-    private Integer isDeleted;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
 }

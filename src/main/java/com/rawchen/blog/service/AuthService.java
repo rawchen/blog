@@ -23,11 +23,6 @@ public interface AuthService {
     void register(RegisterDTO registerDTO);
 
     /**
-     * 刷新Token
-     */
-    LoginVO refreshToken(String refreshToken);
-
-    /**
      * 获取当前用户信息
      */
     UserVO getCurrentUser();

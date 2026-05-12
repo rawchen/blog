@@ -70,7 +70,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/tag",
                         "/api/auth/login",
                         "/api/auth/register",
-                        "/api/auth/refresh",
                         // 文章公开接口（不含admin）
                         "/api/article/article-list",
                         "/api/article/detail/**",
@@ -128,6 +127,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/friends",
                         "/admin/login"
                 ).permitAll()
+                // 后台管理接口需要 ADMIN 或 STAFF 角色
+                .antMatchers("/api/**/admin/**").hasAnyRole("ADMIN", "STAFF")
                 // 其他请求需要认证
                 .anyRequest().authenticated()
                 .and()

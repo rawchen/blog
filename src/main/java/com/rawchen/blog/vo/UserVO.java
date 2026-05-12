@@ -67,6 +67,11 @@ public class UserVO implements Serializable {
     private Integer status;
 
     /**
+     * 角色: ADMIN-超管, STAFF-管理员
+     */
+    private String role;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

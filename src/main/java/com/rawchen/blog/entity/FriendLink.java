@@ -2,9 +2,7 @@ package com.rawchen.blog.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
 
 /**
  * 友链实体
@@ -12,16 +10,11 @@ import java.time.LocalDateTime;
  * @author RawChen
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("blog_friend_link")
-public class FriendLink implements Serializable {
+public class FriendLink extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * 主键ID
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
 
     /**
      * 网站名称
@@ -63,16 +56,4 @@ public class FriendLink implements Serializable {
      * 排序
      */
     private Integer sortOrder;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
 }

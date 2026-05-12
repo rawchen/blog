@@ -44,7 +44,6 @@ public class FriendLinkController {
 
     @ApiOperation("获取友链分页列表（后台）")
     @GetMapping("/admin/page")
-    @PreAuthorize("hasAuthority('content:friendLink')")
     public R<Page<FriendLinkVO>> getFriendLinkPage(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -53,21 +52,18 @@ public class FriendLinkController {
 
     @ApiOperation("根据ID获取友链")
     @GetMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:friendLink')")
     public R<FriendLink> getFriendLinkById(@PathVariable Long id) {
         return R.ok(friendLinkService.getFriendLinkById(id));
     }
 
     @ApiOperation("添加友链")
     @PostMapping("/admin")
-    @PreAuthorize("hasAuthority('content:friendLink')")
     public R<Long> addFriendLink(@Valid @RequestBody FriendLinkDTO dto) {
         return R.ok(friendLinkService.addFriendLink(dto));
     }
 
     @ApiOperation("更新友链")
     @PutMapping("/admin")
-    @PreAuthorize("hasAuthority('content:friendLink')")
     public R<Void> updateFriendLink(@Valid @RequestBody FriendLinkDTO dto) {
         friendLinkService.updateFriendLink(dto);
         return R.ok();
@@ -75,7 +71,7 @@ public class FriendLinkController {
 
     @ApiOperation("删除友链")
     @DeleteMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:friendLink')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> deleteFriendLink(@PathVariable Long id) {
         friendLinkService.deleteFriendLink(id);
         return R.ok();
@@ -83,7 +79,6 @@ public class FriendLinkController {
 
     @ApiOperation("审核友链")
     @PutMapping("/admin/{id}/audit")
-    @PreAuthorize("hasAuthority('content:friendLink')")
     public R<Void> auditFriendLink(@PathVariable Long id, @RequestParam Integer status) {
         friendLinkService.auditFriendLink(id, status);
         return R.ok();
@@ -91,7 +86,6 @@ public class FriendLinkController {
 
     @ApiOperation("检测友链状态")
     @PostMapping("/admin/check/{id}")
-    @PreAuthorize("hasAuthority('content:friendLink')")
     public R<Void> checkFriendLinkStatus(@PathVariable Long id) {
         friendLinkService.checkFriendLinkStatus(id);
         return R.ok();

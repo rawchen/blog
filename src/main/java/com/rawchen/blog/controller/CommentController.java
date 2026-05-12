@@ -67,7 +67,6 @@ public class CommentController {
 
     @ApiOperation("分页查询评论列表（后台）")
     @GetMapping("/admin/list")
-    @PreAuthorize("hasAuthority('content:comment:query')")
     public R<PageResult<CommentVO>> getCommentListAdmin(
             @RequestParam(defaultValue = "1") Long current,
             @RequestParam(defaultValue = "10") Long size,
@@ -77,7 +76,6 @@ public class CommentController {
 
     @ApiOperation("审核评论")
     @PutMapping("/admin/audit/{id}")
-    @PreAuthorize("hasAuthority('content:comment:audit')")
     public R<Void> auditComment(@PathVariable Long id, @RequestParam Integer status) {
         commentService.auditComment(id, status);
         return R.ok();
@@ -85,7 +83,6 @@ public class CommentController {
 
     @ApiOperation("批量审核评论")
     @PutMapping("/admin/batch-audit")
-    @PreAuthorize("hasAuthority('content:comment:audit')")
     public R<Void> batchAuditComment(@RequestBody List<Long> ids, @RequestParam Integer status) {
         commentService.batchAuditComments(ids, status);
         return R.ok();
@@ -93,7 +90,7 @@ public class CommentController {
 
     @ApiOperation("删除评论")
     @DeleteMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:comment:delete')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> deleteComment(@PathVariable Long id) {
         commentService.deleteComment(id);
         return R.ok();
@@ -101,7 +98,7 @@ public class CommentController {
 
     @ApiOperation("批量删除评论")
     @PostMapping("/admin/batch-delete")
-    @PreAuthorize("hasAuthority('content:comment:delete')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> batchDeleteComment(@RequestBody List<Long> ids) {
         commentService.batchDeleteComments(ids);
         return R.ok();

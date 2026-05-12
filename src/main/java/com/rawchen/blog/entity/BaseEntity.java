@@ -7,47 +7,20 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 角色实体
+ * 实体基类
  *
  * @author RawChen
  */
 @Data
-@TableName("sys_role")
-public class Role implements Serializable {
+public class BaseEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * 角色ID
+     * 主键ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
     private Long id;
-
-    /**
-     * 角色名称
-     */
-    private String roleName;
-
-    /**
-     * 角色编码
-     */
-    private String roleCode;
-
-    /**
-     * 描述
-     */
-    private String description;
-
-    /**
-     * 状态 0-禁用 1-正常
-     */
-    private Integer status;
-
-    /**
-     * 是否删除 0-否 1-是
-     */
-    @TableLogic
-    private Integer isDeleted;
 
     /**
      * 创建时间
@@ -60,4 +33,11 @@ public class Role implements Serializable {
      */
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    /**
+     * 是否删除 0-否 1-是
+     */
+    @TableLogic
+    @TableField(value = "is_deleted", fill = FieldFill.INSERT)
+    private Integer deleted;
 }

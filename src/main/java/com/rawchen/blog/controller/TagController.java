@@ -36,7 +36,6 @@ public class TagController {
 
     @ApiOperation("分页查询标签列表")
     @GetMapping("/admin/list")
-    @PreAuthorize("hasAuthority('content:tag:query')")
     public R<PageResult<TagVO>> getTagListPage(
             @RequestParam(defaultValue = "1") Long current,
             @RequestParam(defaultValue = "10") Long size,
@@ -46,21 +45,18 @@ public class TagController {
 
     @ApiOperation("根据ID获取标签")
     @GetMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:tag:query')")
     public R<Tag> getTagById(@PathVariable Long id) {
         return R.ok(tagService.getTagById(id));
     }
 
     @ApiOperation("创建标签")
     @PostMapping("/admin")
-    @PreAuthorize("hasAuthority('content:tag:add')")
     public R<Long> createTag(@RequestBody Tag tag) {
         return R.ok(tagService.createTag(tag));
     }
 
     @ApiOperation("更新标签")
     @PutMapping("/admin")
-    @PreAuthorize("hasAuthority('content:tag:edit')")
     public R<Void> updateTag(@RequestBody Tag tag) {
         tagService.updateTag(tag);
         return R.ok();
@@ -68,7 +64,7 @@ public class TagController {
 
     @ApiOperation("删除标签")
     @DeleteMapping("/admin/{id}")
-    @PreAuthorize("hasAuthority('content:tag:delete')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> deleteTag(@PathVariable Long id) {
         tagService.deleteTag(id);
         return R.ok();

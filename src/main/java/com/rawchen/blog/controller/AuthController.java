@@ -39,12 +39,6 @@ public class AuthController {
         return R.ok();
     }
 
-    @ApiOperation("刷新Token")
-    @PostMapping("/refresh")
-    public R<LoginVO> refreshToken(@RequestParam String refreshToken) {
-        return R.ok(authService.refreshToken(refreshToken));
-    }
-
     @ApiOperation("获取当前用户信息")
     @GetMapping("/info")
     public R<UserVO> getCurrentUser() {

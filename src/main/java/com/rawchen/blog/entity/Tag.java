@@ -2,9 +2,7 @@ package com.rawchen.blog.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import lombok.EqualsAndHashCode;
 
 /**
  * 标签实体
@@ -12,16 +10,11 @@ import java.time.LocalDateTime;
  * @author RawChen
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName("blog_tag")
-public class Tag implements Serializable {
+public class Tag extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    /**
-     * 标签ID
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
 
     /**
      * 标签名称
@@ -52,22 +45,4 @@ public class Tag implements Serializable {
      * 状态 0-禁用 1-正常
      */
     private Integer status;
-
-    /**
-     * 是否删除 0-否 1-是
-     */
-    @TableLogic
-    private Integer isDeleted;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
 }

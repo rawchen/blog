@@ -8,10 +8,6 @@ export function register(data) {
   return request({ url: '/auth/register', method: 'post', data })
 }
 
-export function refreshToken(refreshToken) {
-  return request({ url: '/auth/refresh', method: 'post', params: { refreshToken } })
-}
-
 export function getCurrentUser() {
   return request({ url: '/auth/info', method: 'get' })
 }
