@@ -27,6 +27,7 @@ import CommentList from './pages/admin/Comment'
 import UserList from './pages/admin/User'
 import FriendLinkList from './pages/admin/FriendLink'
 import Setting from './pages/admin/Setting'
+import Tool from './pages/admin/Tool'
 
 // 路由守卫
 function PrivateRoute({ children }) {
@@ -80,6 +81,7 @@ function App() {
         <Route path="friend-link" element={<FriendLinkList />} />
         <Route path="user" element={<UserList />} />
         <Route path="setting" element={<Setting />} />
+        <Route path="tool" element={<Tool />} />
       </Route>
     </Routes>
   )

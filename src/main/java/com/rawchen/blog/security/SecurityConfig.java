@@ -96,6 +96,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/config/**",
                         "/api/friend-link/**",
                         "/api/stat/**",
+                        // 迁移工具接口（需要登录）
+                        "/api/migration/admin/**",
                         "/feed",
                         "/sitemap.xml",
                         // Swagger文档

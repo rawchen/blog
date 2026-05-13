@@ -75,4 +75,9 @@ public class Comment extends BaseEntity {
      * 状态 0-待审核 1-已发布 2-垃圾评论
      */
     private Integer status;
+
+    /**
+     * 来源: 0-系统, 1-迁移, 2-抓取
+     */
+    private Integer source;
 }

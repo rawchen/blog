@@ -110,6 +110,11 @@ public class Article extends BaseEntity {
     private ArticleType type = ArticleType.POST;
 
     /**
+     * 来源: 0-系统, 1-迁移, 2-抓取
+     */
+    private Integer source;
+
+    /**
      * 文章类型枚举
      */
     public enum ArticleType {

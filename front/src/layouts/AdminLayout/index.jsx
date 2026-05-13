@@ -13,7 +13,8 @@ import {
   LogoutOutlined,
   EditOutlined,
   OrderedListOutlined,
-  BookOutlined
+  BookOutlined,
+  ToolOutlined
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -59,7 +60,8 @@ function AdminLayout() {
     { key: '/admin/comment', icon: <CommentOutlined />, label: '评论管理' },
     { key: '/admin/friend-link', icon: <LinkOutlined />, label: '友链管理' },
     { key: '/admin/user', icon: <UserOutlined />, label: '用户管理' },
-    { key: '/admin/setting', icon: <SettingOutlined />, label: '网站设置' }
+    { key: '/admin/setting', icon: <SettingOutlined />, label: '网站设置' },
+    { key: '/admin/tool', icon: <ToolOutlined />, label: '工具库' }
   ]
 
   // 获取当前选中的菜单key
