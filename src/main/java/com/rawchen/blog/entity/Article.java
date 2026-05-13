@@ -124,6 +124,10 @@ public class Article extends BaseEntity {
         MUSIC,      // 音乐
         DOWN,       // 下载
         SEARCH,     // 搜索
-        ARCHIVE     // 分类
+        ARCHIVE,    // 分类
+        CROSS,    // 简笔
+        MOVIE,    // 电影
+        PHOTO,    // 咔嚓
+        MOMENT    // 朋友圈
     }
 }
