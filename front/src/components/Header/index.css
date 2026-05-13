@@ -68,31 +68,35 @@
 .header-right {
   display: flex;
   align-items: center;
-  gap: 30px;
+  gap: 10px;
+}
+
+.header-right .svg-inline--fa {
+  vertical-align: -0.2em;
 }
 
 .nav {
-  z-index: 10;
-  display: inline-block;
-  width: auto;
-  gap: 30px;
+z-index: 10;
+display: inline-block;
+width: auto;
+gap: 30px;
 }
 
 .nav a {
-  font-family: 'Josefin Sans', 'Noto Serif SC', sans-serif;
-  color: #313131;
-  text-decoration: none;
-  transition: color 0.3s;
-  transition-duration: 0.3s;
-  font-weight: bold;
-  position: relative;
-  font-size: 14px;
-  padding: 30px 15px;
+font-family: 'Josefin Sans', 'Noto Serif SC', sans-serif;
+color: #313131;
+text-decoration: none;
+transition: color 0.3s;
+transition-duration: 0.3s;
+font-weight: bold;
+position: relative;
+font-size: 14px;
+padding: 30px 15px;
 }
 
 .nav a:hover,
 .nav a.current {
-  /*color: #3b82f6;*/
+/*color: #3b82f6;*/
 }
 
 .nav a.current::after {
@@ -421,7 +425,7 @@
   cursor: pointer;
   color: #666;
   font-size: 16px;
-  padding: 5px;
+  padding: 0px 15px;
   transition: color 0.3s;
 }
 

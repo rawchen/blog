@@ -61,6 +61,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Article::getStatus, 1) // 已发布
+                .eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章
                 .orderByDesc(Article::getIsTop)
                 .orderByDesc(Article::getPublishTime);
 
@@ -130,13 +131,14 @@ public class ArticleServiceImpl implements ArticleService {
         detailVO.setContent(article.getContent());
         detailVO.setContentHtml(article.getContentHtml());
 
-        // 查询上一篇下一篇
+        // 查询上一篇下一篇（只查询POST类型）
         Article prevArticle = articleMapper.selectOne(new LambdaQueryWrapper<Article>()
                 .eq(Article::getStatus, 1)
+                .eq(Article::getType, Article.ArticleType.POST)
                 .lt(Article::getPublishTime, article.getPublishTime())
                 .orderByDesc(Article::getPublishTime)
                 .last("LIMIT 1"));
-        
+
         if (prevArticle != null) {
             ArticleVO prevVO = new ArticleVO();
             prevVO.setId(prevArticle.getId());
@@ -147,10 +149,11 @@ public class ArticleServiceImpl implements ArticleService {
 
         Article nextArticle = articleMapper.selectOne(new LambdaQueryWrapper<Article>()
                 .eq(Article::getStatus, 1)
+                .eq(Article::getType, Article.ArticleType.POST)
                 .gt(Article::getPublishTime, article.getPublishTime())
                 .orderByAsc(Article::getPublishTime)
                 .last("LIMIT 1"));
-        
+
         if (nextArticle != null) {
             ArticleVO nextVO = new ArticleVO();
             nextVO.setId(nextArticle.getId());
@@ -421,7 +424,8 @@ public class ArticleServiceImpl implements ArticleService {
         Page<Article> page = new Page<>(current, size);
 
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Article::getStatus, 1);
+        wrapper.eq(Article::getStatus, 1)
+                .eq(Article::getType, Article.ArticleType.POST); // 只查询普通文章
 
         if (StringUtils.hasText(keyword)) {
             wrapper.and(w -> w.like(Article::getTitle, keyword)
@@ -453,6 +457,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Article::getStatus, 1)
+                .eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章
                 .orderByDesc(Article::getPublishTime);
 
         Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
@@ -477,6 +482,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
                 .eq(Article::getStatus, 1)
+                .eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章
                 .last("ORDER BY RAND() LIMIT " + limit));
 
         return articles.stream()
@@ -492,6 +498,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
                 .eq(Article::getStatus, 1)
+                .eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章
                 .eq(Article::getIsRecommend, 1)
                 .orderByDesc(Article::getPublishTime)
                 .last("LIMIT " + limit));
@@ -538,7 +545,7 @@ public class ArticleServiceImpl implements ArticleService {
         List<Article> articles = articleMapper.selectBatchIds(relatedArticleIds);
 
         return articles.stream()
-                .filter(a -> a.getStatus() == 1)
+                .filter(a -> a.getStatus() == 1 && a.getType() == Article.ArticleType.POST)
                 .map(this::convertToVO)
                 .collect(Collectors.toList());
     }
@@ -551,6 +558,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
                 .eq(Article::getStatus, 1)
+                .eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章
                 .orderByDesc(Article::getPublishTime)
                 .last("LIMIT " + limit));
 
@@ -700,6 +708,14 @@ public class ArticleServiceImpl implements ArticleService {
         ArticleVO vo = new ArticleVO();
         BeanUtils.copyProperties(article, vo);
 
+        // 处理封面图：如果为空，从content中提取第一张图片
+        if (!StringUtils.hasText(vo.getCoverImage()) && StringUtils.hasText(article.getContent())) {
+            String firstImage = extractFirstImage(article.getContent());
+            if (firstImage != null) {
+                vo.setCoverImage(firstImage);
+            }
+        }
+
         // 设置分类名称
         if (article.getCategoryId() != null) {
             Category category = categoryMapper.selectById(article.getCategoryId());
@@ -720,12 +736,12 @@ public class ArticleServiceImpl implements ArticleService {
         // 查询标签
         List<ArticleTag> articleTags = articleTagMapper.selectList(new LambdaQueryWrapper<ArticleTag>()
                 .eq(ArticleTag::getArticleId, article.getId()));
-        
+
         if (!CollectionUtils.isEmpty(articleTags)) {
             List<Long> tagIds = articleTags.stream()
                     .map(ArticleTag::getTagId)
                     .collect(Collectors.toList());
-            
+
             List<Tag> tags = tagMapper.selectBatchIds(tagIds);
             List<TagVO> tagVOs = tags.stream().map(tag -> {
                 TagVO tagVO = new TagVO();
@@ -739,5 +755,30 @@ public class ArticleServiceImpl implements ArticleService {
         vo.setHasPassword(StringUtils.hasText(article.getPassword()));
 
         return vo;
+    }
+
+    /**
+     * 从Markdown内容中提取第一张图片URL
+     */
+    private String extractFirstImage(String content) {
+        if (content == null || content.isEmpty()) {
+            return null;
+        }
+
+        // 匹配Markdown图片语法: ![alt](url)
+        java.util.regex.Pattern mdPattern = java.util.regex.Pattern.compile("!\\[.*?\\]\\(([^)]+)\\)");
+        java.util.regex.Matcher mdMatcher = mdPattern.matcher(content);
+        if (mdMatcher.find()) {
+            return mdMatcher.group(1);
+        }
+
+        // 匹配HTML img标签: <img src="url" 或 <img src='url'
+        java.util.regex.Pattern htmlPattern = java.util.regex.Pattern.compile("<img[^>]+src=[\"']([^\"']+)[\"']");
+        java.util.regex.Matcher htmlMatcher = htmlPattern.matcher(content);
+        if (htmlMatcher.find()) {
+            return htmlMatcher.group(1);
+        }
+
+        return null;
     }
 }
