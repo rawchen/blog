@@ -1,5 +1,5 @@
-import React from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 // 前台页面
@@ -14,6 +14,7 @@ import TimelinePage from './pages/Timeline'
 import MomentsPage from './pages/Moments'
 import FriendsPage from './pages/Friends'
 import NotFoundPage from './pages/NotFound'
+import PageDetail from './pages/Page'
 
 // 后台页面
 import AdminLayout from './layouts/AdminLayout'
@@ -28,6 +29,10 @@ import UserList from './pages/admin/User'
 import FriendLinkList from './pages/admin/FriendLink'
 import Setting from './pages/admin/Setting'
 import Tool from './pages/admin/Tool'
+import PageList from './pages/admin/Page'
+
+// API
+import { getPageList } from './api/article'
 
 // 路由守卫
 function PrivateRoute({ children }) {
@@ -38,6 +43,49 @@ function PrivateRoute({ children }) {
   }
 
   return children
+}
+
+// 动态路由组件：判断是文章ID还是页面slug
+function DynamicRoute() {
+  const { slug } = useParams()
+  const [loading, setLoading] = useState(true)
+  const [pageData, setPageData] = useState(null)
+  const [isPage, setIsPage] = useState(false)
+
+  useEffect(() => {
+    // 如果是纯数字，说明是文章ID，不需要判断
+    if (/^\d+$/.test(slug)) {
+      setIsPage(false)
+      setLoading(false)
+      return
+    }
+
+    // 非数字，尝试获取独立页面
+    const fetchPage = async () => {
+      try {
+        const res = await import('./api/article').then(api => api.getPageBySlug(slug))
+        if (res.data) {
+          setPageData(res.data)
+          setIsPage(true)
+        }
+      } catch (e) {
+        // 不是独立页面，会404
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPage()
+  }, [slug])
+
+  if (loading) return <div className="loading">加载中...</div>
+
+  // 数字ID返回文章详情
+  if (!isPage) {
+    return <ArticleDetail />
+  }
+
+  // 独立页面
+  return <PageDetail page={pageData} />
 }
 
 function App() {
@@ -54,9 +102,8 @@ function App() {
         <Route path="archive" element={<Archive />} />
         <Route path="search" element={<SearchPage />} />
         <Route path="timeline" element={<TimelinePage />} />
-        <Route path="moments" element={<MomentsPage />} />
-        <Route path="friends" element={<FriendsPage />} />
-        <Route path=":id" element={<ArticleDetail />} />
+        {/* 动态路由：文章ID或页面slug */}
+        <Route path=":slug" element={<DynamicRoute />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
 
@@ -75,6 +122,7 @@ function App() {
         <Route path="article/list" element={<ArticleList />} />
         <Route path="article/add" element={<ArticleEdit />} />
         <Route path="article/edit/:id" element={<ArticleEdit />} />
+        <Route path="page" element={<PageList />} />
         <Route path="category" element={<CategoryList />} />
         <Route path="tag" element={<TagList />} />
         <Route path="comment" element={<CommentList />} />

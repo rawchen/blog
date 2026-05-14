@@ -1,9 +1,9 @@
 package com.rawchen.blog.dto;
 
+import com.rawchen.blog.entity.Article;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -32,6 +32,11 @@ public class ArticleDTO implements Serializable {
     private String title;
 
     /**
+     * 文章别名（独立页面必填，用于URL访问）
+     */
+    private String slug;
+
+    /**
      * 摘要
      */
     @Size(max = 500, message = "摘要长度不能超过500个字符")
@@ -40,7 +45,6 @@ public class ArticleDTO implements Serializable {
     /**
      * 内容(Markdown)
      */
-    @NotBlank(message = "内容不能为空")
     private String content;
 
     /**
@@ -49,9 +53,8 @@ public class ArticleDTO implements Serializable {
     private String coverImage;
 
     /**
-     * 分类ID
+     * 分类ID（文章必填）
      */
-    @NotNull(message = "分类不能为空")
     private Long categoryId;
 
     /**
@@ -77,7 +80,6 @@ public class ArticleDTO implements Serializable {
     /**
      * 状态 0-草稿 1-发布
      */
-    @NotNull(message = "状态不能为空")
     private Integer status;
 
     /**
@@ -94,4 +96,20 @@ public class ArticleDTO implements Serializable {
      * 发布时间
      */
     private LocalDateTime publishTime;
+
+    /**
+     * 文章类型: POST-文章, PAGE-独立页面
+     */
+    private Article.ArticleType type = Article.ArticleType.POST;
+
+    /**
+     * 模板名称（独立页面专用）
+     * 可选值: search, archive, friends, moments 等
+     */
+    private String template;
+
+    /**
+     * 排序顺序（独立页面专用）
+     */
+    private Integer sortOrder = 0;
 }

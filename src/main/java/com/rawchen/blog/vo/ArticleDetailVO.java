@@ -1,5 +1,6 @@
 package com.rawchen.blog.vo;
 
+import com.rawchen.blog.entity.Article;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

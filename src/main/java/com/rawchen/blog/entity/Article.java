@@ -104,10 +104,22 @@ public class Article extends BaseEntity {
     private LocalDateTime publishTime;
 
     /**
-     * 文章类型: post-文章, about-关于, friend-友链, music-音乐, down-下载, search-搜索, archive-分类
+     * 文章类型: POST-文章, PAGE-独立页面
      */
     @TableField("type")
     private ArticleType type = ArticleType.POST;
+
+    /**
+     * 模板名称: 用于独立页面的特殊渲染模板
+     * 如: search(搜索页), archive(分类页), friends(友链页), moments(朋友圈)
+     * 为空则使用默认模板渲染markdown内容
+     */
+    private String template;
+
+    /**
+     * 排序顺序
+     */
+    private Integer sortOrder;
 
     /**
      * 来源: 0-系统, 1-迁移, 2-抓取
@@ -119,15 +131,6 @@ public class Article extends BaseEntity {
      */
     public enum ArticleType {
         POST,       // 文章
-        ABOUT,      // 关于
-        FRIEND,     // 友链
-        MUSIC,      // 音乐
-        DOWN,       // 下载
-        SEARCH,     // 搜索
-        ARCHIVE,    // 分类
-        CROSS,    // 简笔
-        MOVIE,    // 电影
-        PHOTO,    // 咔嚓
-        MOMENT    // 朋友圈
+        PAGE        // 独立页面
     }
 }

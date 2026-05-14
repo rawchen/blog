@@ -1,6 +1,6 @@
 package com.rawchen.blog.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.rawchen.blog.entity.Article;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -26,6 +26,11 @@ public class ArticleVO implements Serializable {
      * 标题
      */
     private String title;
+
+    /**
+     * 文章别名
+     */
+    private String slug;
 
     /**
      * 摘要
@@ -116,5 +121,20 @@ public class ArticleVO implements Serializable {
      * 创建时间
      */
     private LocalDateTime createTime;
+
+    /**
+     * 文章类型: POST-文章, PAGE-独立页面
+     */
+    private Article.ArticleType type;
+
+    /**
+     * 模板名称（独立页面专用）
+     */
+    private String template;
+
+    /**
+     * 排序顺序
+     */
+    private Integer sortOrder;
 
 }

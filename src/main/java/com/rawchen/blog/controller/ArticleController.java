@@ -336,4 +336,47 @@ public class ArticleController {
             return R.fail("摘要生成初始化失败: " + e.getMessage());
         }
     }
+
+    // ========== 独立页面管理接口 ==========
+
+    @ApiOperation("获取独立页面列表（前台导航）")
+    @GetMapping("/pages")
+    public R<List<ArticleVO>> getPageList() {
+        return R.ok(articleService.getPageList());
+    }
+
+    @ApiOperation("根据别名获取独立页面详情（前台）")
+    @GetMapping("/page/{slug}")
+    public R<ArticleDetailVO> getPageBySlug(@PathVariable String slug) {
+        return R.ok(articleService.getPageBySlug(slug));
+    }
+
+    @ApiOperation("分页查询独立页面列表（后台）")
+    @GetMapping("/admin/pages")
+    public R<PageResult<ArticleVO>> getPageListAdmin(
+            @RequestParam(defaultValue = "1") Long current,
+            @RequestParam(defaultValue = "10") Long size,
+            @RequestParam(required = false) String keyword) {
+        return R.ok(articleService.getPageListAdmin(current, size, keyword));
+    }
+
+    @ApiOperation("创建独立页面")
+    @PostMapping("/admin/pages")
+    public R<Long> createPage(@Valid @RequestBody ArticleDTO articleDTO) {
+        return R.ok(articleService.createPage(articleDTO));
+    }
+
+    @ApiOperation("更新独立页面")
+    @PutMapping("/admin/pages")
+    public R<Void> updatePage(@Valid @RequestBody ArticleDTO articleDTO) {
+        articleService.updatePage(articleDTO);
+        return R.ok();
+    }
+
+    @ApiOperation("删除独立页面")
+    @DeleteMapping("/admin/pages/{id}")
+    public R<Void> deletePage(@PathVariable Long id) {
+        articleService.deleteArticle(id);
+        return R.ok();
+    }
 }

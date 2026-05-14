@@ -120,3 +120,35 @@ export function updateTopStatus(id, isTop) {
 export function updateRecommendStatus(id, isRecommend) {
   return request({ url: `/article/admin/${id}/recommend`, method: 'put', params: { isRecommend } })
 }
+
+// ========== 独立页面接口 ==========
+
+// 前台获取独立页面列表（用于导航）
+export function getPageList() {
+  return request({ url: '/article/pages', method: 'get' })
+}
+
+// 前台根据别名获取独立页面详情
+export function getPageBySlug(slug) {
+  return request({ url: `/article/page/${slug}`, method: 'get' })
+}
+
+// 后台获取独立页面列表
+export function getPageListAdmin(params) {
+  return request({ url: '/article/admin/pages', method: 'get', params })
+}
+
+// 后台创建独立页面
+export function createPage(data) {
+  return request({ url: '/article/admin/pages', method: 'post', data })
+}
+
+// 后台更新独立页面
+export function updatePage(data) {
+  return request({ url: '/article/admin/pages', method: 'put', data })
+}
+
+// 后台删除独立页面
+export function deletePage(id) {
+  return request({ url: `/article/admin/pages/${id}`, method: 'delete' })
+}

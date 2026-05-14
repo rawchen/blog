@@ -142,4 +142,31 @@ public interface ArticleService {
      * 更新文章推荐状态
      */
     void updateRecommendStatus(Long id, Integer isRecommend);
+
+    // ========== 独立页面相关 ==========
+
+    /**
+     * 获取独立页面列表（前台导航使用）
+     */
+    List<ArticleVO> getPageList();
+
+    /**
+     * 根据别名获取独立页面详情
+     */
+    ArticleDetailVO getPageBySlug(String slug);
+
+    /**
+     * 分页查询独立页面列表（后台管理）
+     */
+    PageResult<ArticleVO> getPageListAdmin(Long current, Long size, String keyword);
+
+    /**
+     * 创建独立页面
+     */
+    Long createPage(ArticleDTO articleDTO);
+
+    /**
+     * 更新独立页面
+     */
+    void updatePage(ArticleDTO articleDTO);
 }

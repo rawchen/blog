@@ -1,0 +1,45 @@
+.page-detail {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.page-header {
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.page-meta {
+  font-size: 14px;
+  color: #999;
+}
+
+.page-meta span {
+  margin-right: 15px;
+}
+
+.page-content {
+  line-height: 1.8;
+  color: #555;
+}
+
+.page-empty {
+  text-align: center;
+  color: #999;
+  padding: 50px 0;
+}
+
+.page-not-found {
+  text-align: center;
+  padding: 100px 0;
+  color: #999;
+  font-size: 18px;
+}

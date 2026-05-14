@@ -235,6 +235,9 @@ public class ArticleServiceImpl implements ArticleService {
         Article article = new Article();
         BeanUtils.copyProperties(articleDTO, article);
 
+        // 确保文章类型为POST
+        article.setType(articleDTO.getType() != null ? articleDTO.getType() : Article.ArticleType.POST);
+
         // Boolean 转 Integer
         article.setIsTop(articleDTO.getIsTop() != null && articleDTO.getIsTop() ? 1 : 0);
         article.setIsRecommend(articleDTO.getIsRecommend() != null && articleDTO.getIsRecommend() ? 1 : 0);
@@ -780,5 +783,145 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         return null;
+    }
+
+    // ========== 独立页面相关 ==========
+
+    @Override
+    public List<ArticleVO> getPageList() {
+        List<Article> pages = articleMapper.selectList(new LambdaQueryWrapper<Article>()
+                .eq(Article::getStatus, 1)
+                .eq(Article::getType, Article.ArticleType.PAGE)
+                .orderByAsc(Article::getSortOrder)
+                .orderByDesc(Article::getCreateTime));
+        return pages.stream().map(this::convertToVO).collect(Collectors.toList());
+    }
+
+    @Override
+    public ArticleDetailVO getPageBySlug(String slug) {
+        Article article = articleMapper.selectOne(new LambdaQueryWrapper<Article>()
+                .eq(Article::getSlug, slug)
+                .eq(Article::getType, Article.ArticleType.PAGE)
+                .eq(Article::getStatus, 1));
+        if (article == null) {
+            throw new BusinessException(ResultCode.ARTICLE_NOT_FOUND);
+        }
+
+        ArticleDetailVO detailVO = new ArticleDetailVO();
+        BeanUtils.copyProperties(convertToVO(article), detailVO);
+        detailVO.setContent(article.getContent());
+        detailVO.setContentHtml(article.getContentHtml());
+        return detailVO;
+    }
+
+    @Override
+    public PageResult<ArticleVO> getPageListAdmin(Long current, Long size, String keyword) {
+        Page<Article> page = new Page<>(current, size);
+
+        LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Article::getType, Article.ArticleType.PAGE)
+                .orderByAsc(Article::getSortOrder)
+                .orderByDesc(Article::getCreateTime);
+
+        if (StringUtils.hasText(keyword)) {
+            wrapper.and(w -> w.like(Article::getTitle, keyword)
+                    .or()
+                    .like(Article::getSlug, keyword));
+        }
+
+        Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
+
+        List<ArticleVO> voList = articlePage.getRecords().stream()
+                .map(this::convertToVO)
+                .collect(Collectors.toList());
+
+        return PageResult.of(new Page<ArticleVO>()
+                .setRecords(voList)
+                .setCurrent(articlePage.getCurrent())
+                .setSize(articlePage.getSize())
+                .setTotal(articlePage.getTotal())
+                .setPages(articlePage.getPages()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long createPage(ArticleDTO articleDTO) {
+        // 检查slug是否重复
+        if (StringUtils.hasText(articleDTO.getSlug())) {
+            Article existPage = articleMapper.selectOne(new LambdaQueryWrapper<Article>()
+                    .eq(Article::getSlug, articleDTO.getSlug()));
+            if (existPage != null) {
+                throw new BusinessException("别名已存在，请使用其他别名");
+            }
+        } else {
+            throw new BusinessException("独立页面别名不能为空");
+        }
+
+        Article article = new Article();
+        BeanUtils.copyProperties(articleDTO, article);
+        article.setType(Article.ArticleType.PAGE);
+        article.setIsTop(0);
+        article.setIsRecommend(0);
+        article.setAllowComment(articleDTO.getAllowComment() == null || articleDTO.getAllowComment() ? 1 : 0);
+
+        // 获取当前用户ID
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, auth.getName()));
+        article.setAuthorId(user.getId());
+
+        if (articleDTO.getStatus() == 1) {
+            if (articleDTO.getPublishTime() != null) {
+                article.setPublishTime(articleDTO.getPublishTime());
+            } else {
+                article.setPublishTime(LocalDateTime.now());
+            }
+        }
+
+        article.setViewCount(0);
+        article.setLikeCount(0);
+        article.setCommentCount(0);
+        article.setSortOrder(articleDTO.getSortOrder() != null ? articleDTO.getSortOrder() : 0);
+
+        articleMapper.insert(article);
+        log.info("创建独立页面成功: {}", article.getTitle());
+
+        return article.getId();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePage(ArticleDTO articleDTO) {
+        Article article = articleMapper.selectById(articleDTO.getId());
+        if (article == null) {
+            throw new BusinessException(ResultCode.ARTICLE_NOT_FOUND);
+        }
+
+        // 检查slug是否重复
+        if (StringUtils.hasText(articleDTO.getSlug())) {
+            Article existPage = articleMapper.selectOne(new LambdaQueryWrapper<Article>()
+                    .eq(Article::getSlug, articleDTO.getSlug())
+                    .ne(Article::getId, articleDTO.getId()));
+            if (existPage != null) {
+                throw new BusinessException("别名已存在，请使用其他别名");
+            }
+        } else {
+            throw new BusinessException("独立页面别名不能为空");
+        }
+
+        String oldSlug = article.getSlug();
+        BeanUtils.copyProperties(articleDTO, article);
+        article.setType(Article.ArticleType.PAGE);
+        article.setAllowComment(articleDTO.getAllowComment() == null || articleDTO.getAllowComment() ? 1 : 0);
+
+        if (articleDTO.getPublishTime() != null) {
+            article.setPublishTime(articleDTO.getPublishTime());
+        } else if (article.getStatus() != 1 && articleDTO.getStatus() == 1) {
+            article.setPublishTime(LocalDateTime.now());
+        }
+
+        article.setSortOrder(articleDTO.getSortOrder() != null ? articleDTO.getSortOrder() : 0);
+        articleMapper.updateById(article);
+        log.info("更新独立页面成功: {}", article.getTitle());
     }
 }
