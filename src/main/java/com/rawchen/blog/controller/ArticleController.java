@@ -379,4 +379,11 @@ public class ArticleController {
         articleService.deleteArticle(id);
         return R.ok();
     }
+
+    @ApiOperation("更新独立页面状态")
+    @PutMapping("/admin/pages/{id}/status")
+    public R<Void> updatePageStatus(@PathVariable Long id, @RequestParam Integer status) {
+        articleService.updatePageStatus(id, status);
+        return R.ok();
+    }
 }

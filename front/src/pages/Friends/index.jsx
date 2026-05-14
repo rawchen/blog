@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { Modal, Form, Input, message } from 'antd'
 import { getFriendLinkList, applyFriendLink } from '../../api/friendLink'
+import MarkdownRenderer from '../../components/MarkdownRenderer'
 import './index.css'
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faClock, faComment, faEye, faUser} from "@fortawesome/free-regular-svg-icons";
+import {Link} from "react-router-dom";
 
-function FriendsPage() {
+function FriendsPage({ pageContent }) {
   const [friends, setFriends] = useState([])
   const [loading, setLoading] = useState(true)
   const [modalVisible, setModalVisible] = useState(false)
@@ -57,20 +61,45 @@ function FriendsPage() {
     <div className="friends-page">
       {/* Header */}
       <div className="friends-header">
-        <h1>友情链接</h1>
+        <h1>{pageContent?.title || '友情链接'}</h1>
       </div>
 
       {/* Meta */}
+      {/*<div className="friends-meta">*/}
+      {/*  <i className="fa fa-clock-o" aria-hidden="true"></i>*/}
+      {/*  更新于 {pageContent?.updateTime ? new Date(pageContent.updateTime).toLocaleDateString('zh-CN') : new Date().toLocaleDateString('zh-CN')}*/}
+      {/*  <i className="fa fa-eye" aria-hidden="true"></i>*/}
+      {/*  {pageContent?.viewCount || 0} 浏览*/}
+      {/*  <i className="fa fa-link" aria-hidden="true" style={{ marginLeft: '15px' }}></i>*/}
+
+      {/*</div>*/}
       <div className="friends-meta">
-        <i className="fa fa-clock-o" aria-hidden="true"></i>
-        更新于 {new Date().toLocaleDateString('zh-CN')}
-        <i className="fa fa-link" aria-hidden="true" style={{ marginLeft: '15px' }}></i>
-        {friends.length} 个友链
+        <span className="meta-item">
+          <FontAwesomeIcon icon={faClock} className="fa-icon" />
+            {new Date(pageContent.publishTime).toLocaleDateString('zh-CN')}
+        </span>
+        <span className="meta-item">
+                  <FontAwesomeIcon icon={faComment} className="fa-icon" />
+                  <Link to="#comments">{pageContent.commentCount || 0} 评论</Link>
+                </span>
+        <span className="meta-item">
+                  <FontAwesomeIcon icon={faEye} className="fa-icon" />
+          {pageContent.viewCount || 0} 浏览
+                </span>
+        <span className="meta-item">
+                  <FontAwesomeIcon icon={faUser} className="fa-icon" />
+          {friends.length || 0} 个友链
+                </span>
+
       </div>
 
       {/* Content */}
       <div className="friends-content">
-        <p>这里是一些朋友的博客链接，欢迎互换友链~</p>
+        {pageContent?.content ? (
+          <MarkdownRenderer content={pageContent.content} />
+        ) : (
+          <p>这里是一些朋友的博客链接，欢迎互换友链~</p>
+        )}
       </div>
 
       {/* Friends List */}

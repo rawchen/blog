@@ -20,14 +20,16 @@
 
 .moments-header h1::before {
   content: '[';
+  font-weight: 600;
   color: #ea5055;
-  margin-right: 5px;
+  margin-right: 12px;
 }
 
 .moments-header h1::after {
   content: ']';
+  font-weight: 600;
   color: #ea5055;
-  margin-left: 5px;
+  margin-left: 12px;
 }
 
 .moments-meta {

@@ -8,17 +8,21 @@ function RelatedPosts({ articleId, limit = 5 }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchRelatedArticles()
-  }, [articleId])
-
-  const fetchRelatedArticles = async () => {
-    try {
-      const res = await getRelatedArticles(articleId, { limit })
-      setArticles(res.data || [])
-    } finally {
+    // 非数字ID不请求
+    if (!articleId || !/^\d+$/.test(String(articleId))) {
       setLoading(false)
+      return
     }
-  }
+    const fetchRelatedArticles = async () => {
+      try {
+        const res = await getRelatedArticles(articleId, { limit })
+        setArticles(res.data || [])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchRelatedArticles()
+  }, [articleId, limit])
 
   if (loading || articles.length === 0) return null
 

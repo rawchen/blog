@@ -84,7 +84,7 @@ public class Article extends BaseEntity {
     private Integer isRecommend;
 
     /**
-     * 状态 0-草稿 1-发布 2-回收站
+     * 状态 0-草稿 1-发布 2-回收站 3-隐藏
      */
     private Integer status;
 

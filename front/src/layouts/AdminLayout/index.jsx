@@ -54,7 +54,7 @@ function AdminLayout() {
       children: [
         { key: '/admin/article/add', icon: <EditOutlined />, label: '写文章' },
         { key: '/admin/article/list', icon: <OrderedListOutlined />, label: '文章管理' },
-        { key: '/admin/page', icon: <FileTextOutlined />, label: '页面管理' }
+        { key: '/admin/page', icon: <FileTextOutlined />, label: '独立页面' }
       ]
     },
     { key: '/admin/category', icon: <FolderOutlined />, label: '分类管理' },

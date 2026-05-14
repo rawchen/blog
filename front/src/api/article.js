@@ -152,3 +152,8 @@ export function updatePage(data) {
 export function deletePage(id) {
   return request({ url: `/article/admin/pages/${id}`, method: 'delete' })
 }
+
+// 更新独立页面状态
+export function updatePageStatus(id, status) {
+  return request({ url: `/article/admin/pages/${id}/status`, method: 'put', params: { status } })
+}

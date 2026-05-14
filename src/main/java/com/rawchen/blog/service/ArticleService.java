@@ -169,4 +169,9 @@ public interface ArticleService {
      * 更新独立页面
      */
     void updatePage(ArticleDTO articleDTO);
+
+    /**
+     * 更新独立页面状态
+     */
+    void updatePageStatus(Long id, Integer status);
 }

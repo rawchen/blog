@@ -82,6 +82,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/article/recommend",
                         "/api/article/*/related",
                         "/api/article/latest-article",
+                        // 独立页面公开接口
+                        "/api/article/pages",
+                        "/api/article/page/**",
                         // 分类公开接口
                         "/api/category/category-list",
                         // 标签公开接口

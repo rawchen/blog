@@ -7,7 +7,7 @@
 
 .archive-page .categorys-title {
   font-size: 14px;
-  position: relative;
+  /*position: relative;*/
   margin: 10px auto;
   padding: 0 30px;
   color: #5f5f5f;
@@ -157,14 +157,16 @@
 
 .archive-header h1::before {
   content: '[';
+  font-weight: 600;
   color: #ea5055;
-  margin-right: 5px;
+  margin-right: 12px;
 }
 
 .archive-header h1::after {
   content: ']';
+  font-weight: 600;
   color: #ea5055;
-  margin-left: 5px;
+  margin-left: 12px;
 }
 
 .archive-header p {

@@ -5,6 +5,9 @@ import MomentsPage from '../Moments'
 import SearchPage from '../Search'
 import ArchivePage from '../Archive'
 import './index.css'
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faClock, faComment, faEye} from "@fortawesome/free-regular-svg-icons";
+import {Link} from "react-router-dom";
 
 // 模板组件映射
 const templateComponents = {
@@ -30,11 +33,25 @@ function PageDetail({ page }) {
     <div className="page-detail">
       <div className="page-header">
         <h1 className="page-title">{page.title}</h1>
+        {/*<div className="page-meta">*/}
+        {/*  <span>浏览：{page.viewCount || 0}</span>*/}
+        {/*  {page.updateTime && (*/}
+        {/*    <span>更新于：{new Date(page.updateTime).toLocaleDateString('zh-CN')}</span>*/}
+        {/*  )}*/}
+        {/*</div>*/}
         <div className="page-meta">
-          <span>浏览：{page.viewCount || 0}</span>
-          {page.updateTime && (
-            <span>更新于：{new Date(page.updateTime).toLocaleDateString('zh-CN')}</span>
-          )}
+          <span className="meta-item">
+            <FontAwesomeIcon icon={faClock} className="fa-icon" />
+            {new Date(page.publishTime).toLocaleDateString('zh-CN')}
+          </span>
+          <span className="meta-item">
+                  <FontAwesomeIcon icon={faComment} className="fa-icon" />
+                  <Link to="#comments">{page.commentCount || 0} 评论</Link>
+                </span>
+          <span className="meta-item">
+                  <FontAwesomeIcon icon={faEye} className="fa-icon" />
+            {page.viewCount || 0} 浏览
+                </span>
         </div>
       </div>
       <div className="page-content">

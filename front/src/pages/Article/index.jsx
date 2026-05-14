@@ -22,7 +22,7 @@ function formatDate(datetime) {
 }
 
 function ArticleDetail() {
-  const { id } = useParams()
+  const { slug: id } = useParams()
   const [article, setArticle] = useState(null)
   const [loading, setLoading] = useState(true)
   const bottomBarRef = useRef(null)
@@ -58,6 +58,11 @@ function ArticleDetail() {
   }, [article])
 
   const fetchArticle = async () => {
+    // 非数字ID不请求
+    if (!id || !/^\d+$/.test(id)) {
+      setLoading(false)
+      return
+    }
     try {
       const res = await getArticleDetail(id)
       setArticle(res.data)

@@ -1,34 +1,36 @@
 /* Friends Page Styles (友链) */
 .friends-page {
   background-color: #f9f9f9;
-  box-shadow: 0 0 55px 0 rgb(0 0 0 / 3%);
+  box-shadow: 0 0 55px 0 rgb(0 0 0 / 1%);
   max-width: 970px;
   margin: 0 auto;
-  padding: 100px 25px 20px;
+  padding: 130px 25px 20px;
 }
 
 .friends-header {
-  margin-bottom: 30px;
-  text-align: center;
+  /*margin-bottom: 30px;*/
+  /*text-align: center;*/
 }
 
 .friends-header h1 {
   font-size: 21px;
   font-weight: 600;
   color: #313131;
-  margin-bottom: 10px;
+  /*margin-bottom: 10px;*/
 }
 
 .friends-header h1::before {
   content: '[';
+  font-weight: 600;
   color: #ea5055;
-  margin-right: 5px;
+  margin-right: 12px;
 }
 
 .friends-header h1::after {
   content: ']';
+  font-weight: 600;
   color: #ea5055;
-  margin-left: 5px;
+  margin-left: 12px;
 }
 
 .friends-header p {
@@ -36,18 +38,20 @@
   color: #666;
 }
 
-/* Post Data */
 .friends-meta {
   font-size: 12px;
   color: #5f5f5f;
-  text-align: center;
-  margin-bottom: 30px;
 }
 
-.friends-meta i {
-  margin: 0 5px;
-  color: #eb5055;
+.friends-meta a {
+  color: #5f5f5f;
+  border-bottom: 1px dashed #a0a0a0;
 }
+
+.friends-meta span {
+  margin-right: 15px;
+}
+
 
 /* Post Content for Description */
 .friends-content {

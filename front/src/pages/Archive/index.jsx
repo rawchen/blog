@@ -87,21 +87,19 @@ function Archive() {
                     <Link to={`/${article.id}`}>
                       <div className="item-label">
                         <div className="item-title">
-                          <a>{article.title}</a>
+                          <span>{article.title}</span>
                         </div>
                         <div className="item-meta clearfix">
                           <div
                             className={`item-meta-ico bg-ico-${getRandomBgIco()}`}
                             style={{
-                              background: 'url(/images/bg-ico.png) no-repeat',
-                              backgroundSize: '40px auto'
+                              // background: 'url(../../assets/images/bg-ico.png) no-repeat',
+                              // backgroundSize: '40px auto'
                             }}
                           />
                           <div className="item-meta-cat">
                             {article.categoryName && (
-                              <Link to={`/category/${article.categoryId}`}>
-                                {article.categoryName}
-                              </Link>
+                              <span>{article.categoryName}</span>
                             )}
                           </div>
                         </div>

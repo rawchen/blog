@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Button, Modal, Form, Input, message, Popconfirm, Space, Select, InputNumber, Switch } from 'antd'
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
-import { getPageListAdmin, createPage, updatePage, deletePage } from '../../../api/article'
+import { getPageListAdmin, createPage, updatePage, deletePage, updatePageStatus } from '../../../api/article'
 
 // 模板选项
 const templateOptions = [
@@ -69,6 +69,16 @@ function PageList() {
     }
   }
 
+  const handleStatusChange = async (id, status) => {
+    try {
+      await updatePageStatus(id, status)
+      message.success(status === 1 ? '已公开' : '已隐藏')
+      fetchList()
+    } catch (error) {
+      console.error('状态切换失败', error)
+    }
+  }
+
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields()
@@ -108,11 +118,14 @@ function PageList() {
     {
       title: '状态',
       dataIndex: 'status',
-      width: 80,
-      render: (status) => (
-        <span style={{ color: status === 1 ? '#52c41a' : '#999' }}>
-          {status === 1 ? '已发布' : '草稿'}
-        </span>
+      width: 100,
+      render: (status, record) => (
+        <Switch
+          checked={status === 1}
+          checkedChildren="公开"
+          unCheckedChildren="隐藏"
+          onChange={(checked) => handleStatusChange(record.id, checked ? 1 : 3)}
+        />
       )
     },
     { title: '浏览量', dataIndex: 'viewCount', width: 80 },
@@ -191,8 +204,8 @@ function PageList() {
           </Form.Item>
           <Form.Item label="状态" name="status">
             <Select>
-              <Select.Option value={0}>草稿</Select.Option>
-              <Select.Option value={1}>发布</Select.Option>
+              <Select.Option value={1}>公开</Select.Option>
+              <Select.Option value={3}>隐藏</Select.Option>
             </Select>
           </Form.Item>
         </Form>

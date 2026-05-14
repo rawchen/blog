@@ -17,8 +17,11 @@ function CommentList({ articleId }) {
   const gravatarDomain = siteConfig.gravatarDomain
 
   useEffect(() => {
-    if (articleId) {
+    // 非数字ID不请求
+    if (articleId && /^\d+$/.test(String(articleId))) {
       fetchComments()
+    } else {
+      setLoading(false)
     }
   }, [articleId, page])
 

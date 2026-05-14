@@ -790,7 +790,6 @@ public class ArticleServiceImpl implements ArticleService {
     @Override
     public List<ArticleVO> getPageList() {
         List<Article> pages = articleMapper.selectList(new LambdaQueryWrapper<Article>()
-                .eq(Article::getStatus, 1)
                 .eq(Article::getType, Article.ArticleType.PAGE)
                 .orderByAsc(Article::getSortOrder)
                 .orderByDesc(Article::getCreateTime));
@@ -923,5 +922,16 @@ public class ArticleServiceImpl implements ArticleService {
         article.setSortOrder(articleDTO.getSortOrder() != null ? articleDTO.getSortOrder() : 0);
         articleMapper.updateById(article);
         log.info("更新独立页面成功: {}", article.getTitle());
+    }
+
+    @Override
+    public void updatePageStatus(Long id, Integer status) {
+        Article article = articleMapper.selectById(id);
+        if (article == null) {
+            throw new BusinessException(ResultCode.ARTICLE_NOT_FOUND);
+        }
+        article.setStatus(status);
+        articleMapper.updateById(article);
+        log.info("更新独立页面状态: id={}, status={}", id, status);
     }
 }

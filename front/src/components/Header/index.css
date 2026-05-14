@@ -76,22 +76,24 @@
 }
 
 .nav {
-z-index: 10;
-display: inline-block;
-width: auto;
-gap: 30px;
+  z-index: 10;
+  display: inline-block;
+  width: auto;
+  gap: 30px;
 }
 
 .nav a {
-font-family: 'Josefin Sans', 'Noto Serif SC', sans-serif;
-color: #313131;
-text-decoration: none;
-transition: color 0.3s;
-transition-duration: 0.3s;
-font-weight: bold;
-position: relative;
-font-size: 14px;
-padding: 30px 15px;
+  font-family: 'Josefin Sans', 'Noto Serif SC', sans-serif;
+  color: #313131;
+  text-decoration: none;
+  transition: color 0.3s;
+  transition-duration: 0.3s;
+  font-weight: bold;
+  position: relative;
+  font-size: 14px;
+  padding: 30px 15px;
+  margin-left: 2px;
+  margin-right: 2px;
 }
 
 .nav a:hover,

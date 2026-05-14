@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { getCategoryList } from '../../api/category'
+import { getPageList } from '../../api/article'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import Headroom from 'headroom.js'
 import './index.css'
 
@@ -11,6 +12,7 @@ function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const siteConfig = useSelector(state => state.siteConfig.data) || {}
   const [categories, setCategories] = useState([])
+  const [pages, setPages] = useState([])
   const headerRef = useRef(null)
   const headroomRef = useRef(null)
   const location = useLocation()
@@ -18,6 +20,7 @@ function Header() {
 
   useEffect(() => {
     loadCategories()
+    loadPages()
   }, [])
 
   useEffect(() => {
@@ -50,9 +53,24 @@ function Header() {
     }
   }
 
+  const loadPages = async () => {
+    try {
+      const res = await getPageList()
+      setPages(res.data || [])
+    } catch (e) {
+      console.error('加载页面列表失败', e)
+    }
+  }
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+
+  // 是否有搜索页面（只要存在 template=search 的页面就显示搜索图标）
+  const hasSearchPage = pages.some(p => p.template === 'search')
+
+  // 公开的页面（status=1）用于桌面端导航
+  const publicPages = pages.filter(p => p.status === 1)
 
   return (
     <header className="web-header" ref={headerRef}>
@@ -63,10 +81,6 @@ function Header() {
 
         <div className="header-right">
           <nav className="nav">
-            <Link to="/" className={location.pathname === '/' ? 'current' : ''}>
-              首页
-            </Link>
-
             {/* 分类下拉菜单 */}
             <Link
                 to="/category"
@@ -92,30 +106,35 @@ function Header() {
               )}
             </Link>
 
-            <Link to="/tag" className={location.pathname.startsWith('/tag') ? 'current' : ''}>
-              标签
-            </Link>
-            <Link to="/archive" className={location.pathname.startsWith('/archive') ? 'current' : ''}>
-              归档
-            </Link>
-            <Link to="/friends" className={location.pathname === '/friends' ? 'current' : ''}>
-              友链
-            </Link>
+            {/* 动态页面导航 */}
+            {publicPages.map(page => (
+                <Link
+                    key={page.id}
+                    to={`/${page.slug}`}
+                    className={location.pathname === `/${page.slug}` ? 'current' : ''}
+                >
+                  {page.title}
+                </Link>
+            ))}
           </nav>
 
           <div className="header-actions">
-            {/* 搜索按钮 */}
-            <Link to="/search" className="search-toggle">
-              <FontAwesomeIcon icon={faSearch} />
-            </Link>
+            {/* 搜索按钮 - 仅当有搜索页面时显示 */}
+            {hasSearchPage && (
+              <Link to="/search" className="search-toggle">
+                <FontAwesomeIcon icon={faSearch} />
+              </Link>
+            )}
           </div>
         </div>
 
         {/* 移动端右侧操作区 */}
         <div className="mobile-actions">
-          <Link to="/search" className="mobile-search-toggle">
-            <FontAwesomeIcon icon={faSearch} />
-          </Link>
+          {hasSearchPage && (
+            <Link to="/search" className="mobile-search-toggle">
+              <FontAwesomeIcon icon={faSearch} />
+            </Link>
+          )}
           <div
             className={`navbar-mobile-menu ${mobileMenuOpen ? 'navbar-mobile-menu-on' : ''}`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -126,10 +145,14 @@ function Header() {
             <ul>
               <li><Link to="/">首页</Link></li>
               <li><Link to="/category">分类</Link></li>
-              <li><Link to="/tag">标签</Link></li>
-              <li><Link to="/archive">归档</Link></li>
-              <li><Link to="/friends">友链</Link></li>
-              <li><Link to="/search">搜索</Link></li>
+              {pages.map(page => (
+                <li key={page.id}>
+                  <Link to={`/${page.slug}`}>
+                    {page.title}
+                    {page.status !== 1 && <span style={{ color: '#999', fontSize: '12px', marginLeft: '4px' }}>隐藏</span>}
+                  </Link>
+                </li>
+              ))}
               <li><Link to="/admin/login">管理</Link></li>
             </ul>
           </div>
