@@ -26,7 +26,13 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
-        log.warn("认证失败: {} - 请求路径: {}", authException.getMessage(), request.getRequestURI());
+        String uri = request.getRequestURI();
+        // 只对API路径记录WARN级别，其他路径（如扫描器探测）用DEBUG减少日志噪音
+        if (uri.startsWith("/api/")) {
+            log.warn("认证失败: {} - 请求路径: {}", authException.getMessage(), uri);
+        } else {
+            log.debug("认证失败: {} - 请求路径: {}", authException.getMessage(), uri);
+        }
 
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
