@@ -151,11 +151,15 @@
 }
 
 .markdown-body .inline-code {
-  padding: 0.2em 0.4em;
   /* background-color: #f0f0f0; */
   background: linear-gradient(to right, #ffc3aa, #ff8d8d);
+  margin: 2px 4px;
   border-radius: 5px;
+  font-size: 16px;
+  color: #000;
   font-family: Consolas,'Microsoft YaHei', Monaco, Andale Mono, Ubuntu Mono, monospace;
+  word-break: break-all;
+  padding: 4px 7px 4px 7px;
 }
 
 /* 代码块操作按钮 */

@@ -131,9 +131,9 @@
   gap: 10px;
   margin-bottom: 30px;
   padding: 20px;
-  background: #fff;
+  /*background: #fff;*/
   border-radius: 0 0 3px 3px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  /*box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);*/
 }
 
 .tag-cloud-item {
@@ -146,7 +146,7 @@
   transition-duration: 0.4s;
   letter-spacing: 0;
   border-radius: 15px;
-  color: #fff;
+  /*color: #fff;*/
   cursor: pointer;
 }
 

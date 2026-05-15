@@ -447,65 +447,10 @@
   color: #3b82f6;
 }
 
-/* 搜索框 */
-.search-box {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: #fff;
-  padding: 15px 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.search-box form {
-  max-width: 600px;
-  margin: 0 auto;
-  display: flex;
-  gap: 10px;
-}
-
-.search-box input {
-  flex: 1;
-  padding: 10px 15px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  font-size: 14px;
-  outline: none;
-}
-
-.search-box input:focus {
-  border-color: #3b82f6;
-}
-
-.search-box button {
-  padding: 10px 20px;
-  background: #3b82f6;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.search-box button:hover {
-  background: #2563eb;
-}
-
 /* 移动端搜索按钮 - 默认隐藏 */
 .mobile-actions {
   display: none;
   align-items: center;
-}
-
-.mobile-search-toggle {
-  font-size: 16px;
-  padding: 5px;
-  cursor: pointer;
-}
-
-.mobile-search-toggle:hover {
-  color: #3b82f6;
 }
 
 /* 响应式 */

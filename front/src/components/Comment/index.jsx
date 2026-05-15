@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { message } from 'antd'
 import CommentItem from './CommentItem'
 import CommentForm from './CommentForm'
 import { getCommentList, submitComment } from '../../api/comment'
+import { clearAuth } from '../../store/modules/auth'
 import './index.css'
 
 function CommentList({ articleId }) {
@@ -15,10 +16,17 @@ function CommentList({ articleId }) {
   const pageSize = 10
   const siteConfig = useSelector(state => state.siteConfig.data) || {}
   const gravatarDomain = siteConfig.gravatarDomain
+  const dispatch = useDispatch()
 
-  // 用户信息状态
+  // 登录用户状态
+  const { isAuthenticated, userInfo } = useSelector(state => state.auth)
+
+  // 游客信息状态
   const [savedInfo, setSavedInfo] = useState(null)
   const [showGuestInfo, setShowGuestInfo] = useState(true)
+
+  // 是否为登录用户
+  const isLoggedIn = isAuthenticated && userInfo
 
   useEffect(() => {
     // 非数字ID不请求
@@ -30,14 +38,19 @@ function CommentList({ articleId }) {
   }, [articleId, page])
 
   useEffect(() => {
-    // 从localStorage读取保存的用户信息
+    // 登录用户不需要读取游客信息
+    if (isLoggedIn) {
+      setShowGuestInfo(false)
+      return
+    }
+    // 从localStorage读取保存的游客信息
     const saved = localStorage.getItem('comment_user_info')
     if (saved) {
       const info = JSON.parse(saved)
       setSavedInfo(info)
       setShowGuestInfo(false)
     }
-  }, [])
+  }, [isLoggedIn])
 
   const fetchComments = async () => {
     try {
@@ -52,23 +65,38 @@ function CommentList({ articleId }) {
 
   const handleSubmit = async (data) => {
     try {
-      await submitComment({
-        ...data,
+      // 构建评论数据
+      const commentData = {
         articleId,
         parentId: replyTo?.id || 0,
-        replyUserId: replyTo?.userId || null
-      })
-      // 保存用户信息
-      if (data.nickname && data.email) {
-        const info = {
-          nickname: data.nickname,
-          email: data.email,
-          website: data.website
-        }
-        localStorage.setItem('comment_user_info', JSON.stringify(info))
-        setSavedInfo(info)
-        setShowGuestInfo(false)
+        replyUserId: replyTo?.userId || null,
+        userAgent: navigator.userAgent
       }
+
+      if (isLoggedIn) {
+        // 登录用户：使用用户信息
+        commentData.nickname = userInfo.nickname || userInfo.username || userInfo.name
+        commentData.email = userInfo.email
+        commentData.userId = userInfo.id
+        // website使用siteConfig.site_url或当前域名
+        commentData.website = siteConfig.siteUrl || window.location.origin
+      } else {
+        // 游客：使用表单数据
+        Object.assign(commentData, data)
+        // 保存游客信息
+        if (data.nickname && data.email) {
+          const info = {
+            nickname: data.nickname,
+            email: data.email,
+            website: data.website
+          }
+          localStorage.setItem('comment_user_info', JSON.stringify(info))
+          setSavedInfo(info)
+          setShowGuestInfo(false)
+        }
+      }
+
+      await submitComment(commentData)
       setReplyTo(null)
       fetchComments()
       message.success('发送评论成功')
@@ -91,22 +119,29 @@ function CommentList({ articleId }) {
     setShowGuestInfo(!showGuestInfo)
   }
 
-  // 获取用户代理信息
-  const getUserAgent = () => {
-    return navigator.userAgent
+  // 退出登录
+  const handleLogout = () => {
+    dispatch(clearAuth())
+    message.success('已退出登录')
   }
 
   // 渲染response头部
   const renderResponse = (replyDisplayName) => (
     <span className="response">
       发表评论
-      {savedInfo && !showGuestInfo && (
+      {isLoggedIn ? (
+        <>
+          {' / '}
+          <span style={{ color: '#eb5055' }}>{userInfo.nickname || userInfo.username || userInfo.name}</span> 你好.{' '}
+          <a onClick={handleLogout} style={{ cursor: 'pointer', color: '#eb5055' }}>注销</a> ?
+        </>
+      ) : savedInfo && !showGuestInfo ? (
         <>
           {' / '}
           <span style={{ color: '#eb5055' }}>{savedInfo.nickname}</span> 你好.{' '}
           <a onClick={toggleGuestInfo} style={{ cursor: 'pointer', color: '#eb5055' }}>修改昵称</a> ?
         </>
-      )}
+      ) : null}
       {replyDisplayName && (
         <>
           {' '}
@@ -130,10 +165,10 @@ function CommentList({ articleId }) {
           <CommentForm
             onSubmit={handleSubmit}
             replyTo={null}
-            getUserAgent={getUserAgent}
-            savedInfo={savedInfo}
-            showGuestInfo={showGuestInfo}
-            toggleGuestInfo={toggleGuestInfo}
+            savedInfo={isLoggedIn ? null : savedInfo}
+            showGuestInfo={isLoggedIn ? false : showGuestInfo}
+            toggleGuestInfo={isLoggedIn ? null : toggleGuestInfo}
+            isLoggedIn={isLoggedIn}
           />
         </div>
 
@@ -153,11 +188,10 @@ function CommentList({ articleId }) {
                   renderResponse={renderResponse}
                   commentFormProps={{
                     onSubmit: handleSubmit,
-                    replyTo,
-                    getUserAgent,
-                    savedInfo,
-                    showGuestInfo,
-                    toggleGuestInfo
+                    savedInfo: isLoggedIn ? null : savedInfo,
+                    showGuestInfo: isLoggedIn ? false : showGuestInfo,
+                    toggleGuestInfo: isLoggedIn ? null : toggleGuestInfo,
+                    isLoggedIn
                   }}
                 />
               ))}

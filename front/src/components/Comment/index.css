@@ -415,8 +415,9 @@
   transition: background-color 0.2s;
 }
 
-.smilies-button:hover {
-  background-color: #f0f0f0;
+.smilies-button img:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
 }
 
 .smilie-trigger {
@@ -427,9 +428,9 @@
 .smilies-box {
   position: absolute;
   z-index: 9999;
-  width: 321px;
-  margin-top: -116px;
-  margin-left: -8px;
+  width: 318px;
+  margin-top: -74px;
+  margin-left: -6px;
   padding: 5px;
   background-color: #fff;
   border: 1px solid #bbb;
@@ -440,14 +441,17 @@
 .smilie-item {
   cursor: pointer;
   display: inline-block;
-  padding: 2px;
+  padding: 1px;
   margin: 1px;
   border-radius: 4px;
   transition: background-color 0.2s;
 }
 
 .smilie-item:hover {
-  background-color: #f5f5f5;
+  /*background-color: #f5f5f5;*/
+  cursor: pointer;
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
 }
 
 .smilie-img {

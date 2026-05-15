@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSearch, faClock, faFolder } from '@fortawesome/free-solid-svg-icons'
 import { getArticleList } from '../../api/article'
 import { getTagList } from '../../api/tag'
 import './index.css'
@@ -84,7 +86,7 @@ function SearchPage() {
             autoComplete="off"
           />
           <button type="submit">
-            <i className="fa fa-search"></i>
+            <FontAwesomeIcon icon={faSearch} />
           </button>
         </div>
       </form>
@@ -110,12 +112,12 @@ function SearchPage() {
                               <a>{article.title}</a>
                             </div>
                             <div className="item-meta">
-                              <i className="fa fa-clock-o" aria-hidden="true"></i>
+                              <FontAwesomeIcon icon={faClock} />
                               {article.publishTime || article.createTime}
                               {article.categoryName && (
                                 <>
                                   <span style={{ margin: '0 5px' }}>·</span>
-                                  <i className="fa fa-folder-o" aria-hidden="true"></i>
+                                  <FontAwesomeIcon icon={faFolder} />
                                   {article.categoryName}
                                 </>
                               )}
@@ -130,7 +132,7 @@ function SearchPage() {
             </>
           ) : (
             <div className="no-results">
-              <i className="fa fa-search" aria-hidden="true"></i>
+              <FontAwesomeIcon icon={faSearch} />
               <p>没有找到任何内容哦, 请换个别的关键字再试试</p>
             </div>
           )}
@@ -142,7 +144,7 @@ function SearchPage() {
 
       {/* Tag Cloud */}
       <div className="tag-cloud-section">
-        <h3>热门标签</h3>
+        {/*<h3>热门标签</h3>*/}
         <div className="tag-cloud">
           {tags.map((tag, index) => (
             <Link

@@ -11,7 +11,7 @@ const getSmilieImgUrl = (filename) => {
   return smilieImages[key] || ''
 }
 
-function CommentForm({ onSubmit, replyTo, getUserAgent, savedInfo, showGuestInfo, toggleGuestInfo }) {
+function CommentForm({ onSubmit, savedInfo, showGuestInfo, toggleGuestInfo, isLoggedIn }) {
   const [form, setForm] = useState({
     nickname: '',
     email: '',
@@ -89,11 +89,11 @@ function CommentForm({ onSubmit, replyTo, getUserAgent, savedInfo, showGuestInfo
 
     setSubmitting(true)
     try {
-      const userAgent = getUserAgent()
-      const data = {
-        ...form,
-        userAgent
-      }
+      // 登录用户只需传递content，父组件处理用户信息
+      // 游客传递完整表单数据
+      const data = isLoggedIn
+        ? { content: form.content }
+        : { ...form }
 
       const success = await onSubmit(data)
       if (success) {
