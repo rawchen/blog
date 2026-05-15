@@ -143,7 +143,14 @@ public class ArticleServiceImpl implements ArticleService {
             ArticleVO prevVO = new ArticleVO();
             prevVO.setId(prevArticle.getId());
             prevVO.setTitle(prevArticle.getTitle());
-            prevVO.setCoverImage(prevArticle.getCoverImage());
+            String prevCover = prevArticle.getCoverImage();
+            if (!StringUtils.hasText(prevCover) && StringUtils.hasText(prevArticle.getContent())) {
+                String firstImage = extractFirstImage(prevArticle.getContent());
+                if (firstImage != null) {
+                    prevCover = firstImage;
+                }
+            }
+            prevVO.setCoverImage(prevCover);
             detailVO.setPrevArticle(prevVO);
         }
 
@@ -158,7 +165,14 @@ public class ArticleServiceImpl implements ArticleService {
             ArticleVO nextVO = new ArticleVO();
             nextVO.setId(nextArticle.getId());
             nextVO.setTitle(nextArticle.getTitle());
-            nextVO.setCoverImage(nextArticle.getCoverImage());
+            String nextCover = nextArticle.getCoverImage();
+            if (!StringUtils.hasText(nextCover) && StringUtils.hasText(nextArticle.getContent())) {
+                String firstImage = extractFirstImage(nextArticle.getContent());
+                if (firstImage != null) {
+                    nextCover = firstImage;
+                }
+            }
+            nextVO.setCoverImage(nextCover);
             detailVO.setNextArticle(nextVO);
         }
 
@@ -245,9 +259,14 @@ public class ArticleServiceImpl implements ArticleService {
 
         // 获取当前用户ID
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, auth.getName()));
-        article.setAuthorId(user.getId());
+        User user = null;
+        if (auth != null && auth.getName() != null) {
+            user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                    .eq(User::getUsername, auth.getName()));
+        }
+        if (user != null) {
+            article.setAuthorId(user.getId());
+        }
 
         // 设置发布时间
         if (articleDTO.getStatus() == 1) {
@@ -266,7 +285,9 @@ public class ArticleServiceImpl implements ArticleService {
         log.info("创建文章成功: {}", article.getTitle());
 
         // 保存文章版本
-        saveArticleVersion(article, user.getId());
+        if (user != null) {
+            saveArticleVersion(article, user.getId());
+        }
 
         // 处理新标签创建
         List<Long> allTagIds = new ArrayList<>();
@@ -318,11 +339,13 @@ public class ArticleServiceImpl implements ArticleService {
 
         // 获取当前用户
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, auth.getName()));
+        User user = auth != null ? userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, auth.getName())) : null;
 
         // 保存旧版本
-        saveArticleVersion(article, user.getId());
+        if (user != null) {
+            saveArticleVersion(article, user.getId());
+        }
 
         BeanUtils.copyProperties(articleDTO, article);
 
@@ -585,9 +608,13 @@ public class ArticleServiceImpl implements ArticleService {
 
         // 获取当前用户ID
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, auth.getName()));
-        article.setAuthorId(user.getId());
+        if (auth != null && auth.getName() != null) {
+            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                    .eq(User::getUsername, auth.getName()));
+            if (user != null) {
+                article.setAuthorId(user.getId());
+            }
+        }
 
         article.setViewCount(0);
         article.setLikeCount(0);
@@ -644,11 +671,13 @@ public class ArticleServiceImpl implements ArticleService {
 
         // 获取当前用户
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, auth.getName()));
+        User user = auth != null ? userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .eq(User::getUsername, auth.getName())) : null;
 
         // 保存当前版本
-        saveArticleVersion(article, user.getId());
+        if (user != null) {
+            saveArticleVersion(article, user.getId());
+        }
 
         // 恢复历史版本
         article.setTitle(version.getTitle());
@@ -865,9 +894,13 @@ public class ArticleServiceImpl implements ArticleService {
 
         // 获取当前用户ID
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, auth.getName()));
-        article.setAuthorId(user.getId());
+        if (auth != null && auth.getName() != null) {
+            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                    .eq(User::getUsername, auth.getName()));
+            if (user != null) {
+                article.setAuthorId(user.getId());
+            }
+        }
 
         if (articleDTO.getStatus() == 1) {
             if (articleDTO.getPublishTime() != null) {
