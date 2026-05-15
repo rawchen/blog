@@ -13,7 +13,68 @@ import {
   faAndroid,
   faLinux
 } from '@fortawesome/free-brands-svg-icons'
+import { dateWord } from '../../utils/datetime'
+import { parseSmilies } from '../../utils/smilies'
+import CommentForm from './CommentForm'
 import './index.css'
+
+// 导入所有表情图片
+const smilieImages = import.meta.glob('../../assets/images/smilies/bilibili/*.png', { eager: true, import: 'default' })
+
+// 获取表情图片URL
+const getSmilieImgUrl = (filename) => {
+  const key = `../../assets/images/smilies/bilibili/${filename}`
+  return smilieImages[key] || ''
+}
+
+// 解析表情代码为图片
+const renderSmilies = (text) => {
+  if (!text) return ''
+
+  // 先解析链接，再解析表情
+  let result = parseLinks(text)
+
+  // 替换表情代码为实际图片URL
+  const SMILIES_MAP = {
+    ':mrgreen:': 'icon_mrgreen.png',
+    ':neutral:': 'icon_neutral.png',
+    ':twisted:': 'icon_twisted.png',
+    ':arrow:': 'icon_arrow.png',
+    ':shock:': 'icon_eek.png',
+    ':smile:': 'icon_smile.png',
+    ':???:': 'icon_confused.png',
+    ':cool:': 'icon_cool.png',
+    ':evil:': 'icon_evil.png',
+    ':grin:': 'icon_biggrin.png',
+    ':idea:': 'icon_idea.png',
+    ':oops:': 'icon_redface.png',
+    ':razz:': 'icon_razz.png',
+    ':roll:': 'icon_rolleyes.png',
+    ':wink:': 'icon_wink.png',
+    ':cry:': 'icon_cry.png',
+    ':eek:': 'icon_surprised.png',
+    ':lol:': 'icon_lol.png',
+    ':mad:': 'icon_mad.png',
+    ':sad:': 'icon_sad.png',
+    ':!:': 'icon_exclaim.png',
+    ':?:': 'icon_question.png',
+    ':guzhang:': 'guzhang.png',
+    ':ok:': 'ok.png',
+    ':chigua:': 'chigua.png',
+    ':waizui:': 'waizui.png',
+    ':keguazi:': 'keguazi.png',
+  }
+
+  // 替换表情图片URL
+  Object.entries(SMILIES_MAP).forEach(([code, filename]) => {
+    const imgUrl = getSmilieImgUrl(filename)
+    const escapedCode = code.replace(/[?!]/g, '\\$&')
+    const regex = new RegExp(escapedCode, 'g')
+    result = result.replace(regex, `<img class="smilies-img" src="${imgUrl}" alt="${code}" title="${code}" style="max-width:30px;display:inline-block;vertical-align:middle;margin:2px 0;" />`)
+  })
+
+  return result
+}
 
 // 获取头像URL
 const getAvatarUrl = (email, domain) => {
@@ -22,21 +83,12 @@ const getAvatarUrl = (email, domain) => {
   return `https://${gravatarDomain}/avatar/${hash}?d=mp`
 }
 
-// 格式化时间
-const formatTime = (time) => {
-  if (!time) return ''
-  const date = new Date(time)
-  const now = new Date()
-  const diff = now - date
-  const minutes = Math.floor(diff / 60000)
-  const hours = Math.floor(diff / 3600000)
-  const days = Math.floor(diff / 86400000)
-
-  if (minutes < 1) return '刚刚'
-  if (minutes < 60) return `${minutes}分钟前`
-  if (hours < 24) return `${hours}小时前`
-  if (days < 7) return `${days}天前`
-  return date.toLocaleDateString('zh-CN')
+// 解析链接，将URL转换为可点击的a标签
+const parseLinks = (text) => {
+  if (!text) return ''
+  // 匹配 http:// 或 https:// 开头的URL
+  const urlRegex = /(https?:\/\/[^\s<]+)/g
+  return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
 }
 
 // 解析User-Agent获取浏览器和操作系统
@@ -92,7 +144,7 @@ const parseUserAgent = (ua) => {
   return { browser, os }
 }
 
-function CommentItem({ comment, onReply, depth = 1, gravatarDomain }) {
+function CommentItem({ comment, onReply, depth = 1, gravatarDomain, replyTo, cancelReply, renderResponse, commentFormProps }) {
   const {
     id,
     nickname,
@@ -112,6 +164,7 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain }) {
   const displayAvatar = avatar || getAvatarUrl(email, gravatarDomain)
   const isAuthor = userId && userId !== 0 // 文章作者
   const { browser, os } = parseUserAgent(userAgent)
+  const isReplying = replyTo?.id === id
 
   // 根据浏览器类型选择图标
   const getBrowserIcon = () => {
@@ -171,10 +224,10 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain }) {
                 <a href={`#comment-${replyUserId}`}>@{replyUserName}</a>
               </span>
             )}
-            <span dangerouslySetInnerHTML={{ __html: content }} />
+            <span dangerouslySetInnerHTML={{ __html: renderSmilies(content) }} />
           </div>
           <div className="comment-meta">
-            <time className="comment-time">{formatTime(createTime)}</time>
+            <time className="comment-time">{dateWord(createTime)}</time>
             {os && (
               <span className="agent">
                 <FontAwesomeIcon icon={getOsIcon()} />
@@ -197,6 +250,14 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain }) {
         </div>
       </div>
 
+      {/* 回复表单 - 当回复此评论时显示 */}
+      {isReplying && commentFormProps && (
+        <div id={`respond-comment-${id}`} className="zdypl">
+          {renderResponse(displayName)}
+          <CommentForm {...commentFormProps} />
+        </div>
+      )}
+
       {/* 子评论 */}
       {children && children.length > 0 && (
         <div className="comment-children">
@@ -208,6 +269,10 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain }) {
                 onReply={onReply}
                 depth={depth + 1}
                 gravatarDomain={gravatarDomain}
+                replyTo={replyTo}
+                cancelReply={cancelReply}
+                renderResponse={renderResponse}
+                commentFormProps={commentFormProps}
               />
             ))}
           </ol>

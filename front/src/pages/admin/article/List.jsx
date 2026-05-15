@@ -1,8 +1,20 @@
-import React, { useState, useEffect } from 'react'
-import { Table, Button, Space, Tag, message, Popconfirm, Switch, Image, Tooltip } from 'antd'
-import { ExportOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import React, { useState, useEffect, useRef } from 'react'
+import { Table, Button, Space, Tag, message, Popconfirm, Switch, Image, Tooltip, Input, Select, DatePicker, Row, Col, Card } from 'antd'
+import { ExportOutlined, EditOutlined, DeleteOutlined, SearchOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
+import dayjs from 'dayjs'
 import { getArticleListAdmin, deleteArticle, updateTopStatus, updateRecommendStatus } from '../../../api/article'
+import { dateWord } from '../../../utils/datetime'
+
+const { RangePicker } = DatePicker
+
+const statusOptions = [
+  { value: 0, label: '草稿' },
+  { value: 1, label: '已发布' },
+  { value: 2, label: '回收站' },
+  { value: 3, label: '隐藏' },
+  { value: 4, label: '待审核' }
+]
 
 function ArticleList() {
   const [loading, setLoading] = useState(false)
@@ -12,21 +24,61 @@ function ArticleList() {
     pageSize: 10,
     total: 0
   })
+  // 筛选条件
+  const [keyword, setKeyword] = useState('')
+  const [status, setStatus] = useState(undefined)
+  const [dateRange, setDateRange] = useState(null)
+  const searchTimerRef = useRef(null)
   const navigate = useNavigate()
 
   useEffect(() => {
     fetchList()
   }, [pagination.current, pagination.pageSize])
 
-  const fetchList = async () => {
+  // 标题搜索防抖
+  const handleKeywordChange = (e) => {
+    const value = e.target.value
+    setKeyword(value)
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current)
+    }
+    searchTimerRef.current = setTimeout(() => {
+      setPagination(prev => ({ ...prev, current: 1 }))
+      fetchListWithParams(1, pagination.pageSize, value, status, dateRange)
+    }, 300)
+  }
+
+  // 状态筛选
+  const handleStatusChange = (value) => {
+    setStatus(value)
+    setPagination(prev => ({ ...prev, current: 1 }))
+    fetchListWithParams(1, pagination.pageSize, keyword, value, dateRange)
+  }
+
+  // 时间范围筛选
+  const handleDateRangeChange = (dates) => {
+    setDateRange(dates)
+    setPagination(prev => ({ ...prev, current: 1 }))
+    fetchListWithParams(1, pagination.pageSize, keyword, status, dates)
+  }
+
+  const fetchList = () => {
+    fetchListWithParams(pagination.current, pagination.pageSize, keyword, status, dateRange)
+  }
+
+  const fetchListWithParams = async (current, size, kw, st, dr) => {
     setLoading(true)
     try {
-      const res = await getArticleListAdmin({
-        current: pagination.current,
-        size: pagination.pageSize
-      })
+      const params = { current, size }
+      if (kw) params.keyword = kw
+      if (st !== undefined && st !== null) params.status = st
+      if (dr && dr[0] && dr[1]) {
+        params.startTime = dr[0].format('YYYY-MM-DD')
+        params.endTime = dr[1].format('YYYY-MM-DD')
+      }
+      const res = await getArticleListAdmin(params)
       setDataSource(res.data.records)
-      setPagination({ ...pagination, total: res.data.total })
+      setPagination(prev => ({ ...prev, current, total: res.data.total }))
     } finally {
       setLoading(false)
     }
@@ -91,8 +143,8 @@ function ArticleList() {
       dataIndex: 'status',
       width: 50,
       render: (status) => {
-        const statusMap = { 0: '草稿', 1: '已发布', 2: '回收站' }
-        const colorMap = { 0: 'default', 1: 'success', 2: 'error' }
+        const statusMap = { 0: '草稿', 1: '已发布', 2: '回收站', 3: '隐藏', 4: '待审核' }
+        const colorMap = { 0: 'default', 1: 'success', 2: 'error', 3: 'warning', 4: 'processing' }
         return <Tag color={colorMap[status]}>{statusMap[status]}</Tag>
       }
     },
@@ -118,7 +170,7 @@ function ArticleList() {
         />
       )
     },
-    { title: '创建时间', dataIndex: 'createTime', width: 100 },
+    { title: '创建时间', dataIndex: 'createTime', width: 100, render: (time) => dateWord(time) },
     {
       title: '操作',
       width: 200,
@@ -152,7 +204,44 @@ function ArticleList() {
         .article-list .ant-table-thead > tr > th {
           padding: 8px 16px;
         }
+        .filter-card {
+          margin-bottom: 16px;
+        }
+        .filter-card .ant-input,
+        .filter-card .ant-select {
+          width: 100%;
+        }
       `}</style>
+      <Card className="filter-card" size="small">
+        <Row gutter={16}>
+          <Col span={6}>
+            <Input
+              placeholder="搜索标题"
+              prefix={<SearchOutlined />}
+              value={keyword}
+              onChange={handleKeywordChange}
+              allowClear
+            />
+          </Col>
+          <Col span={4}>
+            <Select
+              placeholder="状态筛选"
+              options={statusOptions}
+              value={status}
+              onChange={handleStatusChange}
+              allowClear
+            />
+          </Col>
+          <Col span={8}>
+            <RangePicker
+              placeholder={['开始日期', '结束日期']}
+              value={dateRange}
+              onChange={handleDateRangeChange}
+              style={{ width: '100%' }}
+            />
+          </Col>
+        </Row>
+      </Card>
       <Table
         loading={loading}
         dataSource={dataSource}
@@ -161,6 +250,7 @@ function ArticleList() {
         scroll={{ x: 1200 }}
         pagination={{
           ...pagination,
+          showTotal: (total) => `共 ${total} 条`,
           onChange: (page, pageSize) => setPagination({ ...pagination, current: page, pageSize })
         }}
       />

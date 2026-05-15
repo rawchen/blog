@@ -154,7 +154,7 @@ function FriendLinkList() {
         dataSource={dataSource}
         columns={columns}
         rowKey="id"
-        pagination={pagination}
+        pagination={{ ...pagination, showTotal: (total) => `共 ${total} 条` }}
         onChange={handleTableChange}
       />
 

@@ -31,7 +31,7 @@ public interface ArticleService {
     /**
      * 分页查询文章列表（后台）
      */
-    PageResult<ArticleVO> getArticleListAdmin(Long current, Long size, String keyword, Integer status);
+    PageResult<ArticleVO> getArticleListAdmin(Long current, Long size, String keyword, Integer status, String startTime, String endTime);
 
     /**
      * 根据ID获取文章

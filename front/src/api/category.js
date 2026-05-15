@@ -4,6 +4,10 @@ export function getCategoryList() {
   return request({ url: '/category/category-list', method: 'get' })
 }
 
+export function getCategoryListAdmin(params) {
+  return request({ url: '/category/admin/list', method: 'get', params })
+}
+
 export function getCategoryById(id) {
   return request({ url: `/category/admin/${id}`, method: 'get' })
 }

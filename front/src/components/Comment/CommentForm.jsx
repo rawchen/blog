@@ -1,36 +1,86 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { SMILIES_LIST, SMILIES_MAP } from '../../utils/smilies'
 import './index.css'
 
-function CommentForm({ onSubmit, replyTo, getUserAgent }) {
+// 导入所有表情图片
+const smilieImages = import.meta.glob('../../assets/images/smilies/bilibili/*.png', { eager: true, import: 'default' })
+
+// 获取表情图片URL
+const getSmilieImgUrl = (filename) => {
+  const key = `../../assets/images/smilies/bilibili/${filename}`
+  return smilieImages[key] || ''
+}
+
+function CommentForm({ onSubmit, replyTo, getUserAgent, savedInfo, showGuestInfo, toggleGuestInfo }) {
   const [form, setForm] = useState({
     nickname: '',
     email: '',
     website: '',
     content: ''
   })
-  const [showGuestInfo, setShowGuestInfo] = useState(true)
   const [submitting, setSubmitting] = useState(false)
-  const [savedInfo, setSavedInfo] = useState(null)
+  const [showSmilies, setShowSmilies] = useState(false)
+  const textareaRef = useRef(null)
+  const smiliesBoxRef = useRef(null)
 
   useEffect(() => {
-    // 从localStorage读取保存的用户信息
-    const saved = localStorage.getItem('comment_user_info')
-    if (saved) {
-      const info = JSON.parse(saved)
-      setSavedInfo(info)
+    // 从savedInfo初始化表单
+    if (savedInfo) {
       setForm(prev => ({
         ...prev,
-        nickname: info.nickname || '',
-        email: info.email || '',
-        website: info.website || ''
+        nickname: savedInfo.nickname || '',
+        email: savedInfo.email || '',
+        website: savedInfo.website || ''
       }))
-      setShowGuestInfo(false)
     }
-  }, [])
+  }, [savedInfo])
+
+  // 点击外部关闭表情框
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (smiliesBoxRef.current && !smiliesBoxRef.current.contains(e.target)) {
+        setShowSmilies(false)
+      }
+    }
+    if (showSmilies) {
+      document.addEventListener('click', handleClickOutside)
+    }
+    return () => {
+      document.removeEventListener('click', handleClickOutside)
+    }
+  }, [showSmilies])
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setForm(prev => ({ ...prev, [name]: value }))
+  }
+
+  // 插入表情到文本框
+  const insertSmilie = (code) => {
+    const textarea = textareaRef.current
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const text = ` ${code} `
+    const newContent = form.content.substring(0, start) + text + form.content.substring(end)
+
+    setForm(prev => ({ ...prev, content: newContent }))
+
+    // 设置光标位置
+    setTimeout(() => {
+      textarea.focus()
+      textarea.setSelectionRange(start + text.length, start + text.length)
+    }, 0)
+
+    setShowSmilies(false)
+  }
+
+  // 切换表情框显示
+  const toggleSmilies = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setShowSmilies(!showSmilies)
   }
 
   const handleSubmit = async (e) => {
@@ -45,15 +95,6 @@ function CommentForm({ onSubmit, replyTo, getUserAgent }) {
         userAgent
       }
 
-      // 保存用户信息
-      if (form.nickname && form.email) {
-        localStorage.setItem('comment_user_info', JSON.stringify({
-          nickname: form.nickname,
-          email: form.email,
-          website: form.website
-        }))
-      }
-
       const success = await onSubmit(data)
       if (success) {
         setForm(prev => ({ ...prev, content: '' }))
@@ -63,10 +104,6 @@ function CommentForm({ onSubmit, replyTo, getUserAgent }) {
     }
   }
 
-  const toggleGuestInfo = () => {
-    setShowGuestInfo(!showGuestInfo)
-  }
-
   return (
     <form
       id="comment-form"
@@ -74,14 +111,6 @@ function CommentForm({ onSubmit, replyTo, getUserAgent }) {
       onSubmit={handleSubmit}
       role="form"
     >
-      {/* 已登录用户欢迎信息 */}
-      {savedInfo && !showGuestInfo && (
-        <div className="guest-info-toggle">
-          <span>{savedInfo.nickname}</span> 欢迎回来，
-          <span onClick={toggleGuestInfo}>修改昵称 ?</span>
-        </div>
-      )}
-
       {/* 游客信息输入 */}
       {showGuestInfo && (
         <div className="guest-info">
@@ -115,13 +144,6 @@ function CommentForm({ onSubmit, replyTo, getUserAgent }) {
         </div>
       )}
 
-      {/* 回复提示 */}
-      {replyTo && (
-        <div style={{ padding: '10px 0', color: '#666', fontSize: '13px' }}>
-          回复 <span style={{ color: '#eb5055' }}>@{replyTo.nickname || replyTo.author}</span>
-        </div>
-      )}
-
       {/* 评论内容 */}
       <textarea
         id="textarea"
@@ -130,8 +152,46 @@ function CommentForm({ onSubmit, replyTo, getUserAgent }) {
         placeholder="我来简单喵两句"
         value={form.content}
         onChange={handleChange}
+        ref={textareaRef}
         required
       />
+
+      {/* 表情选择器 */}
+      <div className="smilies-wrapper" ref={smiliesBoxRef}>
+        {showSmilies && (
+          <div className="smilies-box">
+            {SMILIES_LIST.map(code => (
+              <span
+                key={code}
+                className="smilie-item"
+                title={code}
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  insertSmilie(code)
+                }}
+              >
+                <img
+                  src={getSmilieImgUrl(SMILIES_MAP[code])}
+                  alt={code}
+                  className="smilie-img"
+                />
+              </span>
+            ))}
+          </div>
+        )}
+        <span
+          className="smilies-button"
+          title="选择表情"
+          onClick={toggleSmilies}
+        >
+          <img
+            src={getSmilieImgUrl(SMILIES_MAP[':smile:'])}
+            alt="选择表情"
+            className="smilie-trigger"
+          />
+        </span>
+      </div>
 
       <button
         type="submit"

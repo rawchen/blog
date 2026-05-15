@@ -112,15 +112,6 @@
   color: #3498db;
 }
 
-.comment-author {
-  color: #3498db;
-  margin-right: 5px;
-}
-
-.comment-content {
-  color: #bdc3c7;
-}
-
 .icp a:hover {
   border-bottom: 1px solid #cdcdcd;
   color: black;

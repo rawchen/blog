@@ -1,5 +1,6 @@
 package com.rawchen.blog.controller;
 
+import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.entity.Category;
 import com.rawchen.blog.service.CategoryService;
@@ -32,6 +33,15 @@ public class CategoryController {
     }
 
     // ========== 后台管理接口 ==========
+
+    @ApiOperation("分页获取分类列表（后台）")
+    @GetMapping("/admin/list")
+    public R<PageResult<CategoryVO>> getCategoryListAdmin(
+            @RequestParam(defaultValue = "1") Long current,
+            @RequestParam(defaultValue = "10") Long size,
+            @RequestParam(required = false) String keyword) {
+        return R.ok(categoryService.getCategoryListAdmin(current, size, keyword));
+    }
 
     @ApiOperation("根据ID获取分类")
     @GetMapping("/admin/{id}")

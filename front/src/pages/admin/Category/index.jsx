@@ -1,24 +1,26 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Button, Modal, Form, Input, message, Popconfirm, Space } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
-import { getCategoryList, createCategory, updateCategory, deleteCategory } from '../../../api/category'
+import { getCategoryListAdmin, createCategory, updateCategory, deleteCategory } from '../../../api/category'
 
 function CategoryList() {
   const [loading, setLoading] = useState(false)
   const [dataSource, setDataSource] = useState([])
+  const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
   const [modalVisible, setModalVisible] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [form] = Form.useForm()
 
   useEffect(() => {
     fetchList()
-  }, [])
+  }, [pagination.current])
 
   const fetchList = async () => {
     setLoading(true)
     try {
-      const res = await getCategoryList()
-      setDataSource(res.data || [])
+      const res = await getCategoryListAdmin({ current: pagination.current, size: pagination.pageSize })
+      setDataSource(res.data.records || [])
+      setPagination({ ...pagination, total: res.data.total })
     } finally {
       setLoading(false)
     }
@@ -94,7 +96,11 @@ function CategoryList() {
         dataSource={dataSource}
         columns={columns}
         rowKey="id"
-        pagination={false}
+        pagination={{
+          ...pagination,
+          showTotal: (total) => `共 ${total} 条`,
+          onChange: (page) => setPagination({ ...pagination, current: page })
+        }}
       />
 
       <Modal

@@ -87,6 +87,7 @@ function CommentList() {
       rowKey="id"
       pagination={{
         ...pagination,
+        showTotal: (total) => `共 ${total} 条`,
         onChange: (page) => setPagination({ ...pagination, current: page })
       }}
     />

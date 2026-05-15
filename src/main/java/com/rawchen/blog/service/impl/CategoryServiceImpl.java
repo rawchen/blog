@@ -1,6 +1,8 @@
 package com.rawchen.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.entity.Category;
 import com.rawchen.blog.mapper.ArticleMapper;
 import com.rawchen.blog.mapper.CategoryMapper;
@@ -10,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,6 +41,31 @@ public class CategoryServiceImpl implements CategoryService {
         return categories.stream()
                 .map(this::convertToVO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public PageResult<CategoryVO> getCategoryListAdmin(Long current, Long size, String keyword) {
+        Page<Category> page = new Page<>(current, size);
+
+        LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByAsc(Category::getSortOrder);
+
+        if (StringUtils.hasText(keyword)) {
+            wrapper.like(Category::getCategoryName, keyword);
+        }
+
+        Page<Category> categoryPage = categoryMapper.selectPage(page, wrapper);
+
+        List<CategoryVO> voList = categoryPage.getRecords().stream()
+                .map(this::convertToVO)
+                .collect(Collectors.toList());
+
+        return PageResult.of(new Page<CategoryVO>()
+                .setRecords(voList)
+                .setCurrent(categoryPage.getCurrent())
+                .setSize(categoryPage.getSize())
+                .setTotal(categoryPage.getTotal())
+                .setPages(categoryPage.getPages()));
     }
 
     @Override

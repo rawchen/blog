@@ -140,8 +140,10 @@ public class ArticleController {
             @RequestParam(defaultValue = "1") Long current,
             @RequestParam(defaultValue = "10") Long size,
             @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Integer status) {
-        return R.ok(articleService.getArticleListAdmin(current, size, keyword, status));
+            @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) String startTime,
+            @RequestParam(required = false) String endTime) {
+        return R.ok(articleService.getArticleListAdmin(current, size, keyword, status, startTime, endTime));
     }
 
     @ApiOperation("根据ID获取文章")

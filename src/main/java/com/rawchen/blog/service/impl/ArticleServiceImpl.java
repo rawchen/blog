@@ -166,11 +166,12 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public PageResult<ArticleVO> getArticleListAdmin(Long current, Long size, String keyword, Integer status) {
+    public PageResult<ArticleVO> getArticleListAdmin(Long current, Long size, String keyword, Integer status, String startTime, String endTime) {
         Page<Article> page = new Page<>(current, size);
-        
+
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
-        wrapper.orderByDesc(Article::getCreateTime);
+        wrapper.eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章，过滤掉独立页面
+                .orderByDesc(Article::getCreateTime);
 
         if (status != null) {
             wrapper.eq(Article::getStatus, status);
@@ -182,8 +183,16 @@ public class ArticleServiceImpl implements ArticleService {
                     .like(Article::getSummary, keyword));
         }
 
+        // 时间范围筛选
+        if (StringUtils.hasText(startTime)) {
+            wrapper.ge(Article::getCreateTime, startTime + " 00:00:00");
+        }
+        if (StringUtils.hasText(endTime)) {
+            wrapper.le(Article::getCreateTime, endTime + " 23:59:59");
+        }
+
         Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
-        
+
         List<ArticleVO> voList = articlePage.getRecords().stream()
                 .map(this::convertToVO)
                 .collect(Collectors.toList());

@@ -18,7 +18,6 @@
 
 #comments a {
   position: relative;
-  color: #5f5f5f;
 }
 
 #comments a:hover {
@@ -123,6 +122,7 @@
 }
 
 .comment-content {
+  word-wrap: break-word;
   padding-top: 4px;
   margin-bottom: 10px;
   color: #313131;
@@ -197,9 +197,20 @@
   padding: 20px;
 }
 
+.comment-list .zdypl {
+  padding: 10px;
+  margin-bottom: -40px;
+  margin-top: -10px!important;
+}
+
 .zdypl .response {
   border-top: 1px #dcdcdc dashed;
   padding: 16px 0 16px 10px !important;
+}
+
+.comment-list .comment-form{
+  border: 1.8px #d6d6d6 dashed;
+  padding: 10px 10px !important;
 }
 
 .comment-form {
@@ -228,12 +239,12 @@
 
 .comment-form textarea.form-control {
   overflow: hidden;
-  height: 150px;
+  height: 140px;
   padding: 10px 0;
   resize: none;
   border-radius: 0;
   border-bottom: none;
-  background: #fff url('/images/comments-bg.jpg') right center no-repeat;
+  background: #fff url('../../assets/images/comments-bg.jpg') right center no-repeat;
   background-size: 200px;
 }
 
@@ -387,4 +398,68 @@
   .comment-form .input-control {
     max-width: 100%;
   }
+}
+
+/* Smilies 表情选择器 */
+.smilies-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-top: 10px;
+}
+
+.smilies-button {
+  cursor: pointer;
+  display: inline-block;
+  padding: 2px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.smilies-button:hover {
+  background-color: #f0f0f0;
+}
+
+.smilie-trigger {
+  max-width: 30px;
+  vertical-align: middle;
+}
+
+.smilies-box {
+  position: absolute;
+  z-index: 9999;
+  width: 321px;
+  margin-top: -116px;
+  margin-left: -8px;
+  padding: 5px;
+  background-color: #fff;
+  border: 1px solid #bbb;
+  border-radius: 11px;
+  box-shadow: 1px 3px 15px #bbb;
+}
+
+.smilie-item {
+  cursor: pointer;
+  display: inline-block;
+  padding: 2px;
+  margin: 1px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.smilie-item:hover {
+  background-color: #f5f5f5;
+}
+
+.smilie-img {
+  max-width: 30px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* 评论中显示的表情图片 */
+.smilies-img {
+  max-width: 30px !important;
+  display: inline-block !important;
+  vertical-align: middle;
+  margin: 2px 0;
 }
