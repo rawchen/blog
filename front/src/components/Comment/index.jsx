@@ -70,7 +70,8 @@ function CommentList({ articleId }) {
         articleId,
         parentId: replyTo?.id || 0,
         replyUserId: replyTo?.userId || null,
-        userAgent: navigator.userAgent
+        userAgent: navigator.userAgent,
+        content: data.content
       }
 
       if (isLoggedIn) {
@@ -82,7 +83,9 @@ function CommentList({ articleId }) {
         commentData.website = siteConfig.siteUrl || window.location.origin
       } else {
         // 游客：使用表单数据
-        Object.assign(commentData, data)
+        commentData.nickname = data.nickname
+        commentData.email = data.email
+        commentData.website = data.website
         // 保存游客信息
         if (data.nickname && data.email) {
           const info = {
