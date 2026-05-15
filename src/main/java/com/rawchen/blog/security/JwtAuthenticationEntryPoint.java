@@ -26,7 +26,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException, ServletException {
-        log.error("认证失败: {}", authException.getMessage());
+        log.warn("认证失败: {} - 请求路径: {}", authException.getMessage(), request.getRequestURI());
 
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

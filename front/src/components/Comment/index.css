@@ -54,6 +54,7 @@
 
 .comment-list {
   padding-left: 0;
+  margin: 0;
   list-style-type: none;
 }
 
@@ -465,5 +466,5 @@
   max-width: 30px !important;
   display: inline-block !important;
   vertical-align: middle;
-  margin: 2px 0;
+  margin: -5px 0px 0px 0px;
 }
