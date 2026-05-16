@@ -188,6 +188,7 @@
 .md-editor-pane {
   flex: 1;
   overflow: hidden;
+  position: relative;
 }
 
 .md-editor-pane-left {
@@ -491,4 +492,32 @@
   font-size: 12px;
   color: #ff4d4f;
   margin-top: 4px;
+}
+
+/* 回到顶部按钮 */
+.md-editor-back-top {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #d9d9d9;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+  z-index: 10;
+  color: #595959;
+}
+
+.md-editor-back-top:hover {
+  background: #1890ff;
+  border-color: #1890ff;
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
 }

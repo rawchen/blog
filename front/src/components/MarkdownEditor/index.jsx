@@ -9,7 +9,6 @@ import {
   BoldOutlined,
   ItalicOutlined,
   StrikethroughOutlined,
-  MinusOutlined,
   LinkOutlined,
   OrderedListOutlined,
   UnorderedListOutlined,
@@ -20,7 +19,10 @@ import {
   CloudUploadOutlined,
   InboxOutlined,
   FullscreenOutlined,
-  FullscreenExitOutlined
+  FullscreenExitOutlined,
+  BorderVerticleOutlined,
+  JavaScriptOutlined,
+  UpOutlined
 } from '@ant-design/icons'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -59,6 +61,7 @@ function MarkdownEditor({
   const [uploadList, setUploadList] = useState([]) // 上传列表 {file, status, url, altText}
   const [dragActive, setDragActive] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
+  const [showBackTop, setShowBackTop] = useState(false)
   const textareaRef = useRef(null)
   const fileInputRef = useRef(null)
   const previewRef = useRef(null)
@@ -68,7 +71,6 @@ function MarkdownEditor({
     const textarea = textareaRef.current
     if (!textarea || disabled) return
 
-    const scrollTop = textarea.scrollTop  // 保存滚动位置
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
     const selectedText = value.substring(start, end)
@@ -81,18 +83,27 @@ function MarkdownEditor({
 
     onChange?.(newValue)
 
-    // 恢复光标位置和滚动位置
+    // 设置光标位置并滚动到可见区域
     setTimeout(() => {
       textarea.focus()
+      let newStart, newEnd
       if (selectedText) {
         // 如果有选中文本，光标放在插入内容之后
-        textarea.selectionStart = textarea.selectionEnd = start + before.length + textToInsert.length + after.length
+        newStart = newEnd = start + before.length + textToInsert.length + after.length
       } else {
         // 如果没有选中文本，光标放在占位符位置（选中占位符便于替换）
-        textarea.selectionStart = start + before.length
-        textarea.selectionEnd = start + before.length + placeholder.length
+        newStart = start + before.length
+        newEnd = start + before.length + placeholder.length
       }
-      textarea.scrollTop = scrollTop  // 恢复滚动位置
+      textarea.selectionStart = newStart
+      textarea.selectionEnd = newEnd
+
+      // 滚动到光标位置，确保光标可见
+      // 计算光标所在行的大致位置
+      const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 20
+      const linesBeforeCursor = newValue.substring(0, newStart).split('\n').length
+      const scrollTarget = Math.max(0, (linesBeforeCursor - 1) * lineHeight - textarea.clientHeight / 2)
+      textarea.scrollTop = scrollTarget
     }, 0)
   }, [value, onChange, disabled])
 
@@ -101,9 +112,7 @@ function MarkdownEditor({
     const textarea = textareaRef.current
     if (!textarea || disabled) return
 
-    const scrollTop = textarea.scrollTop  // 保存滚动位置
     const start = textarea.selectionStart
-
     const newValue =
       value.substring(0, start) +
       text +
@@ -113,8 +122,14 @@ function MarkdownEditor({
 
     setTimeout(() => {
       textarea.focus()
-      textarea.selectionStart = textarea.selectionEnd = start + text.length
-      textarea.scrollTop = scrollTop  // 恢复滚动位置
+      const newCursorPos = start + text.length
+      textarea.selectionStart = textarea.selectionEnd = newCursorPos
+
+      // 滚动到光标位置
+      const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 20
+      const linesBeforeCursor = newValue.substring(0, newCursorPos).split('\n').length
+      const scrollTarget = Math.max(0, (linesBeforeCursor - 1) * lineHeight - textarea.clientHeight / 2)
+      textarea.scrollTop = scrollTarget
     }, 0)
   }, [value, onChange, disabled])
 
@@ -189,7 +204,7 @@ function MarkdownEditor({
     },
     {
       key: 'codeblock',
-      icon: <CodeOutlined style={{ fontWeight: 'bold' }} />,
+      icon: <JavaScriptOutlined />,
       tooltip: '代码块 (Ctrl+Shift+`)',
       shortcut: '`',
       shiftKey: true,
@@ -229,7 +244,7 @@ function MarkdownEditor({
     { type: 'divider' },
     {
       key: 'divider',
-      icon: <MinusOutlined />,
+      icon: <BorderVerticleOutlined />,
       tooltip: '分隔线 (Ctrl+Shift+-)',
       shortcut: '-',
       shiftKey: true,
@@ -315,13 +330,24 @@ function MarkdownEditor({
 
   // 同步滚动
   const handleScroll = useCallback((e) => {
+    const textarea = e.target
+    // 显示/隐藏回到顶部按钮
+    setShowBackTop(textarea.scrollTop > 200)
+
     if (mode !== 'split' || !previewRef.current) return
 
-    const textarea = e.target
     const preview = previewRef.current
     const scrollRatio = textarea.scrollTop / (textarea.scrollHeight - textarea.clientHeight)
     preview.scrollTop = scrollRatio * (preview.scrollHeight - preview.clientHeight)
   }, [mode])
+
+  // 滚动到顶部
+  const scrollToTop = () => {
+    const textarea = textareaRef.current
+    if (textarea) {
+      textarea.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
 
   // 上传文件到OSS
   const uploadToOSS = async (file, ossStyle) => {
@@ -404,7 +430,6 @@ function MarkdownEditor({
     const textarea = textareaRef.current
     if (!textarea) return
 
-    const scrollTop = textarea.scrollTop  // 保存滚动位置
     const imageMarkdown = `![${altText}](${imageUrl})`
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
@@ -412,11 +437,16 @@ function MarkdownEditor({
 
     onChange?.(newValue)
 
-    // 恢复光标位置和滚动位置
     setTimeout(() => {
       textarea.focus()
-      textarea.selectionStart = textarea.selectionEnd = start + imageMarkdown.length
-      textarea.scrollTop = scrollTop  // 恢复滚动位置
+      const newCursorPos = start + imageMarkdown.length
+      textarea.selectionStart = textarea.selectionEnd = newCursorPos
+
+      // 滚动到光标位置
+      const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 20
+      const linesBeforeCursor = newValue.substring(0, newCursorPos).split('\n').length
+      const scrollTarget = Math.max(0, (linesBeforeCursor - 1) * lineHeight - textarea.clientHeight / 2)
+      textarea.scrollTop = scrollTarget
     }, 0)
   }
 
@@ -753,6 +783,13 @@ function MarkdownEditor({
               placeholder={placeholder}
               disabled={disabled}
             />
+            {showBackTop && (
+              <Tooltip title="回到顶部">
+                <div className="md-editor-back-top" onClick={scrollToTop}>
+                  <UpOutlined />
+                </div>
+              </Tooltip>
+            )}
           </div>
         )}
         {mode !== 'edit' && (

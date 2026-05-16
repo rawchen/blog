@@ -15,7 +15,8 @@ import {
   OrderedListOutlined,
   BookOutlined,
   ToolOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  GithubOutlined
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -99,6 +100,12 @@ function AdminLayout() {
   }
 
   const userMenuItems = [
+    {
+      key: 'github',
+      icon: <GithubOutlined />,
+      label: 'GitHub',
+      onClick: () => window.open('http://github.com/rawchen/blog', '_blank')
+    },
     {
       key: 'logout',
       icon: <LogoutOutlined />,

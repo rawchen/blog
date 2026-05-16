@@ -93,6 +93,17 @@ function ArticleEdit() {
   }
 
   useEffect(() => {
+    // id 变化时重置状态
+    draftCheckedRef.current = false
+    isRemoteLoadedRef.current = false
+    setDraftInfo(null)
+
+    // 清空表单（新建文章时）
+    if (!id) {
+      form.resetFields()
+      setContentValue('')
+    }
+
     fetchCategories()
     fetchTags()
     if (id) {
@@ -274,6 +285,7 @@ function ArticleEdit() {
                   background: '#f5f5f5',
                   borderRadius: 6,
                   fontSize: 14,
+                  fontWeight: 800,
                   color: id ? '#1890ff' : '#8c8c8c',
                   cursor: id ? 'pointer' : 'default',
                   overflow: 'hidden',
