@@ -52,7 +52,6 @@ function MarkdownEditor({
   value = '',
   onChange,
   placeholder = '请输入Markdown内容',
-  height = 500,
   disabled = false
 }) {
   const [mode, setMode] = useState('split') // 'edit' | 'preview' | 'split'
@@ -767,7 +766,7 @@ function MarkdownEditor({
       </div>
 
       {/* 编辑区域 */}
-      <div className="md-editor-body" style={{ height: fullscreen ? '100vh' : height }}>
+      <div className="md-editor-body">
         {mode !== 'preview' && (
           <div className={`md-editor-pane ${mode === 'split' ? 'md-editor-pane-left' : ''}`}>
             <textarea

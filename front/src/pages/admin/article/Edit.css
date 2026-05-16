@@ -1,8 +1,8 @@
 .article-edit-container {
   display: flex;
   gap: 16px;
-  height: calc(100vh - 120px);
-  min-height: 600px;
+  flex: 1;
+  min-height: 0;
 }
 
 .article-edit-main {
@@ -10,12 +10,14 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .article-edit-card {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .article-edit-card .ant-card-body {
@@ -23,35 +25,42 @@
   display: flex;
   flex-direction: column;
   padding: 16px;
+  min-height: 0;
 }
 
 .article-edit-card .ant-form {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .content-editor-item {
   flex: 1;
   margin-bottom: 0 !important;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .content-editor-item .ant-form-item-control {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .content-editor-item .ant-form-item-control-input {
   flex: 1;
   display: flex;
-  /*flex-direction: column;*/
+  min-height: 0;
 }
 
 .content-editor-item .ant-form-item-control-input-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .article-edit-sidebar {

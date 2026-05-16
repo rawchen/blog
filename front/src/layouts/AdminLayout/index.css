@@ -1,5 +1,12 @@
 .admin-layout {
-  height: 100vh;
+  height: 100%;
+}
+
+.admin-layout > .ant-layout {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
 }
 
 .header {
@@ -9,6 +16,7 @@
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  flex-shrink: 0;
 }
 
 .trigger {
@@ -31,5 +39,8 @@
   padding: 16px;
   background: #fff;
   border-radius: 8px;
-  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
