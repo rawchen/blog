@@ -93,24 +93,23 @@ function ArticleEdit() {
   }
 
   useEffect(() => {
-    // id 变化时重置状态
-    draftCheckedRef.current = false
-    isRemoteLoadedRef.current = false
-    setDraftInfo(null)
-
-    // 清空表单（新建文章时）
-    if (!id) {
-      form.resetFields()
-      setContentValue('')
-    }
-
     fetchCategories()
     fetchTags()
     if (id) {
       fetchArticle()
     } else {
-      // 新建文章时检查本地草稿
-      checkAndRestoreDraft()
+      // 新建文章时：先检查草稿，没有草稿才清空表单
+      if (!draftCheckedRef.current) {
+        draftCheckedRef.current = true
+        const draft = loadDraft()
+        if (draft && (draft.title || draft.content || draft.summary)) {
+          setDraftInfo({ savedAt: draft.savedAt })
+          restoreDraft(draft)
+        } else {
+          form.resetFields()
+          setContentValue('')
+        }
+      }
     }
   }, [id])
 

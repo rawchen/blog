@@ -55,6 +55,10 @@
   font-weight: bold;
 }
 
+.admin-layout .logo {
+  border-bottom: 1px solid #445a77;
+}
+
 .logo:hover {
   color: #eb5055;
 }

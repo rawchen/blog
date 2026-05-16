@@ -77,7 +77,23 @@ getSiteConfig().then(res => {
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
-      <ConfigProvider locale={zhCN}>
+      <ConfigProvider
+        locale={zhCN}
+        theme={{
+          components: {
+            Layout: {
+              siderBg: '#314156'
+            },
+            Menu: {
+              // itemMarginInline: 0,
+              // itemBorderRadius: 0,
+              darkItemBg: '#314156',
+              darkSubMenuItemBg: '#1f2d3d',
+              darkPopupBg: '#001529'
+            }
+          }
+        }}
+      >
         <BrowserRouter>
           <App />
         </BrowserRouter>
