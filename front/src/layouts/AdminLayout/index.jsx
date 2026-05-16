@@ -80,14 +80,10 @@ function AdminLayout() {
     return path
   }, [location.pathname])
 
-  // 获取展开的子菜单keys
-  const openKeys = useMemo(() => {
-    const path = location.pathname
-    if (path.startsWith('/admin/article')) {
-      return ['blog']
-    }
-    return []
-  }, [location.pathname])
+  // 默认展开所有子菜单
+  const defaultOpenKeys = useMemo(() => {
+    return menuItems.filter(item => item.children).map(item => item.key)
+  }, [])
 
   const handleMenuClick = ({ key }) => navigate(key)
 
@@ -119,7 +115,7 @@ function AdminLayout() {
           theme="dark"
           mode="inline"
           selectedKeys={[selectedKey]}
-          defaultOpenKeys={openKeys}
+          defaultOpenKeys={defaultOpenKeys}
           items={menuItems}
           onClick={handleMenuClick}
         />

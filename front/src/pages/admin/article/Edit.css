@@ -87,3 +87,14 @@
     position: static;
   }
 }
+
+/* 草稿信息卡片 */
+.draft-info-card {
+  margin-bottom: 12px;
+  background: #f6ffed;
+  border-color: #b7eb8f;
+}
+
+.draft-info-card .ant-card-body {
+  padding: 8px 12px;
+}
