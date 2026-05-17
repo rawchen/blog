@@ -115,7 +115,7 @@ function AdminLayout() {
   ]
 
   return (
-    <Layout className="admin-layout">
+    <Layout className={`admin-layout ${collapsed ? 'sider-collapsed' : ''}`}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <div className="logo">{collapsed ? 'BLOG' : '博客管理系统'}</div>
         <Menu
