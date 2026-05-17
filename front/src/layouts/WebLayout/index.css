@@ -38,6 +38,7 @@ html {
   }
 
   ::-webkit-scrollbar-thumb {
+    cursor: pointer;
     background-color: #bbb;
   }
 

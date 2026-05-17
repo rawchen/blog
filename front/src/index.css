@@ -6,6 +6,7 @@
 
 html {
   height: 100%;
+  overflow-y: scroll;
 }
 
 body {
@@ -18,9 +19,7 @@ body {
   background-color: #f3f3f3;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: 100%;
-  overflow-y: scroll;
-  scrollbar-gutter: stable;
+  min-height: 100%;
 }
 
 #root {

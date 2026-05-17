@@ -31,6 +31,10 @@
   height: calc(100vh - 42px) !important;
 }
 
+.md-editor-container.fullscreen .md-editor-pane {
+  height: calc(100vh - 42px) !important;
+}
+
 .md-editor-container.fullscreen .md-editor-textarea,
 .md-editor-container.fullscreen .md-editor-preview {
   height: 100% !important;
@@ -195,6 +199,7 @@
 }
 
 .md-editor-pane {
+  height: calc(100vh - 250px);
   flex: 1;
   min-height: 0;
   min-width: 0;
@@ -225,6 +230,37 @@
   line-height: 1.6;
   background: #fff;
   color: #333;
+}
+
+.md-editor-textarea::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.md-editor-textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.md-editor-textarea::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  cursor: pointer;
+}
+
+.md-editor-pane::-webkit-scrollbar-thumb {
+  cursor: pointer;
+  background: #d9d9d9;
+}
+
+.md-editor-pane::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
+}
+
+.md-editor-textarea::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
+}
+
+.md-editor-textarea::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .md-editor-textarea:disabled {

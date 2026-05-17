@@ -273,7 +273,9 @@ function ArticleEdit() {
           <Form form={form} layout="vertical" onValuesChange={handleValuesChange}>
             <div style={{ display: 'flex', gap: 12 }}>
               <Form.Item name="title" rules={[{ required: true, message: '请输入标题' }]} style={{ flex: 7, marginBottom: 24 }}>
-                <Input placeholder="请输入标题" size="large" />
+                <Input placeholder="标题" size="large"
+                       style={{ borderRadius: 5 }}
+                />
               </Form.Item>
               <Form.Item style={{ flex: 3, marginBottom: 24 }}>
                 <div style={{
