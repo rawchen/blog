@@ -41,12 +41,22 @@ public class OperationLogAspect {
 
     @Around("@annotation(operationLogAnnotation)")
     public Object around(ProceedingJoinPoint joinPoint, OperationLogAnnotation operationLogAnnotation) throws Throwable {
+        // 方法执行前获取用户信息（适用于 logout 等会清空 SecurityContext 的场景）
+        Object[] beforeUserInfo = getCurrentUserInfo();
+
         // 执行方法
         Object result = joinPoint.proceed();
 
+        // 方法执行后获取用户信息（适用于 login 等执行后才设置 SecurityContext 的场景）
+        Object[] afterUserInfo = getCurrentUserInfo();
+
+        // 优先使用非 anonymous 的用户信息
+        Long userId = (Long) (beforeUserInfo[0] != null ? beforeUserInfo[0] : afterUserInfo[0]);
+        String username = !"anonymous".equals(beforeUserInfo[1]) ? (String) beforeUserInfo[1] : (String) afterUserInfo[1];
+
         try {
             // 保存操作日志
-            saveOperationLog(joinPoint, operationLogAnnotation, result);
+            saveOperationLog(joinPoint, operationLogAnnotation, result, userId, username);
         } catch (Exception e) {
             log.error("保存操作日志失败", e);
         }
@@ -54,7 +64,20 @@ public class OperationLogAspect {
         return result;
     }
 
-    private void saveOperationLog(ProceedingJoinPoint joinPoint, OperationLogAnnotation operationLogAnnotation, Object result) {
+    /**
+     * 获取当前用户信息
+     * @return [userId, username]
+     */
+    private Object[] getCurrentUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof User) {
+            User user = (User) authentication.getPrincipal();
+            return new Object[]{user.getId(), user.getUsername()};
+        }
+        return new Object[]{null, "anonymous"};
+    }
+
+    private void saveOperationLog(ProceedingJoinPoint joinPoint, OperationLogAnnotation operationLogAnnotation, Object result, Long userId, String username) {
         // 获取当前请求
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes == null) {
@@ -62,16 +85,6 @@ public class OperationLogAspect {
         }
 
         HttpServletRequest request = attributes.getRequest();
-
-        // 获取当前用户
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Long userId = null;
-        String username = "anonymous";
-        if (authentication != null && authentication.isAuthenticated() && authentication.getPrincipal() instanceof User) {
-            User user = (User) authentication.getPrincipal();
-            userId = user.getId();
-            username = user.getUsername();
-        }
 
         // 获取IP地址
         String ip = IpUtil.getClientIp(request);

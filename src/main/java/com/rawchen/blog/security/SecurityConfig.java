@@ -130,7 +130,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/timeline",
                         "/moments",
                         "/friends",
-                        "/admin/login"
+                        "/admin/**"
                 ).permitAll()
                 // 后台管理接口需要 ADMIN 或 STAFF 角色
                 .antMatchers("/api/**/admin/**").hasAnyRole("ADMIN", "STAFF")
