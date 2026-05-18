@@ -1,8 +1,11 @@
 package com.rawchen.blog.controller;
 
+import com.rawchen.blog.annotation.OperationLogAnnotation;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.dto.LoginDTO;
 import com.rawchen.blog.dto.RegisterDTO;
+import com.rawchen.blog.enums.OperationType;
+import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.service.AuthService;
 import com.rawchen.blog.vo.LoginVO;
 import com.rawchen.blog.vo.UserVO;
@@ -28,12 +31,14 @@ public class AuthController {
 
     @ApiOperation("用户登录")
     @PostMapping("/login")
+    @OperationLogAnnotation(type = OperationType.LOGIN, target = TargetType.USER, description = "用户登录")
     public R<LoginVO> login(@Valid @RequestBody LoginDTO loginDTO) {
         return R.ok(authService.login(loginDTO));
     }
 
     @ApiOperation("用户注册")
     @PostMapping("/register")
+    @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.USER, description = "用户注册")
     public R<Void> register(@Valid @RequestBody RegisterDTO registerDTO) {
         authService.register(registerDTO);
         return R.ok();
@@ -47,6 +52,7 @@ public class AuthController {
 
     @ApiOperation("退出登录")
     @PostMapping("/logout")
+    @OperationLogAnnotation(type = OperationType.LOGOUT, target = TargetType.USER, description = "用户登出")
     public R<Void> logout() {
         authService.logout();
         return R.ok();

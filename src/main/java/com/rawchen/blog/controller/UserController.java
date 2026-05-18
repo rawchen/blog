@@ -2,9 +2,12 @@ package com.rawchen.blog.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.rawchen.blog.annotation.OperationLogAnnotation;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.entity.User;
+import com.rawchen.blog.enums.OperationType;
+import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.mapper.UserMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -60,6 +63,7 @@ public class UserController {
     @ApiOperation("更新用户状态")
     @PutMapping("/admin/status/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.USER, description = "更新用户状态")
     public R<Void> updateUserStatus(@PathVariable Long id, @RequestParam Integer status) {
         User user = userMapper.selectById(id);
         if (user == null) {
@@ -73,6 +77,7 @@ public class UserController {
     @ApiOperation("重置用户密码")
     @PutMapping("/admin/reset-password/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.RESET, target = TargetType.USER, description = "重置用户密码")
     public R<String> resetPassword(@PathVariable Long id) {
         User user = userMapper.selectById(id);
         if (user == null) {
@@ -86,6 +91,7 @@ public class UserController {
     @ApiOperation("更新用户角色")
     @PutMapping("/admin/role/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.USER, description = "更新用户角色")
     public R<Void> updateUserRole(@PathVariable Long id, @RequestParam String role) {
         User user = userMapper.selectById(id);
         if (user == null) {

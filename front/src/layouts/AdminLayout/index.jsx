@@ -16,7 +16,11 @@ import {
   BookOutlined,
   ToolOutlined,
   FileTextOutlined,
-  GithubOutlined
+  GithubOutlined,
+  AuditOutlined,
+  LoginOutlined,
+  ProfileOutlined,
+  GlobalOutlined
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -63,6 +67,16 @@ function AdminLayout() {
     { key: '/admin/comment', icon: <CommentOutlined />, label: '评论管理' },
     { key: '/admin/friend-link', icon: <LinkOutlined />, label: '友链管理' },
     { key: '/admin/user', icon: <UserOutlined />, label: '用户管理' },
+    {
+      key: 'log',
+      icon: <AuditOutlined />,
+      label: '日志管理',
+      children: [
+        { key: '/admin/log/login', icon: <LoginOutlined />, label: '登录日志' },
+        { key: '/admin/log/operation', icon: <ProfileOutlined />, label: '操作日志' },
+        { key: '/admin/log/access', icon: <GlobalOutlined />, label: '访问日志' }
+      ]
+    },
     { key: '/admin/setting', icon: <SettingOutlined />, label: '网站设置' },
     { key: '/admin/tool', icon: <ToolOutlined />, label: '工具库' }
   ]

@@ -1,9 +1,13 @@
 package com.rawchen.blog.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.rawchen.blog.annotation.AccessLogAnnotation;
+import com.rawchen.blog.annotation.OperationLogAnnotation;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.dto.FriendLinkDTO;
 import com.rawchen.blog.entity.FriendLink;
+import com.rawchen.blog.enums.OperationType;
+import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.service.FriendLinkService;
 import com.rawchen.blog.vo.FriendLinkVO;
 import io.swagger.annotations.Api;
@@ -30,6 +34,7 @@ public class FriendLinkController {
 
     @ApiOperation("获取友链列表（前台）")
     @GetMapping("/list")
+    @AccessLogAnnotation("FRIENDS")
     public R<List<FriendLinkVO>> getFriendLinkList() {
         return R.ok(friendLinkService.getFriendLinkList());
     }
@@ -58,12 +63,14 @@ public class FriendLinkController {
 
     @ApiOperation("添加友链")
     @PostMapping("/admin")
+    @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.FRIEND, description = "添加友链", recordDetail = true)
     public R<Long> addFriendLink(@Valid @RequestBody FriendLinkDTO dto) {
         return R.ok(friendLinkService.addFriendLink(dto));
     }
 
     @ApiOperation("更新友链")
     @PutMapping("/admin")
+    @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.FRIEND, description = "更新友链")
     public R<Void> updateFriendLink(@Valid @RequestBody FriendLinkDTO dto) {
         friendLinkService.updateFriendLink(dto);
         return R.ok();
@@ -72,6 +79,7 @@ public class FriendLinkController {
     @ApiOperation("删除友链")
     @DeleteMapping("/admin/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.FRIEND, description = "删除友链")
     public R<Void> deleteFriendLink(@PathVariable Long id) {
         friendLinkService.deleteFriendLink(id);
         return R.ok();
@@ -79,6 +87,7 @@ public class FriendLinkController {
 
     @ApiOperation("审核友链")
     @PutMapping("/admin/{id}/audit")
+    @OperationLogAnnotation(type = OperationType.AUDIT, target = TargetType.FRIEND, description = "审核友链")
     public R<Void> auditFriendLink(@PathVariable Long id, @RequestParam Integer status) {
         friendLinkService.auditFriendLink(id, status);
         return R.ok();

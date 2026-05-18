@@ -51,10 +51,8 @@ mybatis-plus:
 jwt:
   # 密钥（生产环境请使用随机字符串）
   secret: rawchen-blog-jwt-secret-key-2026-very-long-secret-key-for-security
-  # Access Token 过期时间（单位：毫秒）默认2小时
-  expiration: 7200000
-  # Refresh Token 过期时间（单位：毫秒）默认7天
-  refresh-expiration: 604800000
+  # Access Token 过期时间（单位：毫秒）默认1个月
+  expiration: 2592000000
   # Token前缀
   token-prefix: Bearer
   # Token请求头名称
@@ -74,3 +72,7 @@ logging:
     com.rawchen.blog.mapper: debug
   pattern:
     console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n'
+
+# IP数据库路径
+ip2region:
+  xdb: file:./data/ip2region_v4.xdb

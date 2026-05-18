@@ -45,16 +45,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         // 获取Token
         String token = getTokenFromRequest(request);
+        log.debug("JWT过滤器执行 - 请求URI: {}, Token存在: {}", request.getRequestURI(), StringUtils.hasText(token));
 
         if (StringUtils.hasText(token) && jwtTokenUtil.validateToken(token)) {
             try {
                 // 从Token中获取用户名
                 String username = jwtTokenUtil.getUsernameFromToken(token);
+                log.debug("从Token获取用户名: {}", username);
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     // 查询用户信息
                     User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
                             .eq(User::getUsername, username));
+
+                    log.debug("查询用户结果: user={}, status={}", user != null ? user.getUsername() : "null", user != null ? user.getStatus() : "null");
 
                     if (user != null && user.getStatus() == 1) {
                         // 构建权限（角色）
@@ -67,12 +71,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                         // 设置到Security上下文
                         SecurityContextHolder.getContext().setAuthentication(authentication);
-                        log.debug("设置用户认证信息: {}", username);
+                        log.debug("设置用户认证信息成功: {}, userId={}", username, user.getId());
+                    } else {
+                        log.warn("用户不存在或已被禁用: username={}, userStatus={}", username, user != null ? user.getStatus() : "用户不存在");
                     }
                 }
             } catch (Exception e) {
-                log.error("JWT认证失败: {}", e.getMessage());
+                log.error("JWT认证失败: {}", e.getMessage(), e);
             }
+        } else if (StringUtils.hasText(token)) {
+            log.warn("Token验证失败: {}", token);
         }
 
         filterChain.doFilter(request, response);
@@ -83,6 +91,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private String getTokenFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader(jwtConfig.getHeader());
+        log.debug("请求头 {} = {}", jwtConfig.getHeader(), bearerToken != null ? "Bearer ***" : "null");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(jwtConfig.getTokenPrefix())) {
             return bearerToken.substring(jwtConfig.getTokenPrefix().length()).trim();
         }

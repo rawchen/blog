@@ -1,9 +1,13 @@
 package com.rawchen.blog.controller;
 
+import com.rawchen.blog.annotation.AccessLogAnnotation;
+import com.rawchen.blog.annotation.OperationLogAnnotation;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.dto.MomentDTO;
 import com.rawchen.blog.entity.Moment;
+import com.rawchen.blog.enums.OperationType;
+import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.service.MomentService;
 import com.rawchen.blog.vo.MomentVO;
 import io.swagger.annotations.Api;
@@ -29,6 +33,7 @@ public class MomentController {
 
     @ApiOperation("获取朋友圈列表（前台）")
     @GetMapping("/list")
+    @AccessLogAnnotation("MOMENTS")
     public R<PageResult<MomentVO>> getMomentList(
             @RequestParam(defaultValue = "1") Long current,
             @RequestParam(defaultValue = "10") Long size) {
@@ -45,6 +50,7 @@ public class MomentController {
 
     @ApiOperation("添加动态")
     @PostMapping("/admin")
+    @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.MOMENT, description = "添加动态", recordDetail = true)
     public R<Long> addMoment(@Valid @RequestBody MomentDTO dto) {
         return R.ok(momentService.addMoment(dto));
     }
@@ -59,6 +65,7 @@ public class MomentController {
     @ApiOperation("删除动态")
     @DeleteMapping("/admin/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.MOMENT, description = "删除动态")
     public R<Void> deleteMoment(@PathVariable Long id) {
         momentService.deleteMoment(id);
         return R.ok();

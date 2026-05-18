@@ -30,6 +30,9 @@ import FriendLinkList from './pages/admin/FriendLink'
 import Setting from './pages/admin/Setting'
 import Tool from './pages/admin/Tool'
 import PageList from './pages/admin/Page'
+import LoginLog from './pages/admin/log/LoginLog'
+import OperationLog from './pages/admin/log/OperationLog'
+import AccessLog from './pages/admin/log/AccessLog'
 
 // API
 import { getPageList } from './api/article'
@@ -130,6 +133,11 @@ function App() {
         <Route path="user" element={<UserList />} />
         <Route path="setting" element={<Setting />} />
         <Route path="tool" element={<Tool />} />
+        <Route path="log">
+          <Route path="login" element={<LoginLog />} />
+          <Route path="operation" element={<OperationLog />} />
+          <Route path="access" element={<AccessLog />} />
+        </Route>
       </Route>
     </Routes>
   )

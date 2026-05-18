@@ -1,8 +1,11 @@
 package com.rawchen.blog.controller;
 
+import com.rawchen.blog.annotation.OperationLogAnnotation;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.dto.CommentDTO;
+import com.rawchen.blog.enums.OperationType;
+import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.service.CommentService;
 import com.rawchen.blog.vo.CommentVO;
 import io.swagger.annotations.Api;
@@ -76,6 +79,7 @@ public class CommentController {
 
     @ApiOperation("审核评论")
     @PutMapping("/admin/audit/{id}")
+    @OperationLogAnnotation(type = OperationType.AUDIT, target = TargetType.COMMENT, description = "审核评论")
     public R<Void> auditComment(@PathVariable Long id, @RequestParam Integer status) {
         commentService.auditComment(id, status);
         return R.ok();
@@ -83,6 +87,7 @@ public class CommentController {
 
     @ApiOperation("批量审核评论")
     @PutMapping("/admin/batch-audit")
+    @OperationLogAnnotation(type = OperationType.AUDIT, target = TargetType.COMMENT, description = "批量审核评论")
     public R<Void> batchAuditComment(@RequestBody List<Long> ids, @RequestParam Integer status) {
         commentService.batchAuditComments(ids, status);
         return R.ok();
@@ -91,6 +96,7 @@ public class CommentController {
     @ApiOperation("删除评论")
     @DeleteMapping("/admin/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.COMMENT, description = "删除评论")
     public R<Void> deleteComment(@PathVariable Long id) {
         commentService.deleteComment(id);
         return R.ok();
@@ -99,6 +105,7 @@ public class CommentController {
     @ApiOperation("批量删除评论")
     @PostMapping("/admin/batch-delete")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.COMMENT, description = "批量删除评论")
     public R<Void> batchDeleteComment(@RequestBody List<Long> ids) {
         commentService.batchDeleteComments(ids);
         return R.ok();

@@ -266,17 +266,16 @@ public class ArticleServiceImpl implements ArticleService {
         article.setIsRecommend(articleDTO.getIsRecommend() != null && articleDTO.getIsRecommend() ? 1 : 0);
         article.setAllowComment(articleDTO.getAllowComment() == null || articleDTO.getAllowComment() ? 1 : 0);
 
-        // 获取当前用户ID
+        // 获取当前用户ID（直接从认证信息中获取User对象）
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = null;
-        if (auth != null && auth.getName() != null) {
-            user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                    .eq(User::getUsername, auth.getName()));
+        if (auth == null || auth.getPrincipal() == null || !(auth.getPrincipal() instanceof User)) {
+            throw new BusinessException("未获取到当前登录用户信息");
         }
-        if (user != null) {
-            article.setAuthorId(user.getId());
+        User user = (User) auth.getPrincipal();
+        article.setAuthorId(user.getId());
+        if (articleDTO.getStatus() == null) {
+            articleDTO.setStatus(1);
         }
-
         // 设置发布时间
         if (articleDTO.getStatus() == 1) {
             if (articleDTO.getPublishTime() != null) {
@@ -346,10 +345,12 @@ public class ArticleServiceImpl implements ArticleService {
             throw new BusinessException(ResultCode.ARTICLE_NOT_FOUND);
         }
 
-        // 获取当前用户
+        // 获取当前用户（直接从认证信息中获取）
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = auth != null ? userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, auth.getName())) : null;
+        User user = null;
+        if (auth != null && auth.getPrincipal() instanceof User) {
+            user = (User) auth.getPrincipal();
+        }
 
         // 保存旧版本
         if (user != null) {
@@ -615,15 +616,13 @@ public class ArticleServiceImpl implements ArticleService {
         article.setIsRecommend(articleDTO.getIsRecommend() != null && articleDTO.getIsRecommend() ? 1 : 0);
         article.setAllowComment(articleDTO.getAllowComment() == null || articleDTO.getAllowComment() ? 1 : 0);
 
-        // 获取当前用户ID
+        // 获取当前用户ID（直接从认证信息中获取User对象）
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getName() != null) {
-            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                    .eq(User::getUsername, auth.getName()));
-            if (user != null) {
-                article.setAuthorId(user.getId());
-            }
+        if (auth == null || auth.getPrincipal() == null || !(auth.getPrincipal() instanceof User)) {
+            throw new BusinessException("未获取到当前登录用户信息");
         }
+        User user = (User) auth.getPrincipal();
+        article.setAuthorId(user.getId());
 
         article.setViewCount(0);
         article.setLikeCount(0);
@@ -678,10 +677,12 @@ public class ArticleServiceImpl implements ArticleService {
             throw new BusinessException(ResultCode.ARTICLE_NOT_FOUND);
         }
 
-        // 获取当前用户
+        // 获取当前用户（直接从认证信息中获取）
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = auth != null ? userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, auth.getName())) : null;
+        User user = null;
+        if (auth != null && auth.getPrincipal() instanceof User) {
+            user = (User) auth.getPrincipal();
+        }
 
         // 保存当前版本
         if (user != null) {
@@ -901,15 +902,13 @@ public class ArticleServiceImpl implements ArticleService {
         article.setIsRecommend(0);
         article.setAllowComment(articleDTO.getAllowComment() == null || articleDTO.getAllowComment() ? 1 : 0);
 
-        // 获取当前用户ID
+        // 获取当前用户ID（直接从认证信息中获取User对象）
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.getName() != null) {
-            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                    .eq(User::getUsername, auth.getName()));
-            if (user != null) {
-                article.setAuthorId(user.getId());
-            }
+        if (auth == null || auth.getPrincipal() == null || !(auth.getPrincipal() instanceof User)) {
+            throw new BusinessException("未获取到当前登录用户信息");
         }
+        User user = (User) auth.getPrincipal();
+        article.setAuthorId(user.getId());
 
         if (articleDTO.getStatus() == 1) {
             if (articleDTO.getPublishTime() != null) {

@@ -1,8 +1,12 @@
 package com.rawchen.blog.controller;
 
+import com.rawchen.blog.annotation.AccessLogAnnotation;
+import com.rawchen.blog.annotation.OperationLogAnnotation;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.entity.Category;
+import com.rawchen.blog.enums.OperationType;
+import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.service.CategoryService;
 import com.rawchen.blog.vo.CategoryVO;
 import io.swagger.annotations.Api;
@@ -28,6 +32,7 @@ public class CategoryController {
 
     @ApiOperation("获取分类列表")
     @GetMapping("/category-list")
+    @AccessLogAnnotation("CATEGORY")
     public R<List<CategoryVO>> getCategoryList() {
         return R.ok(categoryService.getCategoryList());
     }
@@ -51,12 +56,14 @@ public class CategoryController {
 
     @ApiOperation("创建分类")
     @PostMapping("/admin")
+    @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.CATEGORY, description = "创建分类", recordDetail = true)
     public R<Long> createCategory(@RequestBody Category category) {
         return R.ok(categoryService.createCategory(category));
     }
 
     @ApiOperation("更新分类")
     @PutMapping("/admin")
+    @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.CATEGORY, description = "更新分类")
     public R<Void> updateCategory(@RequestBody Category category) {
         categoryService.updateCategory(category);
         return R.ok();
@@ -65,6 +72,7 @@ public class CategoryController {
     @ApiOperation("删除分类")
     @DeleteMapping("/admin/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.CATEGORY, description = "删除分类")
     public R<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return R.ok();

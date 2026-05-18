@@ -1,6 +1,7 @@
 package com.rawchen.blog.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.rawchen.blog.annotation.AccessLogAnnotation;
 import com.rawchen.blog.entity.Article;
 import com.rawchen.blog.entity.Config;
 import com.rawchen.blog.mapper.ArticleMapper;
@@ -37,6 +38,7 @@ public class FeedController {
 
     @ApiOperation("RSS订阅")
     @GetMapping(value = "/feed", produces = MediaType.APPLICATION_XML_VALUE)
+    @AccessLogAnnotation("RSS")
     public String getRssFeed() {
         // 获取站点配置
         String siteTitle = getConfigValue("site_title", "RawChen Blog");

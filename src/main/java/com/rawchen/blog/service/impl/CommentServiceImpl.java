@@ -162,14 +162,11 @@ public class CommentServiceImpl implements CommentService {
 
         // 检查是否登录用户
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                    .eq(User::getUsername, auth.getName()));
-            if (user != null) {
-                comment.setUserId(user.getId());
-                comment.setNickname(user.getNickname());
-                comment.setEmail(user.getEmail());
-            }
+        if (auth != null && auth.isAuthenticated() && auth.getPrincipal() instanceof User) {
+            User user = (User) auth.getPrincipal();
+            comment.setUserId(user.getId());
+            comment.setNickname(user.getNickname());
+            comment.setEmail(user.getEmail());
         }
 
         // 过滤HTML标签
@@ -219,14 +216,11 @@ public class CommentServiceImpl implements CommentService {
 
         // 检查是否登录用户
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-            User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                    .eq(User::getUsername, auth.getName()));
-            if (user != null) {
-                comment.setUserId(user.getId());
-                comment.setNickname(user.getNickname());
-                comment.setEmail(user.getEmail());
-            }
+        if (auth != null && auth.isAuthenticated() && auth.getPrincipal() instanceof User) {
+            User user = (User) auth.getPrincipal();
+            comment.setUserId(user.getId());
+            comment.setNickname(user.getNickname());
+            comment.setEmail(user.getEmail());
         }
 
         // 过滤HTML标签

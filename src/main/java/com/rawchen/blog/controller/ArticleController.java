@@ -1,12 +1,16 @@
 package com.rawchen.blog.controller;
 
 import cn.hutool.json.JSONUtil;
+import com.rawchen.blog.annotation.AccessLogAnnotation;
+import com.rawchen.blog.annotation.OperationLogAnnotation;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.config.DeepseekConfig;
 import com.rawchen.blog.dto.ArticleDTO;
 import com.rawchen.blog.entity.Article;
 import com.rawchen.blog.entity.ArticleVersion;
+import com.rawchen.blog.enums.OperationType;
+import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.service.ArticleService;
 import com.rawchen.blog.vo.ArticleDetailVO;
 import com.rawchen.blog.vo.ArticleEditVO;
@@ -49,6 +53,7 @@ public class ArticleController {
 
     @ApiOperation("分页查询文章列表（前台）")
     @PostMapping("/article-list")
+    @AccessLogAnnotation("HOME")
     public R<PageResult<ArticleVO>> getArticleList(@RequestBody Map<String, Object> params) {
         Long current = params.get("current") != null ? Long.valueOf(params.get("current").toString()) : 1L;
         Long size = params.get("size") != null ? Long.valueOf(params.get("size").toString()) : 10L;
@@ -60,6 +65,7 @@ public class ArticleController {
 
     @ApiOperation("获取文章详情（前台）")
     @GetMapping("/detail/{id}")
+    @AccessLogAnnotation("ARTICLE")
     public R<ArticleDetailVO> getArticleDetail(
             @PathVariable Long id,
             @RequestParam(required = false) String password) {
@@ -68,6 +74,7 @@ public class ArticleController {
 
     @ApiOperation("根据别名获取文章")
     @GetMapping("/slug/{slug}")
+    @AccessLogAnnotation("ARTICLE")
     public R<ArticleDetailVO> getArticleBySlug(@PathVariable String slug) {
         return R.ok(articleService.getArticleBySlug(slug));
     }
@@ -88,6 +95,7 @@ public class ArticleController {
 
     @ApiOperation("搜索文章")
     @GetMapping("/search")
+    @AccessLogAnnotation("SEARCH")
     public R<PageResult<ArticleVO>> searchArticles(
             @RequestParam(defaultValue = "1") Long current,
             @RequestParam(defaultValue = "10") Long size,
@@ -97,6 +105,7 @@ public class ArticleController {
 
     @ApiOperation("时间线归档")
     @GetMapping("/timeline")
+    @AccessLogAnnotation("ARCHIVE")
     public R<PageResult<ArticleVO>> getArticleTimeline(
             @RequestParam(defaultValue = "1") Long current,
             @RequestParam(defaultValue = "10") Long size) {
@@ -154,12 +163,14 @@ public class ArticleController {
 
     @ApiOperation("创建文章")
     @PostMapping("/admin")
+    @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.ARTICLE, description = "创建文章", recordDetail = true)
     public R<Long> createArticle(@Valid @RequestBody ArticleDTO articleDTO) {
         return R.ok(articleService.createArticle(articleDTO));
     }
 
     @ApiOperation("更新文章")
     @PutMapping("/admin")
+    @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.ARTICLE, description = "更新文章")
     public R<Void> updateArticle(@Valid @RequestBody ArticleDTO articleDTO) {
         articleService.updateArticle(articleDTO);
         return R.ok();
@@ -168,6 +179,7 @@ public class ArticleController {
     @ApiOperation("删除文章")
     @DeleteMapping("/admin/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.ARTICLE, description = "删除文章")
     public R<Void> deleteArticle(@PathVariable Long id) {
         articleService.deleteArticle(id);
         return R.ok();
@@ -176,6 +188,7 @@ public class ArticleController {
     @ApiOperation("批量删除文章")
     @PostMapping("/admin/batch-delete")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.ARTICLE, description = "批量删除文章")
     public R<Void> batchDeleteArticles(@RequestBody List<Long> ids) {
         articleService.batchDeleteArticles(ids);
         return R.ok();
@@ -349,6 +362,7 @@ public class ArticleController {
 
     @ApiOperation("根据别名获取独立页面详情（前台）")
     @GetMapping("/page/{slug}")
+    @AccessLogAnnotation("PAGE")
     public R<ArticleDetailVO> getPageBySlug(@PathVariable String slug) {
         return R.ok(articleService.getPageBySlug(slug));
     }
@@ -364,12 +378,14 @@ public class ArticleController {
 
     @ApiOperation("创建独立页面")
     @PostMapping("/admin/pages")
+    @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.PAGE, description = "创建独立页面", recordDetail = true)
     public R<Long> createPage(@Valid @RequestBody ArticleDTO articleDTO) {
         return R.ok(articleService.createPage(articleDTO));
     }
 
     @ApiOperation("更新独立页面")
     @PutMapping("/admin/pages")
+    @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.PAGE, description = "更新独立页面")
     public R<Void> updatePage(@Valid @RequestBody ArticleDTO articleDTO) {
         articleService.updatePage(articleDTO);
         return R.ok();
@@ -377,6 +393,7 @@ public class ArticleController {
 
     @ApiOperation("删除独立页面")
     @DeleteMapping("/admin/pages/{id}")
+    @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.PAGE, description = "删除独立页面")
     public R<Void> deletePage(@PathVariable Long id) {
         articleService.deleteArticle(id);
         return R.ok();

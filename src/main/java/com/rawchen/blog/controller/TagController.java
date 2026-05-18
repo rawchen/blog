@@ -1,8 +1,12 @@
 package com.rawchen.blog.controller;
 
+import com.rawchen.blog.annotation.AccessLogAnnotation;
+import com.rawchen.blog.annotation.OperationLogAnnotation;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.entity.Tag;
+import com.rawchen.blog.enums.OperationType;
+import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.service.TagService;
 import com.rawchen.blog.vo.TagVO;
 import io.swagger.annotations.Api;
@@ -28,6 +32,7 @@ public class TagController {
 
     @ApiOperation("获取标签列表")
     @GetMapping("/list")
+    @AccessLogAnnotation("TAG")
     public R<List<TagVO>> getTagList() {
         return R.ok(tagService.getTagList());
     }
@@ -51,12 +56,14 @@ public class TagController {
 
     @ApiOperation("创建标签")
     @PostMapping("/admin")
+    @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.TAG, description = "创建标签", recordDetail = true)
     public R<Long> createTag(@RequestBody Tag tag) {
         return R.ok(tagService.createTag(tag));
     }
 
     @ApiOperation("更新标签")
     @PutMapping("/admin")
+    @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.TAG, description = "更新标签")
     public R<Void> updateTag(@RequestBody Tag tag) {
         tagService.updateTag(tag);
         return R.ok();
@@ -65,6 +72,7 @@ public class TagController {
     @ApiOperation("删除标签")
     @DeleteMapping("/admin/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.TAG, description = "删除标签")
     public R<Void> deleteTag(@PathVariable Long id) {
         tagService.deleteTag(id);
         return R.ok();

@@ -78,9 +78,9 @@ public class ArticleDTO implements Serializable {
     private Boolean isRecommend = false;
 
     /**
-     * 状态 0-草稿 1-发布
+     * 状态 0-待审 1-发布 2-加密 3-隐藏 4-私密
      */
-    private Integer status;
+    private Integer status = 1;
 
     /**
      * 访问密码

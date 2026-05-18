@@ -26,6 +26,8 @@
         <knife4j.version>3.0.3</knife4j.version>
         <fastjson.version>2.0.25</fastjson.version>
         <hutool.version>5.8.18</hutool.version>
+        <!-- ip2region IP地址解析 -->
+        <ip2region.version>3.3.6</ip2region.version>
     </properties>
 
     <dependencies>
@@ -105,6 +107,13 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>${hutool.version}</version>
+        </dependency>
+
+        <!-- ip2region IP地址解析 -->
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+            <version>${ip2region.version}</version>
         </dependency>
 
         <!-- Aliyun OSS SDK -->

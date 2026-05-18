@@ -64,6 +64,32 @@ public class OperationLog implements Serializable {
     private String userAgent;
 
     /**
+     * 国家
+     */
+    private String country;
+
+    /**
+     * 省份
+     */
+    private String province;
+
+    /**
+     * 城市
+     */
+    private String city;
+
+    /**
+     * 运营商
+     */
+    private String isp;
+
+    /**
+     * 基于ip2region归属地完整描述
+     * 例如：中国|广东省|东莞市|移动|CN 或者：United States|California|0|0|US
+     */
+    private String location;
+
+    /**
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)

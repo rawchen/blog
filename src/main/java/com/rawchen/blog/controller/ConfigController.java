@@ -1,8 +1,11 @@
 package com.rawchen.blog.controller;
 
+import com.rawchen.blog.annotation.OperationLogAnnotation;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.dto.ConfigDTO;
 import com.rawchen.blog.entity.Config;
+import com.rawchen.blog.enums.OperationType;
+import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.service.ConfigService;
 import com.rawchen.blog.vo.SiteConfigVO;
 import io.swagger.annotations.Api;
@@ -49,6 +52,7 @@ public class ConfigController {
 
     @ApiOperation("更新配置")
     @PutMapping
+    @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.CONFIG, description = "更新配置")
     public R<Void> updateConfig(@Valid @RequestBody ConfigDTO dto) {
         configService.updateConfig(dto);
         return R.ok();
@@ -56,6 +60,7 @@ public class ConfigController {
 
     @ApiOperation("批量更新配置")
     @PutMapping("/batch")
+    @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.CONFIG, description = "批量更新配置")
     public R<Void> updateConfigs(@Valid @RequestBody List<ConfigDTO> configs) {
         configService.updateConfigs(configs);
         return R.ok();
@@ -64,6 +69,7 @@ public class ConfigController {
     @ApiOperation("删除配置")
     @DeleteMapping("/{key}")
     @PreAuthorize("hasRole('ADMIN')")
+    @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.CONFIG, description = "删除配置")
     public R<Void> deleteConfig(@PathVariable String key) {
         configService.deleteConfig(key);
         return R.ok();
