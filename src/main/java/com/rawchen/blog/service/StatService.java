@@ -3,6 +3,7 @@ package com.rawchen.blog.service;
 import com.rawchen.blog.vo.AccessTrendVO;
 import com.rawchen.blog.vo.ChartItemVO;
 import com.rawchen.blog.vo.DashboardStatsVO;
+import com.rawchen.blog.vo.PageTypeCompareVO;
 import com.rawchen.blog.vo.SiteStatVO;
 import com.rawchen.blog.vo.TrendVO;
 
@@ -102,4 +103,10 @@ public interface StatService {
      * 获取访客城市分布
      */
     List<Map<String, Object>> getCityDistribution();
+
+    /**
+     * 获取页面类型访问对比（昨日vs今日）
+     * 过滤掉隐藏的独立页面
+     */
+    List<PageTypeCompareVO> getPageTypeCompare();
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Table, Button, Tag, message, Popconfirm, Space } from 'antd'
 import { CheckOutlined, CloseOutlined, DeleteOutlined } from '@ant-design/icons'
 import { getCommentListAdmin, auditComment, deleteComment } from '../../../api/comment'
+import { renderSmilies } from '../../../utils/smilies'
 
 function CommentList() {
   const [loading, setLoading] = useState(false)
@@ -47,8 +48,8 @@ function CommentList() {
     { title: 'ID', dataIndex: 'id', width: 80 },
     { title: '昵称', dataIndex: 'nickname', width: 120 },
     { title: '邮箱', dataIndex: 'email', width: 180 },
-    { title: '内容', dataIndex: 'content', ellipsis: true },
-    { title: 'IP', dataIndex: 'ipAddress', width: 120 },
+    { title: '内容', dataIndex: 'content', ellipsis: true, render: (text) => <span dangerouslySetInnerHTML={{ __html: renderSmilies(text) }} /> },
+    { title: 'IP', dataIndex: 'ipAddress', width: 150 },
     {
       title: '状态',
       dataIndex: 'status',
@@ -59,7 +60,7 @@ function CommentList() {
         return <Tag color={colorMap[status]}>{statusMap[status]}</Tag>
       }
     },
-    { title: '时间', dataIndex: 'createTime', width: 180 },
+    { title: '创建时间', dataIndex: 'createTime', width: 180 },
     {
       title: '操作',
       width: 220,

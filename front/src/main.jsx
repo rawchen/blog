@@ -88,7 +88,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               // itemMarginInline: 0,
               // itemBorderRadius: 0,
               darkItemBg: '#314156',
-              darkSubMenuItemBg: '#1f2d3d',
+              darkSubMenuItemBg: '#293749',
               darkPopupBg: '#001529'
             }
           }

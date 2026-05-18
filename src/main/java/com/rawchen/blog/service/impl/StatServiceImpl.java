@@ -11,6 +11,7 @@ import com.rawchen.blog.service.StatService;
 import com.rawchen.blog.vo.AccessTrendVO;
 import com.rawchen.blog.vo.ChartItemVO;
 import com.rawchen.blog.vo.DashboardStatsVO;
+import com.rawchen.blog.vo.PageTypeCompareVO;
 import com.rawchen.blog.vo.SiteStatVO;
 import com.rawchen.blog.vo.TrendVO;
 import lombok.extern.slf4j.Slf4j;
@@ -286,7 +287,7 @@ public class StatServiceImpl implements StatService {
 
     @Override
     public List<ChartItemVO> getTagArticleCount() {
-        // 实时计算各标签文章数量（Top 20）
+        // 实时计算各标签文章数量（Top 10）
         return tagMapper.findTagArticleCount();
     }
 
@@ -300,5 +301,13 @@ public class StatServiceImpl implements StatService {
     public List<Map<String, Object>> getCityDistribution() {
         LocalDateTime startTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
         return accessLogMapper.findCityDistribution(startTime, 20);
+    }
+
+    @Override
+    public List<PageTypeCompareVO> getPageTypeCompare() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime todayStart = now.toLocalDate().atStartOfDay();
+        LocalDateTime yesterdayStart = todayStart.minusDays(1);
+        return accessLogMapper.findPageTypeCompare(yesterdayStart, todayStart, 10);
     }
 }

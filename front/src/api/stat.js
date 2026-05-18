@@ -96,3 +96,8 @@ export function getCountryDistribution() {
 export function getCityDistribution() {
   return request({ url: '/stat/dashboard/city', method: 'get' })
 }
+
+// 获取页面类型访问对比（昨日vs今日）
+export function getPageTypeCompare() {
+  return request({ url: '/stat/dashboard/page-type-compare', method: 'get' })
+}

@@ -5,6 +5,7 @@ import com.rawchen.blog.service.StatService;
 import com.rawchen.blog.vo.AccessTrendVO;
 import com.rawchen.blog.vo.ChartItemVO;
 import com.rawchen.blog.vo.DashboardStatsVO;
+import com.rawchen.blog.vo.PageTypeCompareVO;
 import com.rawchen.blog.vo.SiteStatVO;
 import com.rawchen.blog.vo.TrendVO;
 import io.swagger.annotations.Api;
@@ -137,6 +138,12 @@ public class StatController {
     @GetMapping("/dashboard/city")
     public R<List<Map<String, Object>>> getCityDistribution() {
         return R.ok(statService.getCityDistribution());
+    }
+
+    @ApiOperation("获取页面类型访问对比（昨日vs今日）")
+    @GetMapping("/dashboard/page-type-compare")
+    public R<List<PageTypeCompareVO>> getPageTypeCompare() {
+        return R.ok(statService.getPageTypeCompare());
     }
 
     /**

@@ -14,81 +14,15 @@ import {
   faLinux
 } from '@fortawesome/free-brands-svg-icons'
 import { dateWord } from '../../utils/datetime'
-import { parseSmilies } from '../../utils/smilies'
+import { renderSmilies } from '../../utils/smilies'
 import CommentForm from './CommentForm'
 import './index.css'
-
-// 导入所有表情图片
-const smilieImages = import.meta.glob('../../assets/images/smilies/bilibili/*.png', { eager: true, import: 'default' })
-
-// 获取表情图片URL
-const getSmilieImgUrl = (filename) => {
-  const key = `../../assets/images/smilies/bilibili/${filename}`
-  return smilieImages[key] || ''
-}
-
-// 解析表情代码为图片
-const renderSmilies = (text) => {
-  if (!text) return ''
-
-  // 先解析链接，再解析表情
-  let result = parseLinks(text)
-
-  // 替换表情代码为实际图片URL
-  const SMILIES_MAP = {
-    ':mrgreen:': 'icon_mrgreen.png',
-    ':neutral:': 'icon_neutral.png',
-    ':twisted:': 'icon_twisted.png',
-    ':arrow:': 'icon_arrow.png',
-    ':shock:': 'icon_eek.png',
-    ':smile:': 'icon_smile.png',
-    ':???:': 'icon_confused.png',
-    ':cool:': 'icon_cool.png',
-    ':evil:': 'icon_evil.png',
-    ':grin:': 'icon_biggrin.png',
-    ':idea:': 'icon_idea.png',
-    ':oops:': 'icon_redface.png',
-    ':razz:': 'icon_razz.png',
-    ':roll:': 'icon_rolleyes.png',
-    ':wink:': 'icon_wink.png',
-    ':cry:': 'icon_cry.png',
-    ':eek:': 'icon_surprised.png',
-    ':lol:': 'icon_lol.png',
-    ':mad:': 'icon_mad.png',
-    ':sad:': 'icon_sad.png',
-    ':!:': 'icon_exclaim.png',
-    ':?:': 'icon_question.png',
-    ':guzhang:': 'guzhang.png',
-    ':ok:': 'ok.png',
-    ':chigua:': 'chigua.png',
-    ':waizui:': 'waizui.png',
-    ':keguazi:': 'keguazi.png',
-  }
-
-  // 替换表情图片URL
-  Object.entries(SMILIES_MAP).forEach(([code, filename]) => {
-    const imgUrl = getSmilieImgUrl(filename)
-    const escapedCode = code.replace(/[?!]/g, '\\$&')
-    const regex = new RegExp(escapedCode, 'g')
-    result = result.replace(regex, `<img class="smilies-img" src="${imgUrl}" alt="${code}" title="${code}" style="max-width:30px;display:inline-block;vertical-align:middle;margin:-5px 0px 0px 0px;" />`)
-  })
-
-  return result
-}
 
 // 获取头像URL
 const getAvatarUrl = (email, domain) => {
   const hash = email ? Md5(email.toLowerCase()) : 'default'
   const gravatarDomain = domain || 'weavatar.com'
   return `https://${gravatarDomain}/avatar/${hash}?d=mp`
-}
-
-// 解析链接，将URL转换为可点击的a标签
-const parseLinks = (text) => {
-  if (!text) return ''
-  // 匹配 http:// 或 https:// 开头的URL
-  const urlRegex = /(https?:\/\/[^\s<]+)/g
-  return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
 }
 
 // 解析User-Agent获取浏览器和操作系统

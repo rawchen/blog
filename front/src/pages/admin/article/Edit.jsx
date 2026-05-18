@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Form, Input, Select, Button, Card, message, Switch, Space, Tooltip, DatePicker, Popover, Radio } from 'antd'
-import { RobotOutlined, DeleteOutlined, SettingOutlined, LinkOutlined } from '@ant-design/icons'
+import {
+  RobotOutlined, DeleteOutlined, SettingOutlined, LinkOutlined, LoadingOutlined, PlusOutlined
+} from '@ant-design/icons'
 import { useNavigate, useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
 import { getArticleById, createArticle, updateArticle, generateSummary } from '../../../api/article'
 import { getCategoryList } from '../../../api/category'
 import { getTagList } from '../../../api/tag'
+import { getStsToken } from '../../../api/oss'
 import MarkdownEditor from '../../../components/MarkdownEditor'
 import './Edit.css'
 
@@ -14,6 +17,16 @@ const { Option } = Select
 
 // 草稿存储key
 const DRAFT_KEY_PREFIX = 'article_draft_'
+
+// 动态导入 ali-oss
+let OSS = null
+const loadOSS = async () => {
+  if (!OSS) {
+    const module = await import('ali-oss')
+    OSS = module.default
+  }
+  return OSS
+}
 
 function ArticleEdit() {
   const [form] = Form.useForm()
@@ -24,10 +37,12 @@ function ArticleEdit() {
   const [contentValue, setContentValue] = useState('')
   const [originalPublishTime, setOriginalPublishTime] = useState(null)
   const [draftInfo, setDraftInfo] = useState(null) // 草稿信息
+  const [coverUploading, setCoverUploading] = useState(false) // 封面上传状态
   const navigate = useNavigate()
   const { id } = useParams()
   const isRemoteLoadedRef = useRef(false) // 标记远程数据是否已加载
   const draftCheckedRef = useRef(false) // 防止重复检查草稿
+  const coverInputRef = useRef(null) // 封面图片input
 
   // 获取草稿存储key
   const getDraftKey = () => id ? `${DRAFT_KEY_PREFIX}edit_${id}` : `${DRAFT_KEY_PREFIX}new`
@@ -162,6 +177,10 @@ function ArticleEdit() {
   const fetchCategories = async () => {
     const res = await getCategoryList()
     setCategories(res.data)
+    // 新建文章时，默认选择第一个分类
+    if (!id && res.data && res.data.length > 0) {
+      form.setFieldValue('categoryId', res.data[0].id)
+    }
   }
 
   const fetchTags = async () => {
@@ -187,6 +206,88 @@ function ArticleEdit() {
       isRemoteLoadedRef.current = true
     } finally {
       setLoading(false)
+    }
+  }
+
+  // 获取站点配置
+  const getSiteConfigCache = () => {
+    try {
+      const config = localStorage.getItem('site_config')
+      if (config) {
+        return JSON.parse(config)
+      }
+    } catch (e) {
+      console.error('获取站点配置失败', e)
+    }
+    return { ossEnabled: true, ossStyle: '' }
+  }
+
+  // 上传封面图片到OSS
+  const uploadCoverToOSS = async (file) => {
+    try {
+      const OSSClient = await loadOSS()
+      const res = await getStsToken()
+      const stsToken = res.data
+
+      // 生成文件路径：blog/年/月/randomStr.ext
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = String(now.getMonth() + 1).padStart(2, '0')
+      const dateFolder = `${year}/${month}`
+      const randomStr = Math.random().toString(36).substring(2, 8)
+      const fileExt = file.name.split('.').pop() || 'png'
+      const objectKey = `${stsToken.uploadFolder || 'blog'}/${dateFolder}/${randomStr}.${fileExt}`
+
+      const client = new OSSClient({
+        region: stsToken.region,
+        accessKeyId: stsToken.accessKeyId,
+        accessKeySecret: stsToken.accessKeySecret,
+        stsToken: stsToken.securityToken,
+        bucket: stsToken.bucketName,
+        secure: true
+      })
+
+      const result = await client.put(objectKey, file)
+
+      // 返回文件URL
+      let url
+      if (stsToken.customDomain) {
+        url = `https://${stsToken.customDomain}/${objectKey}`
+      } else {
+        url = result.url || `https://${stsToken.bucketName}.${stsToken.endpoint}/${objectKey}`
+      }
+      // 拼接OSS样式
+      const siteConfig = getSiteConfigCache()
+      if (siteConfig.ossStyle) {
+        url = url + siteConfig.ossStyle
+      }
+      return url
+    } catch (error) {
+      console.error('上传封面图片失败:', error)
+      throw error
+    }
+  }
+
+  // 封面图片上传处理
+  const handleCoverUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      message.error('请选择图片文件')
+      return
+    }
+
+    setCoverUploading(true)
+    try {
+      const url = await uploadCoverToOSS(file)
+      form.setFieldValue('coverImage', url)
+      message.success('封面图片上传成功')
+    } catch (error) {
+      message.error('上传失败: ' + (error.message || '请稍后重试'))
+    } finally {
+      setCoverUploading(false)
+      e.target.value = '' // 重置input
     }
   }
 
@@ -371,8 +472,29 @@ function ArticleEdit() {
             </Form.Item>
 
             <Form.Item label="封面图片" name="coverImage">
-              <Input placeholder="请输入封面图片URL" />
+              <Input
+                placeholder="请输入封面图片URL或点击右侧上传"
+                addonAfter={
+                  <Tooltip title="上传封面图片">
+                    {coverUploading ? (
+                      <LoadingOutlined style={{ cursor: 'wait' }} />
+                    ) : (
+                        <PlusOutlined
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => coverInputRef.current?.click()}
+                      />
+                    )}
+                  </Tooltip>
+                }
+              />
             </Form.Item>
+            <input
+              ref={coverInputRef}
+              type="file"
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleCoverUpload}
+            />
 
             <Form.Item label="摘要" name="summary">
               <TextArea rows={1} placeholder="请输入摘要（可选）" />

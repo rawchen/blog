@@ -1,6 +1,15 @@
 // 表情包配置 - bilibili风格
 // 路径: /src/assets/images/smilies/bilibili/
 
+// 导入所有表情图片（Vite glob 导入）
+const smilieImages = import.meta.glob('../assets/images/smilies/bilibili/*.png', { eager: true, import: 'default' })
+
+// 获取表情图片URL
+const getSmilieImgUrl = (filename) => {
+  const key = `../assets/images/smilies/bilibili/${filename}`
+  return smilieImages[key] || ''
+}
+
 // 表情代码到图片文件名的映射
 export const SMILIES_MAP = {
   ':mrgreen:': 'icon_mrgreen.png',
@@ -76,17 +85,29 @@ export const getSmilieUrl = (code) => {
 export const parseSmilies = (text) => {
   if (!text) return ''
 
-  // 创建正则表达式匹配所有表情代码
-  const codes = Object.keys(SMILIES_MAP)
-  // 需要对特殊字符进行转义
-  const escapedCodes = codes.map(code => code.replace(/[?!]/g, '\\$&'))
-  const regex = new RegExp(escapedCodes.join('|'), 'g')
+  let result = text
 
-  return text.replace(regex, (match) => {
-    const filename = SMILIES_MAP[match]
-    if (filename) {
-      return `<img class="smilies-img" src="/src/assets/images/smilies/bilibili/${filename}" alt="${match}" title="${match}" style="max-width:30px;display:inline-block;vertical-align:middle;margin:2px;" />`
-    }
-    return match
+  // 替换表情代码为实际图片URL
+  Object.entries(SMILIES_MAP).forEach(([code, filename]) => {
+    const imgUrl = getSmilieImgUrl(filename)
+    const escapedCode = code.replace(/[?!]/g, '\\$&')
+    const regex = new RegExp(escapedCode, 'g')
+    result = result.replace(regex, `<img class="smilies-img" src="${imgUrl}" alt="${code}" title="${code}" style="max-width:30px;display:inline-block;vertical-align:middle;margin:-5px 0px 0px 0px;" />`)
   })
+
+  return result
+}
+
+// 解析链接，将URL转换为可点击的a标签
+export const parseLinks = (text) => {
+  if (!text) return ''
+  const urlRegex = /(https?:\/\/[^\s<]+)/g
+  return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
+}
+
+// 解析表情和链接（先解析链接再解析表情）
+export const renderSmilies = (text) => {
+  if (!text) return ''
+  let result = parseLinks(text)
+  return parseSmilies(result)
 }

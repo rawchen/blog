@@ -84,9 +84,25 @@
   color: #1890ff;
 }
 
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
 .user-info {
   display: flex;
   align-items: center;
+}
+
+.home-link {
+  color: #666;
+  font-size: 18px;
+  margin-right: 16px;
+  transition: color 0.3s;
+}
+
+.home-link:hover {
+  color: #1890ff;
 }
 
 .admin-content {

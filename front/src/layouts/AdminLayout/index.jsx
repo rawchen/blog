@@ -20,7 +20,8 @@ import {
   AuditOutlined,
   LoginOutlined,
   ProfileOutlined,
-  GlobalOutlined
+  GlobalOutlined,
+  HomeOutlined
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -147,13 +148,18 @@ function AdminLayout() {
             className: 'trigger',
             onClick: () => setCollapsed(!collapsed)
           })}
-          <div className="user-info">
-            <Dropdown menu={{ items: userMenuItems }}>
-              <div style={{ cursor: 'pointer' }}>
-                <Avatar icon={<UserOutlined />} src={userAvatar} />
-                <span style={{ marginLeft: 8 }}>{userInfo?.nickname || userInfo?.username}</span>
-              </div>
-            </Dropdown>
+          <div className="header-right">
+            <a href="/" target="_blank" className="home-link" title="访问前台主页">
+              <HomeOutlined />
+            </a>
+            <div className="user-info">
+              <Dropdown menu={{ items: userMenuItems }}>
+                <div style={{ cursor: 'pointer' }}>
+                  <Avatar icon={<UserOutlined />} src={userAvatar} />
+                  <span style={{ marginLeft: 8 }}>{userInfo?.nickname || userInfo?.username}</span>
+                </div>
+              </Dropdown>
+            </div>
           </div>
         </Header>
         <Content className="admin-content">

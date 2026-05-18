@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.rawchen.blog.entity.AccessLog;
 import com.rawchen.blog.vo.AccessTrendVO;
 import com.rawchen.blog.vo.ChartItemVO;
+import com.rawchen.blog.vo.PageTypeCompareVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -116,4 +117,27 @@ public interface AccessLogMapper extends BaseMapper<AccessLog> {
             "WHERE create_time >= #{startTime} AND province IS NOT NULL AND province != '' AND province != '0' " +
             "GROUP BY province, city ORDER BY count DESC LIMIT #{limit}")
     List<Map<String, Object>> findCityDistribution(@Param("startTime") LocalDateTime startTime, @Param("limit") int limit);
+
+    /**
+     * 获取页面类型访问对比统计（昨日vs今日）
+     * 过滤掉隐藏的独立页面(status=3)
+     */
+    @Select("SELECT " +
+            "CASE WHEN l.operation = 'PAGE' THEN CONCAT('页面: ', a.title) ELSE l.operation END as name, " +
+            "SUM(CASE WHEN l.create_time >= #{yesterdayStart} AND l.create_time < #{todayStart} THEN 1 ELSE 0 END) as yesterdayCount, " +
+            "SUM(CASE WHEN l.create_time >= #{todayStart} THEN 1 ELSE 0 END) as todayCount " +
+            "FROM sys_access_log l " +
+            "LEFT JOIN blog_article a ON l.article_id = a.id AND l.operation = 'PAGE' " +
+            "WHERE l.create_time >= #{yesterdayStart} " +
+            "AND l.operation IS NOT NULL AND l.operation != '' " +
+            "AND (l.operation != 'PAGE' OR (a.id IS NOT NULL AND a.status != 3)) " +
+            "GROUP BY CASE WHEN l.operation = 'PAGE' THEN CONCAT('页面: ', a.title) ELSE l.operation END " +
+            "HAVING SUM(CASE WHEN l.create_time >= #{yesterdayStart} AND l.create_time < #{todayStart} THEN 1 ELSE 0 END) > 0 " +
+            "OR SUM(CASE WHEN l.create_time >= #{todayStart} THEN 1 ELSE 0 END) > 0 " +
+            "ORDER BY (SUM(CASE WHEN l.create_time >= #{yesterdayStart} AND l.create_time < #{todayStart} THEN 1 ELSE 0 END) + " +
+            "SUM(CASE WHEN l.create_time >= #{todayStart} THEN 1 ELSE 0 END)) DESC " +
+            "LIMIT #{limit}")
+    List<PageTypeCompareVO> findPageTypeCompare(@Param("yesterdayStart") LocalDateTime yesterdayStart,
+                                                 @Param("todayStart") LocalDateTime todayStart,
+                                                 @Param("limit") int limit);
 }
