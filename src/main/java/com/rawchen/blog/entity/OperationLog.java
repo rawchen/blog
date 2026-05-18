@@ -59,6 +59,11 @@ public class OperationLog implements Serializable {
     private String ipAddress;
 
     /**
+     * 用户代理
+     */
+    private String userAgent;
+
+    /**
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)
