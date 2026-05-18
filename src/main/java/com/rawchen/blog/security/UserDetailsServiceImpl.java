@@ -33,18 +33,16 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UsernameNotFoundException("用户不存在: " + username);
         }
 
+        if (user.getStatus() == 0) {
+            throw new UsernameNotFoundException("用户已被禁用: " + username);
+        }
+
         // 构建权限列表（角色）
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name());
 
-        // 构建UserDetails
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPassword())
-                .disabled(user.getStatus() == 0)
-                .accountExpired(false)
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .authorities(Collections.singletonList(authority))
-                .build();
+        // 直接返回自定义 User 对象作为 principal，并实现 UserDetails 接口
+        // 这样切面和其他地方可以直接获取 User 对象
+        user.setAuthorities(Collections.singletonList(authority));
+        return user;
     }
 }

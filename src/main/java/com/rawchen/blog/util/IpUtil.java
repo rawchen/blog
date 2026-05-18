@@ -40,7 +40,7 @@ public class IpUtil {
      * 获取IP归属地信息
      *
      * @param ip IP地址
-     * @return 归属地信息，格式：国家|区域|省份|城市|ISP
+     * @return 归属地信息，格式：国家|省份|城市|ISP|国家代码
      */
     public String getRegion(String ip) {
         if (ip == null || ip.isEmpty()) {
@@ -75,18 +75,13 @@ public class IpUtil {
             return new String[]{"", "", "", "", ""};
         }
 
-        // ip2region返回格式：国家|区域|省份|城市|ISP
+        // ip2region返回格式：国家|省份|城市|ISP|国家代码
         String[] parts = region.split("\\|");
         String country = parts.length > 0 ? formatPart(parts[0]) : "";
-        String province = parts.length > 2 ? formatPart(parts[2]) : "";
-        String city = parts.length > 3 ? formatPart(parts[3]) : "";
-        String isp = parts.length > 4 ? formatPart(parts[4]) : "";
+        String province = parts.length > 1 ? formatPart(parts[1]) : "";
+        String city = parts.length > 2 ? formatPart(parts[2]) : "";
+        String isp = parts.length > 3 ? formatPart(parts[3]) : "";
         String countryCode = parts.length > 4 ? parts[4] : "";
-
-        // 如果省份为空，尝试从区域获取
-        if (province.isEmpty() && parts.length > 1) {
-            province = formatPart(parts[1]);
-        }
 
         return new String[]{country, province, city, isp, countryCode};
     }

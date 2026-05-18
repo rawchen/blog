@@ -3,9 +3,13 @@ package com.rawchen.blog.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * 用户实体
@@ -15,7 +19,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("sys_user")
-public class User extends BaseEntity {
+public class User extends BaseEntity implements UserDetails {
 
     private static final long serialVersionUID = 1L;
 
@@ -76,9 +80,42 @@ public class User extends BaseEntity {
     private UserRole role = UserRole.STAFF;
 
     /**
+     * 权限列表（不存数据库，用于认证）
+     */
+    @TableField(exist = false)
+    private Collection<? extends GrantedAuthority> authorities;
+
+    /**
      * 用户角色枚举
      */
     public enum UserRole {
         ADMIN, STAFF
+    }
+
+    // ========== UserDetails 接口实现 ==========
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities != null ? authorities : Collections.emptyList();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return status != null && status == 1;
     }
 }

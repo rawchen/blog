@@ -50,13 +50,15 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword())
         );
 
-        // 获取用户信息
-        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, loginDTO.getUsername()));
+        // 获取用户信息（principal 已是自定义 User 对象）
+        User user = (User) authentication.getPrincipal();
 
         if (user.getStatus() == 0) {
             throw new BusinessException(ResultCode.USER_DISABLED);
         }
+
+        // 设置 SecurityContext，以便切面能获取用户信息
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // 生成Token
         String token = jwtTokenUtil.generateToken(user);
