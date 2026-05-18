@@ -2,10 +2,15 @@ package com.rawchen.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.rawchen.blog.entity.Article;
+import com.rawchen.blog.entity.Category;
 import com.rawchen.blog.entity.SiteStat;
+import com.rawchen.blog.entity.Tag;
 import com.rawchen.blog.entity.User;
 import com.rawchen.blog.mapper.*;
 import com.rawchen.blog.service.StatService;
+import com.rawchen.blog.vo.AccessTrendVO;
+import com.rawchen.blog.vo.ChartItemVO;
+import com.rawchen.blog.vo.DashboardStatsVO;
 import com.rawchen.blog.vo.SiteStatVO;
 import com.rawchen.blog.vo.TrendVO;
 import lombok.extern.slf4j.Slf4j;
@@ -13,8 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +51,9 @@ public class StatServiceImpl implements StatService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private AccessLogMapper accessLogMapper;
 
     @Override
     public SiteStatVO getSiteStat() {
@@ -161,5 +172,133 @@ public class StatServiceImpl implements StatService {
 
         // 简单实现：返回最新标签
         return new ArrayList<>();
+    }
+
+    // ========== 仪表盘统计实现 ==========
+
+    @Override
+    public DashboardStatsVO getDashboardStats() {
+        DashboardStatsVO vo = new DashboardStatsVO();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime todayStart = now.toLocalDate().atStartOfDay();
+        LocalDateTime yesterdayStart = todayStart.minusDays(1);
+        LocalDateTime thirtyDaysAgo = now.minusDays(30);
+
+        // 文章总数
+        Long articleCount = articleMapper.selectCount(new LambdaQueryWrapper<Article>()
+                .eq(Article::getStatus, 1));
+        vo.setArticleCount(articleCount);
+
+        // 评论总数
+        Long commentCount = commentMapper.selectCount(null);
+        vo.setCommentCount(commentCount);
+
+        // 分类总数
+        Long categoryCount = categoryMapper.selectCount(null);
+        vo.setCategoryCount(categoryCount);
+
+        // 标签总数
+        Long tagCount = tagMapper.selectCount(null);
+        vo.setTagCount(tagCount);
+
+        // 用户总数
+        Long userCount = userMapper.selectCount(null);
+        vo.setUserCount(userCount);
+
+        // 总浏览量 (从文章表)
+        Long totalViewCount = articleMapper.selectList(new LambdaQueryWrapper<Article>()
+                .eq(Article::getStatus, 1))
+                .stream()
+                .mapToLong(a -> a.getViewCount() != null ? a.getViewCount() : 0)
+                .sum();
+        vo.setTotalViewCount(totalViewCount);
+
+        // 总点赞量
+        Long totalLikeCount = articleMapper.selectList(new LambdaQueryWrapper<Article>()
+                .eq(Article::getStatus, 1))
+                .stream()
+                .mapToLong(a -> a.getLikeCount() != null ? a.getLikeCount() : 0)
+                .sum();
+        vo.setTotalLikeCount(totalLikeCount);
+
+        // 今日PV/UV (从访问日志)
+        vo.setTodayPv(accessLogMapper.countAccessBetween(todayStart, now));
+        vo.setTodayUv(accessLogMapper.countUniqueVisitorsBetween(todayStart, now));
+
+        // 昨日PV/UV
+        vo.setYesterdayPv(accessLogMapper.countAccessBetween(yesterdayStart, todayStart));
+        vo.setYesterdayUv(accessLogMapper.countUniqueVisitorsBetween(yesterdayStart, todayStart));
+
+        // 30天总访问量和独立访客数
+        vo.setTotalAccess30Days(accessLogMapper.countAccessSince(thirtyDaysAgo));
+        vo.setUniqueVisitors30Days(accessLogMapper.countUniqueVisitorsSince(thirtyDaysAgo));
+
+        return vo;
+    }
+
+    @Override
+    public List<AccessTrendVO> getAccessTrend() {
+        LocalDateTime startTime = LocalDateTime.now().minusDays(29).with(LocalTime.MIN);
+        return accessLogMapper.findAccessTrend(startTime);
+    }
+
+    @Override
+    public List<ChartItemVO> getTopArticles(int limit) {
+        LocalDateTime startTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
+        return accessLogMapper.findTopArticlesByAccess(startTime, limit);
+    }
+
+    @Override
+    public List<ChartItemVO> getBrowserDistribution() {
+        LocalDateTime startTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
+        return accessLogMapper.findBrowserDistribution(startTime, 10);
+    }
+
+    @Override
+    public List<ChartItemVO> getOsDistribution() {
+        LocalDateTime startTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
+        return accessLogMapper.findOsDistribution(startTime, 10);
+    }
+
+    @Override
+    public List<ChartItemVO> getProvinceDistribution() {
+        LocalDateTime startTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
+        return accessLogMapper.findProvinceDistribution(startTime, 10);
+    }
+
+    @Override
+    public List<ChartItemVO> getRefererDomainDistribution() {
+        LocalDateTime startTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
+        return accessLogMapper.findRefererDomainDistribution(startTime, 10);
+    }
+
+    @Override
+    public List<ChartItemVO> getOperationDistribution() {
+        LocalDateTime startTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
+        return accessLogMapper.findOperationDistribution(startTime, 10);
+    }
+
+    @Override
+    public List<ChartItemVO> getCategoryArticleCount() {
+        // 实时计算各分类文章数量
+        return categoryMapper.findCategoryArticleCount();
+    }
+
+    @Override
+    public List<ChartItemVO> getTagArticleCount() {
+        // 实时计算各标签文章数量（Top 20）
+        return tagMapper.findTagArticleCount();
+    }
+
+    @Override
+    public List<ChartItemVO> getCountryDistribution() {
+        LocalDateTime startTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
+        return accessLogMapper.findCountryDistribution(startTime, 10);
+    }
+
+    @Override
+    public List<Map<String, Object>> getCityDistribution() {
+        LocalDateTime startTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
+        return accessLogMapper.findCityDistribution(startTime, 20);
     }
 }
