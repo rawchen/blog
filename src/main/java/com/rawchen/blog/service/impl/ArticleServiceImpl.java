@@ -25,7 +25,11 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -99,10 +103,8 @@ public class ArticleServiceImpl implements ArticleService {
 
         Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
 
-        // 转换为VO
-        List<ArticleVO> voList = articlePage.getRecords().stream()
-                .map(this::convertToVO)
-                .collect(Collectors.toList());
+        // 批量转换为VO（优化N+1查询）
+        List<ArticleVO> voList = batchConvertToVO(articlePage.getRecords());
 
         return PageResult.of(new Page<ArticleVO>()
                 .setRecords(voList)
@@ -207,9 +209,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
 
-        List<ArticleVO> voList = articlePage.getRecords().stream()
-                .map(this::convertToVO)
-                .collect(Collectors.toList());
+        List<ArticleVO> voList = batchConvertToVO(articlePage.getRecords());
 
         return PageResult.of(new Page<ArticleVO>()
                 .setRecords(voList)
@@ -475,9 +475,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
 
-        List<ArticleVO> voList = articlePage.getRecords().stream()
-                .map(this::convertToVO)
-                .collect(Collectors.toList());
+        List<ArticleVO> voList = batchConvertToVO(articlePage.getRecords());
 
         return PageResult.of(new Page<ArticleVO>()
                 .setRecords(voList)
@@ -498,9 +496,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
 
-        List<ArticleVO> voList = articlePage.getRecords().stream()
-                .map(this::convertToVO)
-                .collect(Collectors.toList());
+        List<ArticleVO> voList = batchConvertToVO(articlePage.getRecords());
 
         return PageResult.of(new Page<ArticleVO>()
                 .setRecords(voList)
@@ -521,9 +517,7 @@ public class ArticleServiceImpl implements ArticleService {
                 .eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章
                 .last("ORDER BY RAND() LIMIT " + limit));
 
-        return articles.stream()
-                .map(this::convertToVO)
-                .collect(Collectors.toList());
+        return batchConvertToVO(articles);
     }
 
     @Override
@@ -539,9 +533,7 @@ public class ArticleServiceImpl implements ArticleService {
                 .orderByDesc(Article::getPublishTime)
                 .last("LIMIT " + limit));
 
-        return articles.stream()
-                .map(this::convertToVO)
-                .collect(Collectors.toList());
+        return batchConvertToVO(articles);
     }
 
     @Override
@@ -580,10 +572,12 @@ public class ArticleServiceImpl implements ArticleService {
         // 查询文章
         List<Article> articles = articleMapper.selectBatchIds(relatedArticleIds);
 
-        return articles.stream()
+        // 过滤并批量转换
+        List<Article> validArticles = articles.stream()
                 .filter(a -> a.getStatus() == 1 && a.getType() == Article.ArticleType.POST)
-                .map(this::convertToVO)
                 .collect(Collectors.toList());
+
+        return batchConvertToVO(validArticles);
     }
 
     @Override
@@ -598,9 +592,7 @@ public class ArticleServiceImpl implements ArticleService {
                 .orderByDesc(Article::getPublishTime)
                 .last("LIMIT " + limit));
 
-        return articles.stream()
-                .map(this::convertToVO)
-                .collect(Collectors.toList());
+        return batchConvertToVO(articles);
     }
 
     @Override
@@ -744,7 +736,115 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     /**
-     * 转换为VO
+     * 批量转换为VO（优化N+1查询）
+     */
+    private List<ArticleVO> batchConvertToVO(List<Article> articles) {
+        if (CollectionUtils.isEmpty(articles)) {
+            return new ArrayList<>();
+        }
+
+        // 收集所有需要查询的ID
+        List<Long> articleIds = articles.stream().map(Article::getId).collect(Collectors.toList());
+        List<Long> categoryIds = articles.stream()
+                .map(Article::getCategoryId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        List<Long> authorIds = articles.stream()
+                .map(Article::getAuthorId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 批量查询分类
+        Map<Long, Category> categoryMap = categoryIds.isEmpty() ? new HashMap<>() :
+                categoryMapper.selectBatchIds(categoryIds).stream()
+                        .collect(Collectors.toMap(Category::getId, Function.identity()));
+
+        // 批量查询用户
+        Map<Long, User> userMap = authorIds.isEmpty() ? new HashMap<>() :
+                userMapper.selectBatchIds(authorIds).stream()
+                        .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        // 批量查询标签
+        Map<Long, List<TagVO>> articleTagMap = new HashMap<>();
+        if (!articleIds.isEmpty()) {
+            List<ArticleTag> allArticleTags = articleTagMapper.selectList(
+                    new LambdaQueryWrapper<ArticleTag>().in(ArticleTag::getArticleId, articleIds));
+
+            if (!CollectionUtils.isEmpty(allArticleTags)) {
+                List<Long> tagIds = allArticleTags.stream()
+                        .map(ArticleTag::getTagId)
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                Map<Long, Tag> tagMap = tagIds.isEmpty() ? new HashMap<>() :
+                        tagMapper.selectBatchIds(tagIds).stream()
+                                .collect(Collectors.toMap(Tag::getId, Function.identity()));
+
+                for (ArticleTag at : allArticleTags) {
+                    Tag tag = tagMap.get(at.getTagId());
+                    if (tag != null) {
+                        TagVO tagVO = new TagVO();
+                        BeanUtils.copyProperties(tag, tagVO);
+                        articleTagMap.computeIfAbsent(at.getArticleId(), k -> new ArrayList<>()).add(tagVO);
+                    }
+                }
+            }
+        }
+
+        // 转换为VO
+        return articles.stream()
+                .map(article -> convertToVOWithCache(article, categoryMap, userMap, articleTagMap))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 使用缓存的Map转换为VO
+     */
+    private ArticleVO convertToVOWithCache(Article article,
+                                          Map<Long, Category> categoryMap,
+                                          Map<Long, User> userMap,
+                                          Map<Long, List<TagVO>> articleTagMap) {
+        ArticleVO vo = new ArticleVO();
+        BeanUtils.copyProperties(article, vo);
+
+        // 处理封面图：如果为空，从content中提取第一张图片
+        if (!StringUtils.hasText(vo.getCoverImage()) && StringUtils.hasText(article.getContent())) {
+            String firstImage = extractFirstImage(article.getContent());
+            if (firstImage != null) {
+                vo.setCoverImage(firstImage);
+            }
+        }
+
+        // 从Map获取分类
+        if (article.getCategoryId() != null) {
+            Category category = categoryMap.get(article.getCategoryId());
+            if (category != null) {
+                vo.setCategoryName(category.getCategoryName());
+            }
+        }
+
+        // 从Map获取作者
+        if (article.getAuthorId() != null) {
+            User author = userMap.get(article.getAuthorId());
+            if (author != null) {
+                vo.setAuthorName(author.getNickname());
+                vo.setAuthorAvatar(author.getAvatar());
+            }
+        }
+
+        // 从Map获取标签
+        vo.setTags(articleTagMap.getOrDefault(article.getId(), new ArrayList<>()));
+
+        // 是否有密码
+        vo.setHasPassword(StringUtils.hasText(article.getPassword()));
+
+        return vo;
+    }
+
+    /**
+     * 转换为VO（单条查询，用于详情等场景）
      */
     private ArticleVO convertToVO(Article article) {
         ArticleVO vo = new ArticleVO();
@@ -832,7 +932,7 @@ public class ArticleServiceImpl implements ArticleService {
                 .eq(Article::getType, Article.ArticleType.PAGE)
                 .orderByAsc(Article::getSortOrder)
                 .orderByDesc(Article::getCreateTime));
-        return pages.stream().map(this::convertToVO).collect(Collectors.toList());
+        return batchConvertToVO(pages);
     }
 
     @Override
@@ -869,9 +969,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
 
-        List<ArticleVO> voList = articlePage.getRecords().stream()
-                .map(this::convertToVO)
-                .collect(Collectors.toList());
+        List<ArticleVO> voList = batchConvertToVO(articlePage.getRecords());
 
         return PageResult.of(new Page<ArticleVO>()
                 .setRecords(voList)

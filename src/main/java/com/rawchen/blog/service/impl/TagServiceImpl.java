@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -38,8 +40,11 @@ public class TagServiceImpl implements TagService {
                 .eq(Tag::getStatus, 1)
                 .orderByDesc(Tag::getArticleCount));
 
+        // 批量查询文章数量
+        Map<Long, Long> articleCountMap = getArticleCountMap();
+
         return tags.stream()
-                .map(this::convertToVO)
+                .map(tag -> convertToVOWithCount(tag, articleCountMap))
                 .collect(Collectors.toList());
     }
 
@@ -55,8 +60,11 @@ public class TagServiceImpl implements TagService {
 
         Page<Tag> tagPage = tagMapper.selectPage(page, wrapper);
 
+        // 批量查询文章数量
+        Map<Long, Long> articleCountMap = getArticleCountMap();
+
         List<TagVO> voList = tagPage.getRecords().stream()
-                .map(this::convertToVO)
+                .map(tag -> convertToVOWithCount(tag, articleCountMap))
                 .collect(Collectors.toList());
 
         return PageResult.of(new Page<TagVO>()
@@ -65,6 +73,32 @@ public class TagServiceImpl implements TagService {
                 .setSize(tagPage.getSize())
                 .setTotal(tagPage.getTotal())
                 .setPages(tagPage.getPages()));
+    }
+
+    /**
+     * 批量获取标签文章数量
+     */
+    private Map<Long, Long> getArticleCountMap() {
+        Map<Long, Long> result = new HashMap<>();
+        List<Map<String, Object>> counts = articleTagMapper.countPublishedArticlesByTagIds();
+        for (Map<String, Object> item : counts) {
+            Long tagId = ((Number) item.get("tag_id")).longValue();
+            Long count = ((Number) item.get("article_count")).longValue();
+            result.put(tagId, count);
+        }
+        return result;
+    }
+
+    /**
+     * 使用缓存的Map转换为VO
+     */
+    private TagVO convertToVOWithCount(Tag tag, Map<Long, Long> articleCountMap) {
+        TagVO vo = new TagVO();
+        BeanUtils.copyProperties(tag, vo);
+        // 从Map获取文章数量
+        Long count = articleCountMap.getOrDefault(tag.getId(), 0L);
+        vo.setArticleCount(count.intValue());
+        return vo;
     }
 
     @Override
@@ -90,14 +124,5 @@ public class TagServiceImpl implements TagService {
     public void deleteTag(Long id) {
         tagMapper.deleteById(id);
         log.info("删除标签成功: {}", id);
-    }
-
-    private TagVO convertToVO(Tag tag) {
-        TagVO vo = new TagVO();
-        BeanUtils.copyProperties(tag, vo);
-        // 统计该标签下已发布文章数量
-        Long count = articleTagMapper.countPublishedArticlesByTagId(tag.getId());
-        vo.setArticleCount(count != null ? count.intValue() : 0);
-        return vo;
     }
 }

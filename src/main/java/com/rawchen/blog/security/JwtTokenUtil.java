@@ -28,10 +28,14 @@ public class JwtTokenUtil {
     private JwtConfig jwtConfig;
 
     private SecretKey secretKey;
+    private JwtParser jwtParser;
 
     @PostConstruct
     public void init() {
         this.secretKey = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8));
+        this.jwtParser = Jwts.parser()
+                .verifyWith(secretKey)
+                .build();
     }
 
     /**
@@ -125,11 +129,7 @@ public class JwtTokenUtil {
      * 获取所有Claims
      */
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser()
-                .verifyWith(secretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        return jwtParser.parseSignedClaims(token).getPayload();
     }
 
     /**
@@ -152,12 +152,9 @@ public class JwtTokenUtil {
      */
     public boolean validateToken(String token) {
         try {
-            Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token);
+            jwtParser.parseSignedClaims(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (Exception e) {
             log.error("Token验证失败: {}", e.getMessage());
             return false;
         }
