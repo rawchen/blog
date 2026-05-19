@@ -26,9 +26,18 @@ import {
 } from '@ant-design/icons'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import rehypeHighlight from 'rehype-highlight'
 import rehypeRaw from 'rehype-raw'
-import 'highlight.js/styles/monokai-sublime.min.css'
+import Prism from 'prismjs'
+import 'prismjs/themes/prism-okaidia.css'
+import 'prismjs/components/prism-java'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-typescript'
+import 'prismjs/components/prism-python'
+import 'prismjs/components/prism-bash'
+import 'prismjs/components/prism-sql'
+import 'prismjs/components/prism-json'
+import 'prismjs/components/prism-css'
+import 'prismjs/components/prism-markup'
 import { getStsToken } from '../../api/oss'
 import { uploadImageLocal } from '../../api/config'
 import './index.css'
@@ -799,7 +808,26 @@ function MarkdownEditor({
             {value ? (
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeHighlight, rehypeRaw]}
+                rehypePlugins={[rehypeRaw]}
+                components={{
+                  pre: ({ children }) => children,
+                  code: ({ className, children, ...props }) => {
+                    const match = /language-(\w+)/.exec(className || '')
+                    const isInline = !match && !className
+                    if (isInline) {
+                      return <code className="inline-code" {...props}>{children}</code>
+                    }
+                    const codeContent = String(children).replace(/\n$/, '')
+                    const language = match ? match[1] : 'text'
+                    const grammar = Prism.languages[language] || Prism.languages.markup
+                    const highlighted = Prism.highlight(codeContent, grammar, language)
+                    return (
+                      <pre className={className}>
+                        <code dangerouslySetInnerHTML={{ __html: highlighted }} />
+                      </pre>
+                    )
+                  }
+                }}
               >
                 {value}
               </ReactMarkdown>

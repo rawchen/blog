@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, Suspense } from 'react'
 import { Layout, Menu, Dropdown, Avatar, message } from 'antd'
 import {
   MenuFoldOutlined,
@@ -163,7 +163,9 @@ function AdminLayout() {
           </div>
         </Header>
         <Content className="admin-content">
-          <Outlet />
+          <Suspense fallback={null}>
+            <Outlet />
+          </Suspense>
         </Content>
       </Layout>
     </Layout>

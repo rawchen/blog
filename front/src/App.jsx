@@ -1,38 +1,45 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense, lazy } from 'react'
 import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 // 前台页面
 import WebLayout from './layouts/WebLayout'
 import Home from './pages/Home'
-import ArticleDetail from './pages/Article'
 import CategoryPage from './pages/Category'
 import TagPage from './pages/Tag'
 import Archive from './pages/Archive'
 import SearchPage from './pages/Search'
 import TimelinePage from './pages/Timeline'
 import MomentsPage from './pages/Moments'
-import FriendsPage from './pages/Friends'
 import NotFoundPage from './pages/NotFound'
-import PageDetail from './pages/Page'
 
-// 后台页面
-import AdminLayout from './layouts/AdminLayout'
-import Login from './pages/admin/Login'
-import Dashboard from './pages/admin/Dashboard'
-import ArticleList from './pages/admin/article/List'
-import ArticleEdit from './pages/admin/article/Edit'
-import CategoryList from './pages/admin/Category'
-import TagList from './pages/admin/Tag'
-import CommentList from './pages/admin/Comment'
-import UserList from './pages/admin/User'
-import FriendLinkList from './pages/admin/FriendLink'
-import Setting from './pages/admin/Setting'
-import Tool from './pages/admin/Tool'
-import PageList from './pages/admin/Page'
-import LoginLog from './pages/admin/log/LoginLog'
-import OperationLog from './pages/admin/log/OperationLog'
-import AccessLog from './pages/admin/log/AccessLog'
+// 前台页面 - 懒加载（只在访问时才加载 markdown 等重型依赖）
+const ArticleDetail = lazy(() => import('./pages/Article'))
+const FriendsPage = lazy(() => import('./pages/Friends'))
+const PageDetail = lazy(() => import('./pages/Page'))
+
+// 后台页面 - 懒加载，访客不会加载
+const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
+const Login = lazy(() => import('./pages/admin/Login'))
+const Dashboard = lazy(() => import('./pages/admin/Dashboard'))
+const ArticleList = lazy(() => import('./pages/admin/article/List'))
+const ArticleEdit = lazy(() => import('./pages/admin/article/Edit'))
+const CategoryList = lazy(() => import('./pages/admin/Category'))
+const TagList = lazy(() => import('./pages/admin/Tag'))
+const CommentList = lazy(() => import('./pages/admin/Comment'))
+const UserList = lazy(() => import('./pages/admin/User'))
+const FriendLinkList = lazy(() => import('./pages/admin/FriendLink'))
+const Setting = lazy(() => import('./pages/admin/Setting'))
+const Tool = lazy(() => import('./pages/admin/Tool'))
+const PageList = lazy(() => import('./pages/admin/Page'))
+const LoginLog = lazy(() => import('./pages/admin/log/LoginLog'))
+const OperationLog = lazy(() => import('./pages/admin/log/OperationLog'))
+const AccessLog = lazy(() => import('./pages/admin/log/AccessLog'))
+
+// 加载组件
+function Loading() {
+  return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>加载中...</div>
+}
 
 // API
 import { getPageList } from './api/article'
@@ -84,11 +91,19 @@ function DynamicRoute() {
 
   // 数字ID返回文章详情
   if (!isPage) {
-    return <ArticleDetail />
+    return (
+      <Suspense fallback={<div className="loading">加载中...</div>}>
+        <ArticleDetail />
+      </Suspense>
+    )
   }
 
   // 独立页面
-  return <PageDetail page={pageData} />
+  return (
+    <Suspense fallback={<div className="loading">加载中...</div>}>
+      <PageDetail page={pageData} />
+    </Suspense>
+  )
 }
 
 function App() {
@@ -110,13 +125,22 @@ function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Route>
 
-      {/* 后台路由 */}
-      <Route path="/admin/login" element={<Login />} />
+      {/* 后台路由 - 懒加载，外层包一个 Suspense 避免切换闪烁 */}
+      <Route
+        path="/admin/login"
+        element={
+          <Suspense fallback={<Loading />}>
+            <Login />
+          </Suspense>
+        }
+      />
       <Route
         path="/admin"
         element={
           <PrivateRoute>
-            <AdminLayout />
+            <Suspense fallback={<Loading />}>
+              <AdminLayout />
+            </Suspense>
           </PrivateRoute>
         }
       >

@@ -12,5 +12,20 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    modulePreload: false, // 禁用预加载，按需加载
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'antd': ['antd', '@ant-design/icons'],
+          'echarts': ['echarts'],
+          'chartjs': ['chart.js', 'react-chartjs-2'],
+          'markdown': ['react-markdown', 'remark-gfm', 'rehype-raw']
+        }
+      }
+    }
   }
 })

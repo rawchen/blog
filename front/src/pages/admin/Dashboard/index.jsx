@@ -26,9 +26,14 @@ import {
   Filler
 } from 'chart.js'
 import { Line, Bar, Doughnut, PolarArea } from 'react-chartjs-2'
-import ReactECharts from 'echarts-for-react'
-import * as echarts from 'echarts'
+import EChartsWrapper from '../../../components/EChartsWrapper'
 import chinaGeo from '../../../assets/geo/china_geo.json'
+
+// 注册中国地图（只需执行一次）
+import * as echarts from 'echarts/core'
+import { MapChart } from 'echarts/charts'
+echarts.use([MapChart])
+echarts.registerMap('china', chinaGeo)
 import {
   getDashboardStats,
   getAccessTrend,
@@ -520,7 +525,7 @@ function Dashboard() {
           <Card title="访客省份分布 (30天)" size="small" bodyStyle={{ padding: '12px 16px' }}>
             {provinceData.length > 0 ? (
               <div style={{ height: 260 }}>
-                <ReactECharts echarts={echarts} option={chinaMapOption} style={{ height: '100%' }} />
+                <EChartsWrapper option={chinaMapOption} style={{ height: '100%' }} />
               </div>
             ) : noData}
           </Card>
