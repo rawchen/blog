@@ -36,11 +36,6 @@ const LoginLog = lazy(() => import('./pages/admin/log/LoginLog'))
 const OperationLog = lazy(() => import('./pages/admin/log/OperationLog'))
 const AccessLog = lazy(() => import('./pages/admin/log/AccessLog'))
 
-// 加载组件
-function Loading() {
-  return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>加载中...</div>
-}
-
 // API
 import { getPageList } from './api/article'
 
@@ -92,7 +87,7 @@ function DynamicRoute() {
   // 数字ID返回文章详情
   if (!isPage) {
     return (
-      <Suspense fallback={<div className="loading">加载中...</div>}>
+      <Suspense fallback={null}>
         <ArticleDetail />
       </Suspense>
     )
@@ -100,7 +95,7 @@ function DynamicRoute() {
 
   // 独立页面
   return (
-    <Suspense fallback={<div className="loading">加载中...</div>}>
+    <Suspense fallback={null}>
       <PageDetail page={pageData} />
     </Suspense>
   )
@@ -125,11 +120,11 @@ function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Route>
 
-      {/* 后台路由 - 懒加载，外层包一个 Suspense 避免切换闪烁 */}
+      {/* 后台路由 - 懒加载 */}
       <Route
         path="/admin/login"
         element={
-          <Suspense fallback={<Loading />}>
+          <Suspense fallback={null}>
             <Login />
           </Suspense>
         }
@@ -138,7 +133,7 @@ function App() {
         path="/admin"
         element={
           <PrivateRoute>
-            <Suspense fallback={<Loading />}>
+            <Suspense fallback={null}>
               <AdminLayout />
             </Suspense>
           </PrivateRoute>

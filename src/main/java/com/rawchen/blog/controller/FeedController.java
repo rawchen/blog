@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * RSS和SiteMap控制器
@@ -41,8 +43,8 @@ public class FeedController {
     @AccessLogAnnotation("RSS")
     public String getRssFeed() {
         // 获取站点配置
-        String siteTitle = getConfigValue("site_title", "RawChen Blog");
-        String siteDescription = getConfigValue("site_description", "喜欢什么就去做吧!");
+        String siteName = getConfigValue("site_name", "RawChen · Blog");
+        String siteDescription = getConfigValue("site_description", "大道至简 大简至极");
         String siteUrl = getConfigValue("site_url", "https://rawchen.com");
 
         // 获取最新文章
@@ -54,19 +56,20 @@ public class FeedController {
         // 构建RSS XML
         StringBuilder rss = new StringBuilder();
         rss.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        rss.append("<rss version=\"2.0\">\n");
+        rss.append("<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
         rss.append("  <channel>\n");
-        rss.append("    <title>").append(escapeXml(siteTitle)).append("</title>\n");
+        rss.append("    <title>").append(escapeXml(siteName)).append("</title>\n");
         rss.append("    <link>").append(escapeXml(siteUrl)).append("</link>\n");
         rss.append("    <description>").append(escapeXml(siteDescription)).append("</description>\n");
         rss.append("    <language>zh-CN</language>\n");
         rss.append("    <lastBuildDate>").append(formatRfc822Date(LocalDateTime.now())).append("</lastBuildDate>\n");
+        rss.append("    <atom:link href=\"").append(escapeXml(siteUrl)).append("/feed\" rel=\"self\" type=\"application/rss+xml\"/>\n");
 
         for (Article article : articles) {
             rss.append("    <item>\n");
             rss.append("      <title>").append(escapeXml(article.getTitle())).append("</title>\n");
-            rss.append("      <link>").append(escapeXml(siteUrl)).append("/article/").append(article.getId()).append("</link>\n");
-            rss.append("      <guid>").append(escapeXml(siteUrl)).append("/article/").append(article.getId()).append("</guid>\n");
+            rss.append("      <link>").append(escapeXml(siteUrl)).append("/").append(article.getId()).append("</link>\n");
+            rss.append("      <guid>").append(escapeXml(siteUrl)).append("/").append(article.getId()).append("</guid>\n");
             rss.append("      <pubDate>").append(formatRfc822Date(article.getPublishTime())).append("</pubDate>\n");
             rss.append("      <description>").append(escapeXml(article.getSummary() != null ? article.getSummary() : ""))
                     .append("</description>\n");
@@ -147,11 +150,16 @@ public class FeedController {
     }
 
     /**
-     * 转义XML特殊字符
+     * 转义XML特殊字符（先解码已有的HTML实体，避免双重转义）
      */
     private String escapeXml(String str) {
         if (str == null) return "";
-        return str.replace("&", "&amp;")
+        return str.replace("&amp;", "&")
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&quot;", "\"")
+                .replace("&apos;", "'")
+                .replace("&", "&amp;")
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
@@ -163,8 +171,8 @@ public class FeedController {
      */
     private String formatRfc822Date(LocalDateTime dateTime) {
         if (dateTime == null) return "";
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss z");
-        return dateTime.format(DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss +0800"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss Z", Locale.ENGLISH);
+        return dateTime.atZone(ZoneId.of("Asia/Shanghai")).format(formatter);
     }
 
     /**
