@@ -92,17 +92,29 @@
 .user-info {
   display: flex;
   align-items: center;
+  line-height: 40px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.user-info:hover {
+  background-color: #f3f3f3;
 }
 
 .home-link {
+  line-height: 40px;
   color: #666;
   font-size: 18px;
-  margin-right: 16px;
-  transition: color 0.3s;
+  margin-right: 2px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  transition: all 0.3s;
 }
 
 .home-link:hover {
   color: #1890ff;
+  background-color: #f3f3f3;
 }
 
 .admin-content {

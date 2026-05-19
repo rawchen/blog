@@ -23,9 +23,12 @@
 
 html {
   overflow-x: hidden;
-  overflow-y: scroll;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+}
+
+html:has(.web-layout) {
+  overflow-y: scroll;
 }
 
 ::selection {

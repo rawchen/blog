@@ -118,20 +118,26 @@
 }
 
 /* Code Styles */
-.markdown-body pre {
+.code-block-wrapper {
   position: relative;
+  margin: 0 0 16px;
+  border-radius: 6px;
+  background-color: #2d2d2d;
+}
+
+.code-block-wrapper:hover .code-block-actions {
+  opacity: 1;
+}
+
+.markdown-body pre {
   padding: 16px;
   padding-top: 16px;
   overflow: auto;
   font-size: 85%;
   line-height: 1.45;
-  background-color: #2d2d2d;
+  background-color: transparent;
   border-radius: 6px;
-  margin: 0 0 16px;
-}
-
-.markdown-body pre:hover .code-block-actions {
-  opacity: 1;
+  margin: 0;
 }
 
 .markdown-body code {
