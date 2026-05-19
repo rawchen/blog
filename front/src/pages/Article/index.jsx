@@ -6,6 +6,7 @@ import { getArticleDetail, incrementViewCount } from '../../api/article'
 import CommentList from '../../components/Comment'
 import MarkdownRenderer from '../../components/MarkdownRenderer'
 import RelatedPosts from '../../components/RelatedPosts'
+import NotFoundPage from '../NotFound'
 import Headroom from 'headroom.js'
 import './index.css'
 
@@ -73,7 +74,7 @@ function ArticleDetail() {
   }
 
   if (loading) return <div className="loading">加载中...</div>
-  if (!article) return <div className="empty">文章不存在</div>
+  if (!article) return <NotFoundPage />
 
   const bgColor = getRandomBgColor()
 

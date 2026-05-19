@@ -4,6 +4,7 @@ import FriendsPage from '../Friends'
 import MomentsPage from '../Moments'
 import SearchPage from '../Search'
 import ArchivePage from '../Archive'
+import NotFoundPage from '../NotFound'
 import './index.css'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faClock, faComment, faEye} from "@fortawesome/free-regular-svg-icons";
@@ -19,7 +20,7 @@ const templateComponents = {
 
 function PageDetail({ page }) {
   if (!page) {
-    return <div className="page-not-found">页面不存在</div>
+    return <NotFoundPage />
   }
 
   // 如果有模板，使用模板组件

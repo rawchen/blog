@@ -55,7 +55,7 @@ function DynamicRoute() {
   const { slug } = useParams()
   const [loading, setLoading] = useState(true)
   const [pageData, setPageData] = useState(null)
-  const [isPage, setIsPage] = useState(false)
+  const [isPage, setIsPage] = useState(null) // null=未知, true=页面, false=文章
 
   useEffect(() => {
     // 如果是纯数字，说明是文章ID，不需要判断
@@ -72,9 +72,11 @@ function DynamicRoute() {
         if (res.data) {
           setPageData(res.data)
           setIsPage(true)
+        } else {
+          setIsPage(false) // 有响应但无数据，当作文章处理（会404）
         }
       } catch (e) {
-        // 不是独立页面，会404
+        setIsPage(false) // 请求失败，当作文章处理（会404）
       } finally {
         setLoading(false)
       }
@@ -84,19 +86,19 @@ function DynamicRoute() {
 
   if (loading) return <div className="loading">加载中...</div>
 
-  // 数字ID返回文章详情
-  if (!isPage) {
+  // 独立页面
+  if (isPage === true) {
     return (
       <Suspense fallback={null}>
-        <ArticleDetail />
+        <PageDetail page={pageData} />
       </Suspense>
     )
   }
 
-  // 独立页面
+  // 数字ID返回文章详情
   return (
     <Suspense fallback={null}>
-      <PageDetail page={pageData} />
+      <ArticleDetail />
     </Suspense>
   )
 }
