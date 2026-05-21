@@ -50,6 +50,8 @@ public class ConfigServiceImpl implements ConfigService {
     private static final String KEY_OSS_ENABLED = "oss_enabled";
     private static final String KEY_OSS_STYLE = "oss_style";
     private static final String KEY_GRAVATAR_DOMAIN = "gravatar_domain";
+    private static final String KEY_COMMENT_ENABLED = "comment_enabled";
+    private static final String KEY_MAIL_ENABLED = "mail_enabled";
 
     @Override
     public SiteConfigVO getSiteConfig() {
@@ -76,6 +78,8 @@ public class ConfigServiceImpl implements ConfigService {
         vo.setOssEnabled(Boolean.parseBoolean(getConfigByKey(KEY_OSS_ENABLED, "true")));
         vo.setOssStyle(getConfigByKey(KEY_OSS_STYLE));
         vo.setGravatarDomain(getConfigByKey(KEY_GRAVATAR_DOMAIN));
+        vo.setCommentEnabled(Boolean.parseBoolean(getConfigByKey(KEY_COMMENT_ENABLED, "false")));
+        vo.setMailEnabled(Boolean.parseBoolean(getConfigByKey(KEY_MAIL_ENABLED, "false")));
 
         return vo;
     }

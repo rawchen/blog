@@ -118,4 +118,14 @@ public class SiteConfigVO implements Serializable {
      * Gravatar头像域名
      */
     private String gravatarDomain;
+
+    /**
+     * 是否开启评论审核
+     */
+    private Boolean commentEnabled;
+
+    /**
+     * 是否开启邮件通知
+     */
+    private Boolean mailEnabled;
 }

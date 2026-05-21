@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { message } from 'antd'
 import CommentItem from './CommentItem'
 import CommentForm from './CommentForm'
-import { getCommentList, submitComment, getCommentPageNum } from '../../api/comment'
+import { getCommentList, submitComment, replyComment, getCommentPageNum } from '../../api/comment'
 import { clearAuth } from '../../store/modules/auth'
 import './index.css'
 
@@ -25,6 +25,9 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
   // 游客信息状态
   const [savedInfo, setSavedInfo] = useState(null)
   const [showGuestInfo, setShowGuestInfo] = useState(true)
+
+  // 标记锚点是否已处理（避免评论更新后重复触发）
+  const anchorProcessedRef = useRef(false)
 
   // 是否为登录用户
   const isLoggedIn = isAuthenticated && userInfo
@@ -58,9 +61,10 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
     }
   }, [articleId, page, pageResolved])
 
-  // 加载完评论后滚动到锚点
+  // 加载完评论后滚动到锚点（仅首次）
   useEffect(() => {
     if (!comments.length) return
+    if (anchorProcessedRef.current) return
 
     const hash = window.location.hash
     if (!hash) return
@@ -76,6 +80,7 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
           setTimeout(() => el.classList.remove('comment-highlight'), 3000)
         }
       }, 300)
+      anchorProcessedRef.current = true
     } else if (hash === '#comments') {
       setTimeout(() => {
         const el = document.getElementById('comments')
@@ -83,6 +88,7 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
           el.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }
       }, 300)
+      anchorProcessedRef.current = true
     }
   }, [comments])
 
@@ -148,7 +154,12 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
         }
       }
 
-      await submitComment(commentData)
+      // 区分新评论和回复，调用不同接口
+      if (replyTo) {
+        await replyComment(commentData)
+      } else {
+        await submitComment(commentData)
+      }
       setReplyTo(null)
       fetchComments()
       message.success('发送评论成功')

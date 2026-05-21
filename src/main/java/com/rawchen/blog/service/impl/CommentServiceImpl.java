@@ -6,12 +6,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.dto.CommentDTO;
+import com.rawchen.blog.entity.Article;
 import com.rawchen.blog.entity.Comment;
 import com.rawchen.blog.entity.User;
+import com.rawchen.blog.mapper.ArticleMapper;
 import com.rawchen.blog.mapper.CommentMapper;
 import com.rawchen.blog.mapper.UserMapper;
 import com.rawchen.blog.service.CommentService;
 import com.rawchen.blog.service.ConfigService;
+import com.rawchen.blog.service.MailService;
 import com.rawchen.blog.vo.CommentVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -44,6 +47,12 @@ public class CommentServiceImpl implements CommentService {
 
     @Autowired
     private ConfigService configService;
+
+    @Autowired
+    private ArticleMapper articleMapper;
+
+    @Autowired
+    private MailService mailService;
 
     @Autowired
     private HttpServletRequest request;
@@ -184,6 +193,22 @@ public class CommentServiceImpl implements CommentService {
 
         commentMapper.insert(comment);
         log.info("提交评论成功: {}", comment.getId());
+
+        // 发送新评论通知邮件给文章作者
+        try {
+            String mailEnabled = configService.getConfigByKey("mail_enabled", "false");
+            if ("true".equalsIgnoreCase(mailEnabled) || "1".equals(mailEnabled)) {
+                Article article = articleMapper.selectById(comment.getArticleId());
+                if (article != null) {
+                    String blogUrl = configService.getConfigByKey("site_url", "");
+                    String blogName = configService.getConfigByKey("site_name", "我的博客");
+                    mailService.sendNewCommentMail(comment, article, blogUrl, blogName);
+                }
+            }
+        } catch (Exception e) {
+            log.error("发送新评论通知邮件失败", e);
+        }
+
         return comment.getId();
     }
 
@@ -238,6 +263,23 @@ public class CommentServiceImpl implements CommentService {
 
         commentMapper.insert(comment);
         log.info("回复评论成功: {}", comment.getId());
+
+        // 发送回复通知邮件给被回复者
+        try {
+            String mailEnabled = configService.getConfigByKey("mail_enabled", "false");
+            if ("true".equalsIgnoreCase(mailEnabled) || "1".equals(mailEnabled)) {
+                Comment parentComment = commentMapper.selectById(commentDTO.getParentId());
+                Article article = articleMapper.selectById(comment.getArticleId());
+                if (parentComment != null && article != null) {
+                    String blogUrl = configService.getConfigByKey("site_url", "");
+                    String blogName = configService.getConfigByKey("site_name", "我的博客");
+                    mailService.sendReplyMail(comment, parentComment, article, blogUrl, blogName);
+                }
+            }
+        } catch (Exception e) {
+            log.error("发送回复通知邮件失败", e);
+        }
+
         return comment.getId();
     }
 

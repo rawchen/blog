@@ -91,6 +91,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/tag/list",
                         // 评论公开接口
                         "/api/comment/list/**",
+                        "/api/comment/page/**",
                         "/api/comment/latest-comment",
                         "/api/comment/submit",
                         "/api/comment/reply",

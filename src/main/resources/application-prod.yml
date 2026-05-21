@@ -14,6 +14,20 @@ spring:
       max-lifetime: 1800000
       connection-test-query: SELECT 1
 
+  # 邮件配置
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: xxx@qq.com
+    password: xxx
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+    from: xxx@qq.com
+
 # 阿里云OSS配置
 aliyun:
   oss:

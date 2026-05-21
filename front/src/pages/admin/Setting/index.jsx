@@ -25,7 +25,8 @@ const camelToSnake = {
   ossEnabled: 'oss_enabled',
   ossStyle: 'oss_style',
   gravatarDomain: 'gravatar_domain',
-  commentEnabled: 'comment_enabled'
+  commentEnabled: 'comment_enabled',
+  mailEnabled: 'mail_enabled'
 }
 
 // 字段映射：下划线 -> 驼峰
@@ -38,6 +39,7 @@ function Setting() {
   const [saving, setSaving] = useState(false)
   const [ossEnabled, setOssEnabled] = useState(true)
   const [commentEnabled, setCommentEnabled] = useState(false)
+  const [mailEnabled, setMailEnabled] = useState(false)
   const [form] = Form.useForm()
 
   useEffect(() => {
@@ -54,7 +56,7 @@ function Setting() {
         Object.entries(camelToSnake).forEach(([camelKey, snakeKey]) => {
           let value = res.data[camelKey]
           // 布尔值字段特殊处理
-          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled') {
+          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled' || camelKey === 'mailEnabled') {
             value = value === true || value === 'true'
           }
           formValues[snakeKey] = value ?? ''
@@ -62,6 +64,7 @@ function Setting() {
         form.setFieldsValue(formValues)
         setOssEnabled(formValues['oss_enabled'])
         setCommentEnabled(formValues['comment_enabled'])
+        setMailEnabled(formValues['mail_enabled'])
       }
     } catch (e) {
       console.error('加载配置失败', e)
@@ -81,6 +84,9 @@ function Setting() {
       if (values.comment_enabled !== undefined) {
         values.comment_enabled = String(values.comment_enabled)
       }
+      if (values.mail_enabled !== undefined) {
+        values.mail_enabled = String(values.mail_enabled)
+      }
       // 直接发送下划线格式
       const configs = Object.entries(values)
         .filter(([_, v]) => v !== undefined && v !== '')
@@ -93,7 +99,7 @@ function Setting() {
         const camelKey = snakeToCamel[key]
         if (camelKey) {
           // 布尔值字段保持布尔值
-          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled') {
+          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled' || camelKey === 'mailEnabled') {
             cacheData[camelKey] = value === 'true'
           } else {
             cacheData[camelKey] = value
@@ -188,6 +194,9 @@ function Setting() {
               </Form.Item>
               <Form.Item label="开启评论审核" name="comment_enabled" valuePropName="checked">
                 <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setCommentEnabled(checked)} />
+              </Form.Item>
+              <Form.Item label="开启邮件通知" name="mail_enabled" valuePropName="checked">
+                <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setMailEnabled(checked)} />
               </Form.Item>
             </Card>
           </Col>
