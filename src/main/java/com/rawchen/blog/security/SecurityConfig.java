@@ -122,6 +122,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/",
                         "/index.html",
                         "/*",
+                        "/*/*",
                         "/page/**",
                         "/category",
                         "/category/**",

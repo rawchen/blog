@@ -90,8 +90,8 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain, replyTo, can
     userAgent,
     userId,
     children = [],
-    replyUserName,
-    replyUserId
+    parentId,
+    parentNickname
   } = comment
 
   const displayName = nickname || author || '游客'
@@ -163,9 +163,24 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain, replyTo, can
             </span>
           </div>
           <div className="comment-content">
-            {replyUserName && (
+            {parentNickname && parentId && (
               <span className="comment-author-at">
-                <a href={`#comment-${replyUserId}`}>@{replyUserName}</a>
+                <a
+                  href={`#comment-${parentId}`}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    const el = document.getElementById(`comment-${parentId}`)
+                    if (el) {
+                      // 更新URL hash（不触发滚动）
+                      const hash = `#comment-${parentId}`
+                      window.history.replaceState(null, '', hash)
+                      // 直接滚动
+                      el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                      el.classList.add('comment-highlight')
+                      setTimeout(() => el.classList.remove('comment-highlight'), 3000)
+                    }
+                  }}
+                >@{parentNickname}</a>
               </span>
             )}
             <span dangerouslySetInnerHTML={{ __html: renderSmilies(content) }} />

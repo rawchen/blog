@@ -26,6 +26,11 @@ public class CommentVO implements Serializable {
 
     private String replyUserName;
 
+    /**
+     * 父评论昵称（用于显示@回复）
+     */
+    private String parentNickname;
+
     private Long userId;
 
     private String nickname;

@@ -23,13 +23,13 @@
 }
 
 .pagination-btn:hover:not(.disabled):not(.active) {
-  border-color: #1890ff;
-  color: #1890ff;
+  border-color: #ffa8a8;
+  color: #ffa8a8;
 }
 
 .pagination-btn.active {
-  background: #1890ff;
-  border-color: #1890ff;
+  background: #ffa8a8;
+  border-color: #ffa8a8;
   color: #fff;
 }
 

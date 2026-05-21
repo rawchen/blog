@@ -143,17 +143,14 @@ function Header() {
               <span className="middle"></span>
             </span>
             <ul>
-              <li><Link to="/">首页</Link></li>
+              {/*<li><Link to="/">首页</Link></li>*/}
               <li><Link to="/category">分类</Link></li>
-              {pages.map(page => (
+              {publicPages.map(page => (
                 <li key={page.id}>
-                  <Link to={`/${page.slug}`}>
-                    {page.title}
-                    {page.status !== 1 && <span style={{ color: '#999', fontSize: '12px', marginLeft: '4px' }}>隐藏</span>}
-                  </Link>
+                  <Link to={`/${page.slug}`}>{page.title}</Link>
                 </li>
               ))}
-              <li><Link to="/admin/login">管理</Link></li>
+              {/*<li><Link to="/admin/login">管理</Link></li>*/}
             </ul>
           </div>
         </div>

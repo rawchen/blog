@@ -112,6 +112,10 @@
   color: #3498db;
 }
 
+.meta-comments-list img {
+  width: 21px;
+}
+
 .icp a:hover {
   border-bottom: 1px solid #cdcdcd;
   color: black;

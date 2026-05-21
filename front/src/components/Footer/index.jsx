@@ -6,6 +6,7 @@ import {faGithubAlt, faTelegram, faWeibo, faTwitter} from '@fortawesome/free-bra
 import {faEnvelope, faComments, faRss, faComment, faGlobe, faEarthAsia} from '@fortawesome/free-solid-svg-icons'
 import { getRecentArticles } from '../../api/article'
 import { getRecentComments } from '../../api/comment'
+import { renderSmilies } from '../../utils/smilies'
 import { getSiteStat } from '../../api/stat'
 import './index.css'
 
@@ -288,7 +289,7 @@ function Footer() {
                 recentComments.map(comment => (
                   <li key={comment.id}>
                     <Link to={`/${comment.articleId}#comment-${comment.id}`}>
-                      {comment.nickname} : {comment.content}
+                      {comment.nickname} : <span dangerouslySetInnerHTML={{ __html: renderSmilies(comment.content) }} />
                       {/*<span className="comment-author">{comment.nickname}:</span>*/}
                       {/*<span className="comment-content">*/}
                       {/*  {comment.content.length > 30*/}

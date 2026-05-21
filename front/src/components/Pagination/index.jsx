@@ -9,7 +9,7 @@ function Pagination({ current, size, total, onChange }) {
   if (totalPages <= 1) return null
 
   const pages = []
-  const showPages = 5
+  const showPages = 3
   let startPage = Math.max(1, current - Math.floor(showPages / 2))
   let endPage = Math.min(totalPages, startPage + showPages - 1)
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 import { message } from 'antd'
 import CommentItem from './CommentItem'
 import CommentForm from './CommentForm'
@@ -28,6 +29,9 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
 
   // 记录上次处理的hash，用于判断hash是否变化
   const lastProcessedHashRef = useRef(null)
+
+  // React Router location，用于监听 hash 变化
+  const location = useLocation()
 
   // 是否为登录用户
   const isLoggedIn = isAuthenticated && userInfo
@@ -85,28 +89,15 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
     }
   }
 
-  // 评论加载后滚动到锚点（首次）
+  // 监听hash变化：评论加载后、React Router导航（如footer点击最近评论）
   useEffect(() => {
     if (!comments.length) return
-    const hash = window.location.hash
+    const hash = location.hash
     if (hash && lastProcessedHashRef.current !== hash) {
       lastProcessedHashRef.current = hash
       scrollToAnchor(hash)
     }
-  }, [comments])
-
-  // 监听hash变化（处理footer点击最近评论等场景）
-  useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash
-      if (hash && lastProcessedHashRef.current !== hash) {
-        lastProcessedHashRef.current = hash
-        scrollToAnchor(hash)
-      }
-    }
-    window.addEventListener('hashchange', handleHashChange)
-    return () => window.removeEventListener('hashchange', handleHashChange)
-  }, [])
+  }, [comments, location.hash])
 
   useEffect(() => {
     // 登录用户不需要读取游客信息
@@ -252,10 +243,10 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
       {replyDisplayName && (
         <>
           {' '}
-          <span style={{ marginLeft: 10 }}>
-            回复 <span style={{ color: '#eb5055' }}>@{replyDisplayName}</span>
-          </span>
-          <a onClick={cancelReply} style={{ marginLeft: 10, cursor: 'pointer' }}>取消评论</a>
+          {/*<span style={{ marginLeft: 10 }}>*/}
+          {/*  回复 <span style={{ color: '#eb5055' }}>@{replyDisplayName}</span>*/}
+          {/*</span>*/}
+          <a onClick={cancelReply} style={{ marginLeft: 1, cursor: 'pointer' }}>取消评论</a>
         </>
       )}
     </span>

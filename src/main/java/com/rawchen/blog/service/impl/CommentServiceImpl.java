@@ -119,11 +119,13 @@ public class CommentServiceImpl implements CommentService {
         // 合并到总映射
         allVoMap.putAll(rootVoMap);
 
-        // 构建树形结构：将每个评论添加到其父评论的children中
+        // 构建树形结构：将每个评论添加到其父评论的children中，并设置父评论昵称
         for (CommentVO vo : allVoMap.values()) {
             if (vo.getParentId() != null && vo.getParentId() != 0) {
                 CommentVO parent = allVoMap.get(vo.getParentId());
                 if (parent != null) {
+                    // 设置父评论昵称用于显示@回复
+                    vo.setParentNickname(parent.getNickname());
                     if (parent.getChildren() == null) {
                         parent.setChildren(new ArrayList<>());
                     }
