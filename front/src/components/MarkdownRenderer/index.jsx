@@ -35,15 +35,17 @@ function CodeBlock({ className, children }) {
   }
 
   return (
-    <pre className={className}>
+    <div className="code-block-wrapper">
       <div className="code-block-actions">
         <span className="code-block-lang">{language}</span>
         <button className="code-block-copy" onClick={handleCopy}>
           复制
         </button>
       </div>
-      <code dangerouslySetInnerHTML={{ __html: highlighted }} />
-    </pre>
+      <pre className={className}>
+        <code dangerouslySetInnerHTML={{ __html: highlighted }} />
+      </pre>
+    </div>
   )
 }
 

@@ -173,7 +173,7 @@ function Footer() {
                 ZHIHU
               </a>
             )}
-            <a className="social rss" href="/api/feed" target="_blank" rel="noopener noreferrer">
+            <a className="social rss" href="/feed" target="_blank" rel="noopener noreferrer">
               RSS
             </a>
             {siteConfig.githubUrl && (
@@ -242,7 +242,7 @@ function Footer() {
                       <FontAwesomeIcon icon={faTelegram} className="footer-icon" />
                     </a>
                   )}
-                  <a href="/api/feed" title="Feed" target="_blank" rel="noopener noreferrer">
+                  <a href="/feed" title="Feed" target="_blank" rel="noopener noreferrer">
                     <FontAwesomeIcon icon={faRss} className="footer-icon" />
                   </a>
                   {siteConfig.email && (
