@@ -1,5 +1,5 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react'
-import { Routes, Route, Navigate, useParams } from 'react-router-dom'
+import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 // 前台页面
@@ -53,9 +53,30 @@ function PrivateRoute({ children }) {
 // 动态路由组件：判断是文章ID还是页面slug
 function DynamicRoute() {
   const { slug } = useParams()
+  const location = useLocation()
   const [loading, setLoading] = useState(true)
   const [pageData, setPageData] = useState(null)
   const [isPage, setIsPage] = useState(null) // null=未知, true=页面, false=文章
+
+  // 从完整路径解析评论分页页码
+  // 路径格式: /about 或 /about/comment-page-2
+  const pathParts = location.pathname.split('/').filter(Boolean)
+  let commentPage = 1
+  if (pathParts.length > 1) {
+    const pageMatch = pathParts[1].match(/^comment-page-(\d+)$/)
+    if (pageMatch) {
+      commentPage = parseInt(pageMatch[1], 10)
+    }
+  }
+
+  // 解析hash中的评论锚点ID（如 #comment-1329）
+  let anchorCommentId = null
+  if (location.hash) {
+    const commentMatch = location.hash.match(/^#comment-(\d+)$/)
+    if (commentMatch) {
+      anchorCommentId = parseInt(commentMatch[1], 10)
+    }
+  }
 
   useEffect(() => {
     // 如果是纯数字，说明是文章ID，不需要判断
@@ -90,7 +111,7 @@ function DynamicRoute() {
   if (isPage === true) {
     return (
       <Suspense fallback={null}>
-        <PageDetail page={pageData} />
+        <PageDetail page={pageData} commentPage={commentPage} anchorCommentId={anchorCommentId} />
       </Suspense>
     )
   }
@@ -98,7 +119,7 @@ function DynamicRoute() {
   // 数字ID返回文章详情
   return (
     <Suspense fallback={null}>
-      <ArticleDetail />
+      <ArticleDetail commentPage={commentPage} anchorCommentId={anchorCommentId} />
     </Suspense>
   )
 }
@@ -117,8 +138,8 @@ function App() {
         <Route path="archive" element={<Archive />} />
         <Route path="search" element={<SearchPage />} />
         <Route path="timeline" element={<TimelinePage />} />
-        {/* 动态路由：文章ID或页面slug */}
-        <Route path=":slug" element={<DynamicRoute />} />
+        {/* 动态路由：文章ID或页面slug，使用*匹配评论分页路径 */}
+        <Route path=":slug/*" element={<DynamicRoute />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
 

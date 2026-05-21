@@ -22,7 +22,7 @@ function formatDate(datetime) {
   return datetime ? datetime.substring(0, 10) : ''
 }
 
-function ArticleDetail() {
+function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
   const { slug: id } = useParams()
   const [article, setArticle] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -231,7 +231,7 @@ function ArticleDetail() {
 
       {/* Comments */}
       {article.allowComment !== false && (
-        <CommentList articleId={id} />
+        <CommentList articleId={id} initialPage={commentPage} anchorCommentId={anchorCommentId} />
       )}
 
       {/* Post Bottom Bar */}

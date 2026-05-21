@@ -40,6 +40,15 @@ public class CommentController {
         return R.ok(commentService.getCommentList(articleId, current, size));
     }
 
+    @ApiOperation("根据评论ID计算所在页码")
+    @GetMapping("/page/{articleId}/{commentId}")
+    public R<Integer> getCommentPageNum(
+            @PathVariable Long articleId,
+            @PathVariable Long commentId,
+            @RequestParam(defaultValue = "10") Long size) {
+        return R.ok(commentService.getCommentPageNum(articleId, commentId, size));
+    }
+
     @ApiOperation("获取最近评论")
     @PostMapping("/latest-comment")
     public R<List<CommentVO>> getRecentComments(@RequestBody Map<String, Object> params) {

@@ -64,4 +64,9 @@ public interface CommentService {
      * 批量删除评论
      */
     void batchDeleteComments(List<Long> ids);
+
+    /**
+     * 根据评论ID计算其所在页码
+     */
+    Integer getCommentPageNum(Long articleId, Long commentId, Long pageSize);
 }

@@ -290,6 +290,61 @@ public class CommentServiceImpl implements CommentService {
         log.info("批量删除评论成功: {}", ids);
     }
 
+    @Override
+    public Integer getCommentPageNum(Long articleId, Long commentId, Long pageSize) {
+        // 查找目标评论
+        Comment targetComment = commentMapper.selectById(commentId);
+        if (targetComment == null) {
+            return 1;
+        }
+
+        // 如果评论不属于该文章，返回第一页
+        if (!targetComment.getArticleId().equals(articleId)) {
+            return 1;
+        }
+
+        // 找到根评论ID（如果是子评论，需要找到其顶级父评论）
+        Long rootId = getRootCommentId(targetComment);
+
+        // 计算该根评论在所有顶级评论中的位置（按createTime倒序）
+        // 查询所有顶级评论的ID列表（按createTime倒序）
+        List<Comment> rootComments = commentMapper.selectList(new LambdaQueryWrapper<Comment>()
+                .eq(Comment::getArticleId, articleId)
+                .eq(Comment::getStatus, 1)
+                .eq(Comment::getParentId, 0)
+                .orderByDesc(Comment::getCreateTime)
+                .select(Comment::getId));
+
+        // 找到根评论在列表中的位置（从0开始）
+        int position = 0;
+        for (int i = 0; i < rootComments.size(); i++) {
+            if (rootComments.get(i).getId().equals(rootId)) {
+                position = i;
+                break;
+            }
+        }
+
+        // 计算页码（position从0开始，页码从1开始）
+        // 例如：position=0是第一条评论，在第1页；position=9是第10条评论，也在第1页（pageSize=10）
+        int pageNum = (position / pageSize.intValue()) + 1;
+        return pageNum;
+    }
+
+    /**
+     * 获取评论的根评论ID
+     */
+    private Long getRootCommentId(Comment comment) {
+        if (comment.getParentId() == null || comment.getParentId() == 0) {
+            return comment.getId();
+        }
+        // 递归查找父评论直到找到顶级评论
+        Comment parent = commentMapper.selectById(comment.getParentId());
+        if (parent == null) {
+            return comment.getId();
+        }
+        return getRootCommentId(parent);
+    }
+
     private CommentVO convertToVO(Comment comment) {
         CommentVO vo = new CommentVO();
         BeanUtils.copyProperties(comment, vo);

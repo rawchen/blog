@@ -5,6 +5,11 @@ export function getCommentList(articleId, params) {
   return request({ url: `/comment/list/${articleId}`, method: 'get', params })
 }
 
+// 根据评论ID计算所在页码
+export function getCommentPageNum(articleId, commentId, size = 10) {
+  return request({ url: `/comment/page/${articleId}/${commentId}`, method: 'get', params: { size } })
+}
+
 // 获取最近评论
 export function getRecentComments(data) {
   return request({ url: '/comment/latest-comment', method: 'post', data })

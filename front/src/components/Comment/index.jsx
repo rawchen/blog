@@ -3,16 +3,17 @@ import { useSelector, useDispatch } from 'react-redux'
 import { message } from 'antd'
 import CommentItem from './CommentItem'
 import CommentForm from './CommentForm'
-import { getCommentList, submitComment } from '../../api/comment'
+import { getCommentList, submitComment, getCommentPageNum } from '../../api/comment'
 import { clearAuth } from '../../store/modules/auth'
 import './index.css'
 
-function CommentList({ articleId }) {
+function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
   const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(true)
   const [replyTo, setReplyTo] = useState(null)
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(initialPage)
   const [total, setTotal] = useState(0)
+  const [pageResolved, setPageResolved] = useState(!anchorCommentId) // 页码是否已确定
   const pageSize = 10
   const siteConfig = useSelector(state => state.siteConfig.data) || {}
   const gravatarDomain = siteConfig.gravatarDomain
@@ -28,14 +29,62 @@ function CommentList({ articleId }) {
   // 是否为登录用户
   const isLoggedIn = isAuthenticated && userInfo
 
+  // 当有锚点评论ID时，先查询其所在页码
   useEffect(() => {
-    // 非数字ID不请求
+    if (!articleId || !/^\d+$/.test(String(articleId))) {
+      setLoading(false)
+      setPageResolved(true)
+      return
+    }
+    if (anchorCommentId) {
+      getCommentPageNum(articleId, anchorCommentId, pageSize).then(res => {
+        const targetPage = res.data || 1
+        setPage(targetPage)
+        setPageResolved(true)
+      }).catch(() => {
+        setPage(initialPage)
+        setPageResolved(true)
+      })
+    }
+  }, [articleId, anchorCommentId])
+
+  // 页码确定后才加载评论
+  useEffect(() => {
+    if (!pageResolved) return
     if (articleId && /^\d+$/.test(String(articleId))) {
       fetchComments()
     } else {
       setLoading(false)
     }
-  }, [articleId, page])
+  }, [articleId, page, pageResolved])
+
+  // 加载完评论后滚动到锚点
+  useEffect(() => {
+    if (!comments.length) return
+
+    const hash = window.location.hash
+    if (!hash) return
+
+    const commentMatch = hash.match(/^#comment-(\d+)$/)
+    if (commentMatch) {
+      // 延迟滚动，等DOM渲染完成
+      setTimeout(() => {
+        const el = document.getElementById(`comment-${commentMatch[1]}`)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          el.classList.add('comment-highlight')
+          setTimeout(() => el.classList.remove('comment-highlight'), 3000)
+        }
+      }, 300)
+    } else if (hash === '#comments') {
+      setTimeout(() => {
+        const el = document.getElementById('comments')
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 300)
+    }
+  }, [comments])
 
   useEffect(() => {
     // 登录用户不需要读取游客信息
@@ -128,6 +177,27 @@ function CommentList({ articleId }) {
     message.success('已退出登录')
   }
 
+  // 生成分页永久链接URL
+  const getCommentPageUrl = (pageNum) => {
+    const basePath = window.location.pathname.replace(/\/comment-page-\d+$/, '')
+    if (pageNum === 1) {
+      return `${basePath}#comments`
+    }
+    return `${basePath}/comment-page-${pageNum}#comments`
+  }
+
+  // 分页导航（使用replaceState避免组件重新挂载）
+  const handlePageChange = (pageNum) => {
+    const url = getCommentPageUrl(pageNum)
+    window.history.replaceState(null, '', url)
+    setPage(pageNum)
+    // 滚动到评论区顶部
+    const commentsEl = document.getElementById('comments')
+    if (commentsEl) {
+      commentsEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
   // 渲染response头部
   const renderResponse = (replyDisplayName) => (
     <span className="response">
@@ -206,19 +276,19 @@ function CommentList({ articleId }) {
                 <ol className="page-navigator">
                   {page > 1 && (
                     <li className="prev">
-                      <a onClick={() => setPage(page - 1)}>&lt;</a>
+                      <a onClick={() => handlePageChange(page - 1)}>&lt;</a>
                     </li>
                   )}
                   {Array.from({ length: Math.ceil(total / pageSize) }, (_, i) => i + 1)
                     .slice(Math.max(0, page - 3), Math.min(Math.ceil(total / pageSize), page + 2))
                     .map(p => (
                       <li key={p} className={p === page ? 'current' : ''}>
-                        <a onClick={() => setPage(p)}>{p}</a>
+                        <a onClick={() => handlePageChange(p)}>{p}</a>
                       </li>
                     ))}
                   {page < Math.ceil(total / pageSize) && (
                     <li className="next">
-                      <a onClick={() => setPage(page + 1)}>&gt;</a>
+                      <a onClick={() => handlePageChange(page + 1)}>&gt;</a>
                     </li>
                   )}
                 </ol>

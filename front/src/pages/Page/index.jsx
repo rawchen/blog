@@ -1,5 +1,6 @@
 import React from 'react'
 import MarkdownRenderer from '../../components/MarkdownRenderer'
+import CommentList from '../../components/Comment'
 import FriendsPage from '../Friends'
 import MomentsPage from '../Moments'
 import SearchPage from '../Search'
@@ -18,7 +19,7 @@ const templateComponents = {
   'archive': ArchivePage
 }
 
-function PageDetail({ page }) {
+function PageDetail({ page, commentPage = 1, anchorCommentId = null }) {
   if (!page) {
     return <NotFoundPage />
   }
@@ -62,6 +63,11 @@ function PageDetail({ page }) {
           <div className="page-empty">暂无内容</div>
         )}
       </div>
+
+      {/* Comments */}
+      {page.id && (
+        <CommentList articleId={String(page.id)} initialPage={commentPage} anchorCommentId={anchorCommentId} />
+      )}
     </div>
   )
 }
