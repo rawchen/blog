@@ -45,6 +45,7 @@
 }
 
 .logo {
+  cursor: pointer;
   height: 64px;
   display: flex;
   align-items: center;
@@ -432,22 +433,6 @@
   font-size: 16px;
   padding: 0px 15px;
   transition: color 0.3s;
-}
-
-.search-toggle:hover,
-.search-toggle.active {
-  color: #3b82f6;
-}
-
-.admin-link {
-  color: #666;
-  font-size: 16px;
-  padding: 5px;
-  transition: color 0.3s;
-}
-
-.admin-link:hover {
-  color: #3b82f6;
 }
 
 /* 移动端搜索按钮 - 默认隐藏 */

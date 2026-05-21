@@ -112,6 +112,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         // 静态资源
                         "/favicon.ico",
                         "/assets/**",
+                        "/smilies/**",
                         "/*.png",
                         "/*.jpg",
                         "/*.ico",

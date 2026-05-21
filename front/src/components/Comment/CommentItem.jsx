@@ -149,7 +149,17 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain, replyTo, can
               ) : (
                 displayName
               )}
-              {isAuthor && <span style={{ color: '#eb5055', marginLeft: 5 }}></span>}
+              {isAuthor && (
+                <span className="commentapprove" style={{
+                  fontFamily: 'PingFang SC,Microsoft YaHei,sans-serif',
+                  color: '#FFF',
+                  padding: '.1rem .25rem',
+                  fontSize: '.7rem',
+                  borderRadius: '.25rem',
+                  backgroundColor: '#ff5050',
+                  marginLeft: '.25rem'
+                }}>博主</span>
+              )}
             </span>
           </div>
           <div className="comment-content">

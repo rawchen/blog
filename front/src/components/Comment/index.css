@@ -16,12 +16,26 @@
   list-style: none;
 }
 
+#comments .page-navigator a:hover {
+  position: unset;
+}
+
+#comments .page-navigator a:hover::after {
+  width: 0;
+}
+
+/*#comments .page-navigator a:hover {*/
+/*  width: 0;*/
+/*}*/
+
 #comments a {
+  cursor: pointer;
   position: relative;
+  color: #5f5f5f;
 }
 
 #comments a:hover {
-  border-bottom: 2px solid #d1d1d1;
+  /*border-bottom: 2px solid #d1d1d1;*/
 }
 
 #comments a::after {

@@ -59,6 +59,8 @@ export default function useFancybox(options = {}) {
 
       const fancyboxOptions = {
         hideScrollbar: false,
+        placeFocusBack: false,
+        Hash: false,
         Carousel: {
           Thumbs: {
             type: 'classic',

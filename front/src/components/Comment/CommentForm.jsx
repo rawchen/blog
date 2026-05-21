@@ -2,13 +2,9 @@ import React, { useState, useEffect, useRef } from 'react'
 import { SMILIES_LIST, SMILIES_MAP } from '../../utils/smilies'
 import './index.css'
 
-// 导入所有表情图片
-const smilieImages = import.meta.glob('../../assets/images/smilies/bilibili/*.png', { eager: true, import: 'default' })
-
-// 获取表情图片URL
+// 表情图片在 public/smilies/bilibili/ 下，直接通过URL访问
 const getSmilieImgUrl = (filename) => {
-  const key = `../../assets/images/smilies/bilibili/${filename}`
-  return smilieImages[key] || ''
+  return `/smilies/bilibili/${filename}`
 }
 
 function CommentForm({ onSubmit, savedInfo, showGuestInfo, toggleGuestInfo, isLoggedIn }) {

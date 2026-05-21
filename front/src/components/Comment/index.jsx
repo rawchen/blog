@@ -26,8 +26,8 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
   const [savedInfo, setSavedInfo] = useState(null)
   const [showGuestInfo, setShowGuestInfo] = useState(true)
 
-  // 标记锚点是否已处理（避免评论更新后重复触发）
-  const anchorProcessedRef = useRef(false)
+  // 记录上次处理的hash，用于判断hash是否变化
+  const lastProcessedHashRef = useRef(null)
 
   // 是否为登录用户
   const isLoggedIn = isAuthenticated && userInfo
@@ -61,17 +61,12 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
     }
   }, [articleId, page, pageResolved])
 
-  // 加载完评论后滚动到锚点（仅首次）
-  useEffect(() => {
-    if (!comments.length) return
-    if (anchorProcessedRef.current) return
-
-    const hash = window.location.hash
+  // 滚动到锚点评论
+  const scrollToAnchor = (hash) => {
     if (!hash) return
 
     const commentMatch = hash.match(/^#comment-(\d+)$/)
     if (commentMatch) {
-      // 延迟滚动，等DOM渲染完成
       setTimeout(() => {
         const el = document.getElementById(`comment-${commentMatch[1]}`)
         if (el) {
@@ -80,7 +75,6 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
           setTimeout(() => el.classList.remove('comment-highlight'), 3000)
         }
       }, 300)
-      anchorProcessedRef.current = true
     } else if (hash === '#comments') {
       setTimeout(() => {
         const el = document.getElementById('comments')
@@ -88,9 +82,31 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
           el.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }
       }, 300)
-      anchorProcessedRef.current = true
+    }
+  }
+
+  // 评论加载后滚动到锚点（首次）
+  useEffect(() => {
+    if (!comments.length) return
+    const hash = window.location.hash
+    if (hash && lastProcessedHashRef.current !== hash) {
+      lastProcessedHashRef.current = hash
+      scrollToAnchor(hash)
     }
   }, [comments])
+
+  // 监听hash变化（处理footer点击最近评论等场景）
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash
+      if (hash && lastProcessedHashRef.current !== hash) {
+        lastProcessedHashRef.current = hash
+        scrollToAnchor(hash)
+      }
+    }
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
   useEffect(() => {
     // 登录用户不需要读取游客信息
@@ -161,7 +177,14 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
         await submitComment(commentData)
       }
       setReplyTo(null)
-      fetchComments()
+      // 新评论（非回复）应跳转到第一页显示最新评论
+      if (!replyTo && page !== 1) {
+        const url = getCommentPageUrl(1)
+        window.history.replaceState(null, '', url)
+        setPage(1)
+      } else {
+        fetchComments()
+      }
       message.success('发送评论成功')
       return true
     } catch (error) {

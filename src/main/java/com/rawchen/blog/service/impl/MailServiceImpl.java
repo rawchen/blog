@@ -99,7 +99,7 @@ public class MailServiceImpl implements MailService {
         for (Map.Entry<String, String> entry : SMILIES_MAP.entrySet()) {
             String code = entry.getKey();
             String filename = entry.getValue();
-            String imgUrl = baseUrl + "assets/images/smilies/bilibili/" + filename;
+            String imgUrl = baseUrl + "smilies/bilibili/" + filename;
             // 转义特殊正则字符
             String escapedCode = Pattern.quote(code);
             String imgTag = "<img class=\"smilies-img\" src=\"" + imgUrl + "\" alt=\"" + code + "\" title=\"" + code + "\" style=\"max-width:30px;display:inline-block;vertical-align:middle;margin:-5px 0 0 0;\" />";

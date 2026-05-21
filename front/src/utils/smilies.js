@@ -1,13 +1,9 @@
 // 表情包配置 - bilibili风格
-// 路径: /src/assets/images/smilies/bilibili/
-
-// 导入所有表情图片（Vite glob 导入）
-const smilieImages = import.meta.glob('../assets/images/smilies/bilibili/*.png', { eager: true, import: 'default' })
+// 路径: /public/smilies/bilibili/ (静态资源，直接通过URL访问)
 
 // 获取表情图片URL
 const getSmilieImgUrl = (filename) => {
-  const key = `../assets/images/smilies/bilibili/${filename}`
-  return smilieImages[key] || ''
+  return `/smilies/bilibili/${filename}`
 }
 
 // 表情代码到图片文件名的映射
@@ -77,8 +73,7 @@ export const SMILIES_LIST = [
 export const getSmilieUrl = (code) => {
   const filename = SMILIES_MAP[code]
   if (!filename) return null
-  // 使用Vite的静态资源导入方式
-  return `/src/assets/images/smilies/bilibili/${filename}`
+  return `/smilies/bilibili/${filename}`
 }
 
 // 解析文本中的表情代码，替换为图片标签
