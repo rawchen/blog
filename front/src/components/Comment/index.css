@@ -2,7 +2,7 @@
   position: relative;
   z-index: 1;
   color: #5f5f5f;
-  background-color: #f7f7f7;
+  /*background-color: #f7f7f7;*/
   max-width: 970px;
   margin: 0 auto;
 }
@@ -32,6 +32,10 @@
   cursor: pointer;
   position: relative;
   color: #5f5f5f;
+}
+
+#comments .comment-content a {
+  color: #4c94dd;
 }
 
 #comments a:hover {

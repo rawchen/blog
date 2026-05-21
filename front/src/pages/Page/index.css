@@ -6,6 +6,10 @@
   padding: 130px 25px 20px;
 }
 
+.page-detail #comments {
+  padding: 0px;
+}
+
 .page-header {
   margin-bottom: 30px;
   padding-bottom: 20px;
