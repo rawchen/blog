@@ -39,9 +39,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/webjars/**")
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
 
+        // 静态资源缓存配置（图片、图标等长期缓存）
+        registry.addResourceHandler("/smilies/**", "/icons/**", "/favicon.ico", "/logo.png", "/logo-footer.png")
+                .addResourceLocations("classpath:/static/smilies/", "classpath:/static/icons/", "classpath:/static/")
+                .setCachePeriod(31536000); // 1年缓存
+
         // SPA 路由支持：对于非静态资源的请求，返回 index.html
         registry.addResourceHandler("/**")
                 .addResourceLocations("classpath:/static/")
+                .setCachePeriod(86400) // 1天缓存
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver() {
                     @Override
