@@ -14,6 +14,7 @@ import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.service.ArticleService;
 import com.rawchen.blog.vo.ArticleDetailVO;
 import com.rawchen.blog.vo.ArticleEditVO;
+import com.rawchen.blog.vo.ArchiveVO;
 import com.rawchen.blog.vo.ArticleVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -110,6 +111,13 @@ public class ArticleController {
             @RequestParam(defaultValue = "1") Long current,
             @RequestParam(defaultValue = "10") Long size) {
         return R.ok(articleService.getArticleTimeline(current, size));
+    }
+
+    @ApiOperation("归档列表（轻量级）")
+    @GetMapping("/archive")
+    @AccessLogAnnotation("ARCHIVE")
+    public R<List<ArchiveVO>> getArchiveList() {
+        return R.ok(articleService.getArchiveList());
     }
 
     @ApiOperation("随机文章")

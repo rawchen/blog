@@ -20,42 +20,6 @@ function formatDate(datetime) {
   return datetime ? datetime.substring(0, 10) : ''
 }
 
-// Strip Markdown formatting and return plain text
-function stripMarkdown(text) {
-  if (!text) return ''
-  return text
-    // Remove code blocks (```)
-    .replace(/```[\s\S]*?```/g, '')
-    // Remove inline code (`)
-    .replace(/`[^`]*`/g, '')
-    // Remove images ![alt](url)
-    .replace(/!\[.*?\]\(.*?\)/g, '')
-    // Remove links [text](url) -> text
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-    // Remove headers (# ## ### etc.)
-    .replace(/^#{1,6}\s+/gm, '')
-    // Remove bold (**text** or __text__)
-    .replace(/\*\*([^*]+)\*\*/g, '$1')
-    .replace(/__([^_]+)__/g, '$1')
-    // Remove italic (*text* or _text_)
-    .replace(/\*([^*]+)\*/g, '$1')
-    .replace(/_([^_]+)_/g, '$1')
-    // Remove strikethrough (~~text~~)
-    .replace(/~~([^~]+)~~/g, '$1')
-    // Remove blockquotes (> text)
-    .replace(/^>\s+/gm, '')
-    // Remove list markers (- * + or 1.)
-    .replace(/^[\s]*[-*+]\s+/gm, '')
-    .replace(/^[\s]*\d+\.\s+/gm, '')
-    // Remove horizontal rules (--- or ***)
-    .replace(/^[-*]{3,}$/gm, '')
-    // Remove HTML tags
-    .replace(/<[^>]+>/g, '')
-    // Remove extra whitespace and newlines
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
 function Home() {
   const { page } = useParams()
   const navigate = useNavigate()
@@ -180,7 +144,7 @@ function Home() {
             </div>
             <div className={`item-meta-hr ${getRandomBgColor()}`}></div>
             <div className="item-content">
-              <p>{article.summary || stripMarkdown(article.content)?.substring(0, 150) + '...'}</p>
+              <p>{article.summary}</p>
             </div>
           </div>
         </div>

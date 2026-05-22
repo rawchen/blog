@@ -7,6 +7,7 @@ import com.rawchen.blog.entity.Article;
 import com.rawchen.blog.entity.ArticleVersion;
 import com.rawchen.blog.vo.ArticleDetailVO;
 import com.rawchen.blog.vo.ArticleEditVO;
+import com.rawchen.blog.vo.ArchiveVO;
 import com.rawchen.blog.vo.ArticleVO;
 
 import java.util.List;
@@ -82,6 +83,11 @@ public interface ArticleService {
      * 时间线归档
      */
     PageResult<ArticleVO> getArticleTimeline(Long current, Long size);
+
+    /**
+     * 获取归档列表（轻量级，只返回id、标题、分类、发布时间）
+     */
+    List<ArchiveVO> getArchiveList();
 
     /**
      * 随机文章

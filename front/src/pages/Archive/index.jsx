@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { getArticleList } from '../../api/article'
+import { getArchiveList } from '../../api/article'
 import './index.css'
 
 // Random background colors for icons
@@ -27,9 +27,8 @@ function Archive() {
 
   const fetchArticles = async () => {
     try {
-      const total = siteStat.articleCount || 999
-      const res = await getArticleList({ current: 1, size: total })
-      setArticles(res.data.records || [])
+      const res = await getArchiveList()
+      setArticles(res.data || [])
     } finally {
       setLoading(false)
     }
@@ -65,19 +64,19 @@ function Archive() {
       {/* Stats */}
       <div className="archives-count clearfix">
         <div className="archives-count-item">
-          <code>{articles.length}</code>
+          <code>{siteStat.articleCount || articles.length}</code>
           <span>文章</span>
         </div>
         <div className="archives-count-item">
-          <code>{new Set(articles.map(a => a.categoryName)).size}</code>
+          <code>{siteStat.categoryCount || new Set(articles.map(a => a.categoryName)).size}</code>
           <span>分类</span>
         </div>
         <div className="archives-count-item">
-          <code>{articles.reduce((sum, a) => sum + (a.viewCount || 0), 0)}</code>
+          <code>{siteStat.viewCount || 0}</code>
           <span>浏览</span>
         </div>
         <div className="archives-count-item">
-          <code>{articles.reduce((sum, a) => sum + (a.commentCount || 0), 0)}</code>
+          <code>{siteStat.commentCount || 0}</code>
           <span>评论</span>
         </div>
       </div>

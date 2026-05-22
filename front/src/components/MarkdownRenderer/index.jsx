@@ -159,14 +159,25 @@ function MarkdownRenderer({ content, className = '' }) {
   // 兼容Typecho等宽松解析器的换行行为
   const fixLineBreaks = (text) => {
     const lines = text.split('\n')
+    let inCodeBlock = false
     return lines.map((line, i) => {
+      // 检测代码块开始/结束
+      if (line.startsWith('```')) {
+        // 单行代码块如 ```code``` 不切换状态
+        const isInlineBlock = line.length > 3 && line.endsWith('```') && !line.slice(3, -3).includes('```')
+        if (!isInlineBlock) {
+          inCodeBlock = !inCodeBlock
+        }
+        return line
+      }
+      // 代码块内部不处理
+      if (inCodeBlock) return line
       // 最后一行不加
       if (i === lines.length - 1) return line
       // 空行不加（段落分隔）
       if (line.trim() === '') return line
-      // 代码块、引用、列表、标题、表格等特殊内容不加
-      if (line.startsWith('```') ||
-          line.startsWith('    ') ||
+      // 缩进代码块、引用、列表、标题、表格等特殊内容不加
+      if (line.startsWith('    ') ||
           line.startsWith('\t') ||
           line.startsWith('> ') ||
           line.startsWith('- ') ||

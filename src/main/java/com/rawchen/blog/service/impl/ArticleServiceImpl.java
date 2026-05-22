@@ -12,6 +12,7 @@ import com.rawchen.blog.service.ArticleService;
 import com.rawchen.blog.vo.ArticleDetailVO;
 import com.rawchen.blog.vo.ArticleEditVO;
 import com.rawchen.blog.vo.ArticleVO;
+import com.rawchen.blog.vo.ArchiveVO;
 import com.rawchen.blog.vo.TagVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -103,8 +104,8 @@ public class ArticleServiceImpl implements ArticleService {
 
         Page<Article> articlePage = articleMapper.selectPage(page, wrapper);
 
-        // 批量转换为VO（优化N+1查询）
-        List<ArticleVO> voList = batchConvertToVO(articlePage.getRecords());
+        // 批量转换为VO（轻量级，不查询标签和内容）
+        List<ArticleVO> voList = batchConvertToListVO(articlePage.getRecords());
 
         return PageResult.of(new Page<ArticleVO>()
                 .setRecords(voList)
@@ -507,6 +508,43 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
+    public List<ArchiveVO> getArchiveList() {
+        // 只查询需要的字段，避免查询content等大字段
+        List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
+                .select(Article::getId, Article::getTitle, Article::getCategoryId, Article::getPublishTime)
+                .eq(Article::getStatus, 1)
+                .eq(Article::getType, Article.ArticleType.POST)
+                .orderByDesc(Article::getPublishTime));
+
+        if (CollectionUtils.isEmpty(articles)) {
+            return new ArrayList<>();
+        }
+
+        // 批量查询分类
+        List<Long> categoryIds = articles.stream()
+                .map(Article::getCategoryId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        Map<Long, String> categoryNameMap = categoryIds.isEmpty() ? new HashMap<>() :
+                categoryMapper.selectBatchIds(categoryIds).stream()
+                        .collect(Collectors.toMap(Category::getId, Category::getCategoryName));
+
+        // 转换为VO
+        return articles.stream().map(article -> {
+            ArchiveVO vo = new ArchiveVO();
+            vo.setId(article.getId());
+            vo.setTitle(article.getTitle());
+            vo.setPublishTime(article.getPublishTime());
+            if (article.getCategoryId() != null) {
+                vo.setCategoryName(categoryNameMap.get(article.getCategoryId()));
+            }
+            return vo;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
     public List<ArticleVO> getRandomArticles(Integer limit) {
         if (limit == null || limit <= 0) {
             limit = 5;
@@ -733,6 +771,135 @@ public class ArticleServiceImpl implements ArticleService {
 
         articleVersionMapper.insert(version);
         log.debug("保存文章版本: articleId={}, version={}", article.getId(), nextVersion);
+    }
+
+    /**
+     * 批量转换为VO（轻量级，用于列表页，不查询标签和内容）
+     */
+    private List<ArticleVO> batchConvertToListVO(List<Article> articles) {
+        if (CollectionUtils.isEmpty(articles)) {
+            return new ArrayList<>();
+        }
+
+        // 收集分类和作者ID
+        List<Long> categoryIds = articles.stream()
+                .map(Article::getCategoryId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        List<Long> authorIds = articles.stream()
+                .map(Article::getAuthorId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        // 批量查询分类
+        Map<Long, Category> categoryMap = categoryIds.isEmpty() ? new HashMap<>() :
+                categoryMapper.selectBatchIds(categoryIds).stream()
+                        .collect(Collectors.toMap(Category::getId, Function.identity()));
+
+        // 批量查询用户
+        Map<Long, User> userMap = authorIds.isEmpty() ? new HashMap<>() :
+                userMapper.selectBatchIds(authorIds).stream()
+                        .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        // 转换为VO
+        return articles.stream().map(article -> {
+            ArticleVO vo = new ArticleVO();
+            vo.setId(article.getId());
+            vo.setTitle(article.getTitle());
+            vo.setSlug(article.getSlug());
+            vo.setCoverImage(article.getCoverImage());
+            vo.setCategoryId(article.getCategoryId());
+            vo.setAuthorId(article.getAuthorId());
+            vo.setViewCount(article.getViewCount());
+            vo.setLikeCount(article.getLikeCount());
+            vo.setCommentCount(article.getCommentCount());
+            vo.setIsTop(article.getIsTop());
+            vo.setIsRecommend(article.getIsRecommend());
+            vo.setAllowComment(article.getAllowComment());
+            vo.setStatus(article.getStatus());
+            vo.setPublishTime(article.getPublishTime());
+            vo.setCreateTime(article.getCreateTime());
+            vo.setType(article.getType());
+            vo.setSortOrder(article.getSortOrder());
+
+            // 处理封面图：如果为空，从content中提取第一张图片
+            if (!StringUtils.hasText(vo.getCoverImage()) && StringUtils.hasText(article.getContent())) {
+                String firstImage = extractFirstImage(article.getContent());
+                if (firstImage != null) {
+                    vo.setCoverImage(firstImage);
+                }
+            }
+
+            // 处理摘要：如果没有摘要，从内容生成
+            if (StringUtils.hasText(article.getSummary())) {
+                vo.setSummary(article.getSummary());
+            } else if (StringUtils.hasText(article.getContent())) {
+                String plainText = stripMarkdown(article.getContent());
+                vo.setSummary(plainText.length() > 150 ? plainText.substring(0, 150) + "..." : plainText);
+            }
+
+            // 从Map获取分类
+            if (article.getCategoryId() != null) {
+                Category category = categoryMap.get(article.getCategoryId());
+                if (category != null) {
+                    vo.setCategoryName(category.getCategoryName());
+                }
+            }
+
+            // 从Map获取作者
+            if (article.getAuthorId() != null) {
+                User author = userMap.get(article.getAuthorId());
+                if (author != null) {
+                    vo.setAuthorName(author.getNickname());
+                    vo.setAuthorAvatar(author.getAvatar());
+                }
+            }
+
+            // 不设置content和tags
+            vo.setHasPassword(StringUtils.hasText(article.getPassword()));
+
+            return vo;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 去除Markdown格式，返回纯文本
+     */
+    private String stripMarkdown(String text) {
+        if (text == null) return "";
+        return text
+            // Remove code blocks (```)
+            .replaceAll("```[\\s\\S]*?```", "")
+            // Remove inline code (`)
+            .replaceAll("`[^`]*`", "")
+            // Remove images ![alt](url)
+            .replaceAll("!\\[.*?\\]\\(.*?\\)", "")
+            // Remove links [text](url) -> text
+            .replaceAll("\\[([^\\]]+)\\]\\([^)]+\\)", "$1")
+            // Remove headers (# ## ### etc.)
+            .replaceAll("^#{1,6}\\s+", "")
+            // Remove bold (**text** or __text__)
+            .replaceAll("\\*\\*([^*]+)\\*\\*", "$1")
+            .replaceAll("__([^_]+)__", "$1")
+            // Remove italic (*text* or _text_)
+            .replaceAll("\\*([^*]+)\\*", "$1")
+            .replaceAll("_([^_]+)_", "$1")
+            // Remove strikethrough (~~text~~)
+            .replaceAll("~~([^~]+)~~", "$1")
+            // Remove blockquotes (> text)
+            .replaceAll("^>\\s+", "")
+            // Remove list markers (- * + or 1.)
+            .replaceAll("^[\\s]*[-*+]\\s+", "")
+            .replaceAll("^[\\s]*\\d+\\.\\s+", "")
+            // Remove horizontal rules (--- or ***)
+            .replaceAll("^[-*]{3,}$", "")
+            // Remove HTML tags
+            .replaceAll("<[^>]+>", "")
+            // Remove extra whitespace and newlines
+            .replaceAll("\\s+", " ")
+            .trim();
     }
 
     /**

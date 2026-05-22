@@ -31,6 +31,11 @@ export function getArticleTimeline(params) {
   return request({ url: '/article/timeline', method: 'get', params })
 }
 
+// 归档列表（轻量级）
+export function getArchiveList() {
+  return request({ url: '/article/archive', method: 'get' })
+}
+
 // 随机文章
 export function getRandomArticles(params) {
   return request({ url: '/article/random', method: 'get', params })
