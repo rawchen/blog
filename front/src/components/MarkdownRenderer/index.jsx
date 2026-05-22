@@ -57,6 +57,18 @@ function MarkdownRenderer({ content, className = '' }) {
     },
   });
 
+  // 读取HTML渲染配置
+  const htmlRenderEnabled = (() => {
+    try {
+      const config = localStorage.getItem('site_config')
+      if (config) {
+        const parsed = JSON.parse(config)
+        return parsed.htmlRenderEnabled === true
+      }
+    } catch {}
+    return false
+  })()
+
   // 生成目录数据
   const tocItems = useMemo(() => {
     if (!content) return []
@@ -171,7 +183,24 @@ function MarkdownRenderer({ content, className = '' }) {
   }
 
   // 先修复标题格式，再修复换行，最后解析表情代码
-  const processedContent = parseSmilies(fixLineBreaks(fixMarkdownHeaders(content)))
+  let processedContent = parseSmilies(fixLineBreaks(fixMarkdownHeaders(content)))
+
+  // 如果HTML渲染关闭，保护表情标签，转义其他HTML标签，再恢复表情标签
+  if (!htmlRenderEnabled) {
+    let smiliePlaceholders = []
+    let index = 0
+    // 用占位符替换表情img标签
+    processedContent = processedContent.replace(/<img class="smilies-img"[^>]*\/>/g, (match) => {
+      smiliePlaceholders.push(match)
+      return `SMILIE_PH_${index++}`
+    })
+    // 转义剩余HTML标签（仅匹配 <tag> 形式，不影响 Markdown 引用 >）
+    processedContent = processedContent.replace(/<\/?[a-zA-Z][^>]*>/g, (tag) => {
+      return tag.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    })
+    // 恢复表情标签
+    processedContent = processedContent.replace(/SMILIE_PH_(\d+)/g, (_, i) => smiliePlaceholders[parseInt(i)])
+  }
 
   return (
     <div ref={fancyboxRef} className={`markdown-body ${className}`}>

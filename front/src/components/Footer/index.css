@@ -2,7 +2,7 @@
   position: relative;
   z-index: 1;
   margin-top: 0;
-  padding-bottom: 70px;
+  padding-bottom: 50px;
   background-color: #fff;
 }
 
@@ -46,21 +46,21 @@
 .meta-title {
   font-size: 16px;
   font-weight: 600;
-  margin-bottom: 20px;
+  /* margin-bottom: 20px; */
   color: #fff;
   position: relative;
-  padding-bottom: 10px;
+  /* padding-bottom: 10px; */
 }
 
-.meta-title::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 30px;
-  height: 2px;
-  background: #3498db;
-}
+/* .meta-title::after { */
+/*   content: ''; */
+/*   position: absolute; */
+/*   bottom: 0; */
+/*   left: 0; */
+/*   width: 30px; */
+/*   height: 2px; */
+/*   background: #3498db; */
+/* } */
 
 .info-logo {
   font-size: 28px;

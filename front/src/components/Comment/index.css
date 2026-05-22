@@ -148,6 +148,7 @@
   color: #313131;
   font-size: 16px;
   line-height: 1.8;
+  white-space: pre-wrap;
 }
 
 .comment-content img {

@@ -56,6 +56,7 @@ public class ConfigServiceImpl implements ConfigService {
     private static final String KEY_SITE_CREATE_DATE = "site_create_date";
     private static final String KEY_SKILL_LIST = "skill_list";
     private static final String KEY_TYPEWRITER_ENABLED = "typewriter_enabled";
+    private static final String KEY_HTML_RENDER_ENABLED = "html_render_enabled";
 
     @Override
     public SiteConfigVO getSiteConfig() {
@@ -90,6 +91,7 @@ public class ConfigServiceImpl implements ConfigService {
         vo.setSiteCreateDate(getConfigByKey(KEY_SITE_CREATE_DATE, "2026-01-01"));
         vo.setSkillList(getConfigByKey(KEY_SKILL_LIST, "写博客,去看海,极简化"));
         vo.setTypewriterEnabled(Boolean.parseBoolean(getConfigByKey(KEY_TYPEWRITER_ENABLED, "true")));
+        vo.setHtmlRenderEnabled(Boolean.parseBoolean(getConfigByKey(KEY_HTML_RENDER_ENABLED, "false")));
 
         return vo;
     }

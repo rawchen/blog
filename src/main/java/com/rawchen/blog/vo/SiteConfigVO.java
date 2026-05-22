@@ -145,6 +145,11 @@ public class SiteConfigVO implements Serializable {
     private Boolean mailEnabled;
 
     /**
+     * 是否开启HTML渲染
+     */
+    private Boolean htmlRenderEnabled;
+
+    /**
      * 历史累积PV
      */
     private String totalPv;

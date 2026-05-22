@@ -104,3 +104,108 @@ blockquote, dl, ol, p, pre, ul {
 .bg-ico-lock {
   background-position: 0 -360px!important
 }
+
+.about-contact {
+  font-family: 'PingFang SC','Microsoft YaHei',sans-serif;
+  overflow:hidden;
+  margin-left: -6px;
+  margin-right: -22px;
+}
+
+.about-contact .qq,.about-contact .email,.about-contact .telegram {
+  float: left;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 25px;
+  margin: 15px 6px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+  width: 31.5%;
+}
+
+.about-contact .qq {
+  background-color: #ff8888;
+}
+
+.about-contact .email {
+  background-color: #a0cfcf;
+}
+
+.about-contact .telegram {
+  background-color: #80cddc;
+}
+
+.about-contact .qq:hover, .about-contact .email:hover, .about-contact .telegram:hover {
+  opacity: 0.8;
+  -webkit-transition-duration: .3s;
+  transition-duration: .3s;
+}
+
+.about-contact .content {
+  font-weight: bold;
+  color: #fff;
+  line-height: 30px;
+  font-size: 16px;
+  letter-spacing: .5px;
+}
+
+.about-contact i {
+  position: absolute;
+  font-size: 63px;
+  font-weight: bold;
+  color: #fff;
+  left: 16px;
+  bottom: -26px;
+  /* opacity: .4; */
+  transform: rotate(20deg);
+}
+
+@media screen and (max-width:720px) {
+  .about-contact .qq, .about-contact .email, .about-contact .telegram {
+    float: none;
+    width: inherit;
+  }
+  .about-contact {
+    margin-left: -5px;
+    margin-right: -17px;
+  }
+}
+
+/* 本地图标替代 Font Awesome */
+.fa {
+  display: inline-block;
+  font-style: normal;
+  vertical-align: middle;
+}
+.fa::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: brightness(0) invert(1) opacity(0.4);
+}
+.fa-qq::before {
+  background-image: url(/icons/fa-qq.svg);
+}
+.fa-envelope-o::before {
+  background-image: url(/icons/fa-mail.svg);
+}
+.fa-telegram::before,
+.fa-paper-plane::before {
+  background-image: url(/icons/fa-paper-plane.svg);
+}
+
+#githubChart {
+  cursor: pointer;
+  box-shadow: none;
+  webkit-box-shadow: none;
+  width: 98%;
+  padding: 5px;
+  margin-left: 0px;
+  /* border: 4px dotted #fcce8a; */
+  border: 4px dotted #d2d8d9;
+}
