@@ -241,13 +241,15 @@
 }
 
 .post-list-item-container .item-title {
+  letter-spacing: 1.3px;
+  color: #fff;
   font-size: 14px;
   margin-bottom: 8px;
 }
 
 .post-list-item-container .item-title a {
-  color: #313131;
-  /*display: block;*/
+color: #313131;
+/*display: block;*/
   /*overflow: hidden;*/
   /*white-space: nowrap;*/
   /*text-overflow: ellipsis;*/

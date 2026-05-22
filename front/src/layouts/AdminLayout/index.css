@@ -3,6 +3,12 @@
   overflow: hidden;
 }
 
+/* 后台管理：强制禁止 body 滚动条和 Ant Design 的 padding 补偿 */
+body:has(.admin-layout) {
+  overflow: unset !important;
+  padding-right: 0 !important;
+}
+
 .admin-layout > .ant-layout-sider {
   height: 100vh;
   position: fixed;

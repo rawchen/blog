@@ -14,6 +14,7 @@ import 'prismjs/components/prism-json'
 import 'prismjs/components/prism-css'
 import 'prismjs/components/prism-markup'
 import useFancybox from '../../hooks/useFancybox'
+import { parseSmilies } from '../../utils/smilies'
 import './index.css'
 
 // 代码块组件
@@ -106,12 +107,18 @@ function MarkdownRenderer({ content, className = '' }) {
         <a href={href} {...props}>{children}</a>
       )
     },
-    // 图片点击放大（使用 fancybox）
-    img: ({ src, alt, ...props }) => (
-      <a data-fancybox="article-gallery" draggable="false" href={src}>
-        <img src={src} alt={alt} draggable="false" {...props} />
-      </a>
-    ),
+    // 图片点击放大（使用 fancybox），表情图片不加
+    img: ({ src, alt, className, ...props }) => {
+      const isSmilie = className && className.includes('smilies-img')
+      if (isSmilie) {
+        return <img src={src} alt={alt} className={className} {...props} />
+      }
+      return (
+        <a data-fancybox="article-gallery" draggable="false" href={src}>
+          <img src={src} alt={alt} draggable="false" {...props} />
+        </a>
+      )
+    },
     // pre 直接返回 children，避免嵌套
     pre: ({ children }) => children,
     // 代码块
@@ -131,6 +138,41 @@ function MarkdownRenderer({ content, className = '' }) {
 
   if (!content) return null
 
+  // 预处理：修复 # 后无空格的标题（兼容Typecho等宽松解析器）
+  const fixMarkdownHeaders = (text) => {
+    return text.replace(/^(#{1,6})([^\s#])/gm, '$1 $2')
+  }
+
+  // 预处理：将单个换行符转换为Markdown硬换行（两个空格+换行）
+  // 兼容Typecho等宽松解析器的换行行为
+  const fixLineBreaks = (text) => {
+    const lines = text.split('\n')
+    return lines.map((line, i) => {
+      // 最后一行不加
+      if (i === lines.length - 1) return line
+      // 空行不加（段落分隔）
+      if (line.trim() === '') return line
+      // 代码块、引用、列表、标题、表格等特殊内容不加
+      if (line.startsWith('```') ||
+          line.startsWith('    ') ||
+          line.startsWith('\t') ||
+          line.startsWith('> ') ||
+          line.startsWith('- ') ||
+          line.startsWith('* ') ||
+          line.startsWith('+ ') ||
+          /^\d+\. /.test(line) ||
+          line.startsWith('#') ||
+          line.includes('|')) {
+        return line
+      }
+      // 普通文本行，添加两个空格实现硬换行
+      return line + '  '
+    }).join('\n')
+  }
+
+  // 先修复标题格式，再修复换行，最后解析表情代码
+  const processedContent = parseSmilies(fixLineBreaks(fixMarkdownHeaders(content)))
+
   return (
     <div ref={fancyboxRef} className={`markdown-body ${className}`}>
       <ReactMarkdown
@@ -138,7 +180,7 @@ function MarkdownRenderer({ content, className = '' }) {
         rehypePlugins={[rehypeRaw]}
         components={components}
       >
-        {content}
+        {processedContent}
       </ReactMarkdown>
     </div>
   )

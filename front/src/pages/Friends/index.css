@@ -143,8 +143,8 @@
 /* Status Dot */
 .status-dot {
   position: absolute;
-  right: 15px;
-  top: 50%;
+  right: 17px;
+  top: 18%;
   transform: translateY(-50%);
   width: 8px;
   height: 8px;
@@ -152,7 +152,7 @@
 }
 
 .status-dot.normal {
-  background-color: #52c41a;
+  background-color: #50e952;
 }
 
 .status-dot.invalid {

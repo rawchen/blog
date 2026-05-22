@@ -137,4 +137,9 @@ public class ArticleVO implements Serializable {
      */
     private Integer sortOrder;
 
+    /**
+     * 文章内容（编辑时使用）
+     */
+    private String content;
+
 }

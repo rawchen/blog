@@ -64,3 +64,43 @@ blockquote, dl, ol, p, pre, ul {
   /*background: #fff;*/
   border-radius: 8px;
 }
+
+.bg-ico-book {
+  background-position: 0 0!important
+}
+
+.bg-ico-game {
+  background-position: 0 -40px!important
+}
+
+.bg-ico-note {
+  background-position: 0 -80px!important
+}
+
+.bg-ico-chat {
+  background-position: 0 -120px!important
+}
+
+.bg-ico-code {
+  background-position: 0 -160px!important
+}
+
+.bg-ico-image {
+  background-position: 0 -200px!important
+}
+
+.bg-ico-web {
+  background-position: 0 -240px!important
+}
+
+.bg-ico-link {
+  background-position: 0 -280px!important
+}
+
+.bg-ico-design {
+  background-position: 0 -320px!important
+}
+
+.bg-ico-lock {
+  background-position: 0 -360px!important
+}

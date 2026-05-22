@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { getArticleList } from '../../api/article'
 import './index.css'
 
@@ -11,7 +12,12 @@ function getRandomBgIco() {
   return bgIcos[Math.floor(Math.random() * bgIcos.length)]
 }
 
+function getRandomBgColor() {
+  return bgColors[Math.floor(Math.random() * bgColors.length)]
+}
+
 function Archive() {
+  const siteStat = useSelector(state => state.siteStat.data) || {}
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -21,7 +27,8 @@ function Archive() {
 
   const fetchArticles = async () => {
     try {
-      const res = await getArticleList({ current: 1, size: 100 })
+      const total = siteStat.articleCount || 999
+      const res = await getArticleList({ current: 1, size: total })
       setArticles(res.data.records || [])
     } finally {
       setLoading(false)
@@ -81,11 +88,14 @@ function Archive() {
           {Object.entries(groupedArticles).map(([month, monthArticles]) => (
             <React.Fragment key={month}>
               <div className="categorys-title">{month}</div>
-              {monthArticles.map(article => (
-                <div key={article.id} className="post-list-item">
+              {monthArticles.map((article, index) => (
+                <div
+                  key={article.id}
+                  className={`post-list-item${monthArticles.length % 2 === 1 && index === monthArticles.length - 1 ? ' last-odd' : ''}`}
+                >
                   <div className="post-list-item-container">
                     <Link to={`/${article.id}`}>
-                      <div className="item-label">
+                      <div className={`item-label ${getRandomBgColor()}`}>
                         <div className="item-title">
                           <span>{article.title}</span>
                         </div>

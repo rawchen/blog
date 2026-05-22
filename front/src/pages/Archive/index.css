@@ -1,5 +1,6 @@
 /* Archive Page Styles */
 .archive-page {
+  background-color: #f9f9f9;
   padding: 120px 20px 40px;
   max-width: 940px;
   margin: 0 auto;
@@ -11,6 +12,7 @@
   margin: 10px auto;
   padding: 0 30px;
   color: #5f5f5f;
+  clear: both;
 }
 
 .archive-page .categorys-title a {
@@ -19,7 +21,7 @@
 
 .archive-page .categorys-title::before {
   position: absolute;
-  top: 0;
+  /* top: 0; */
   left: 15px;
   content: '#';
   color: #eb5055;
@@ -43,6 +45,10 @@
   align-items: center;
 }
 
+.archive-page .post-list-item.last-odd {
+  width: 100%;
+}
+
 .archive-page .post-list-item-container {
   position: relative;
   overflow: hidden;
@@ -57,7 +63,7 @@
 
 .archive-page .post-list-item-container:hover {
   transform: scale(1.03);
-  background: #ea5055;
+  /* background: #ea5055; */
 }
 
 .archive-page .post-list-item-container:hover .item-label .item-title a {
@@ -71,12 +77,13 @@
 .archive-page .post-list-item-container .item-label {
   height: 113px;
   padding: 25px 20px 40px;
-  background: #fff;
+  /* background: #fff; */
 }
 
 .archive-page .post-list-item-container .item-label .item-title {
   line-height: normal;
   margin-bottom: 10px;
+  font-weight: 800;
 }
 
 .archive-page .post-list-item-container .item-label .item-title a {
@@ -96,6 +103,7 @@
   width: 100%;
   padding: 0 15px 15px;
   text-align: left;
+  color: #fff;
 }
 
 .archive-page .post-list-item-container .item-label .item-meta .item-meta-date {
@@ -114,8 +122,8 @@
   width: 100%;
   text-align: center;
   color: #666;
-  margin-bottom: 30px;
-  background-color: #ffffff94;
+  margin-bottom: 5px;
+  /* background-color: #ffffff94; */
 }
 
 .archives-count .archives-count-item {
@@ -141,11 +149,12 @@
 
 /* Archive Header */
 .archive-header {
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   padding: 20px;
-  background: #fff;
+  /* background: #fff; */
   border-radius: 3px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid rgb(241 241 241);
+  /* box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04); */
 }
 
 .archive-header h1 {

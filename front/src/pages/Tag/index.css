@@ -1,5 +1,6 @@
 /* Tag Page Styles */
 .tag-page {
+  background-color: #f9f9f9;
   padding: 120px 20px 40px;
   max-width: 940px;
   margin: 0 auto;
@@ -85,10 +86,10 @@
 .tag-header {
   /*margin-bottom: 30px;*/
   padding: 20px;
-  background: #fff;
+  /* background: #fff; */
   border-radius: 3px 3px 0 0;
-  border-bottom: 1px solid rgb(245 245 245);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  border-bottom: 1px solid rgb(241 241 241);
+  /* box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04); */
 }
 
 .tag-header h1 {
@@ -130,7 +131,7 @@
   flex-wrap: wrap;
   gap: 10px;
   margin-bottom: 30px;
-  padding: 20px;
+  padding: 20px 0 20px 0;
   /*background: #fff;*/
   border-radius: 0 0 3px 3px;
   /*box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);*/

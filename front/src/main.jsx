@@ -10,8 +10,10 @@ dayjs.locale('zh-cn')
 import App from './App'
 import store from './store'
 import { setSiteConfig } from './store/modules/siteConfig'
+import { setSiteStat } from './store/modules/siteStat'
 import './index.css'
 import { getSiteConfig } from './api/config'
+import { getSiteStat } from './api/stat'
 
 // 应用站点配置到 DOM
 export function applySiteConfig(data) {
@@ -74,6 +76,11 @@ getSiteConfig().then(res => {
   applySiteConfig(data)
 }).catch(() => {})
 
+// 请求站点统计，存入 Redux store
+getSiteStat().then(res => {
+  store.dispatch(setSiteStat(res.data || {}))
+}).catch(() => {})
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
@@ -89,7 +96,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               // itemBorderRadius: 0,
               darkItemBg: '#314156',
               darkSubMenuItemBg: '#293749',
-              darkPopupBg: '#001529'
+              darkPopupBg: '#001529',
+              darkItemHoverBg: '#ffffff0f'
             }
           }
         }}

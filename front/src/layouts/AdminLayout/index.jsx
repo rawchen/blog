@@ -99,9 +99,9 @@ function AdminLayout() {
     return path
   }, [location.pathname])
 
-  // 默认展开所有子菜单
+  // 默认展开博客管理菜单，日志管理菜单默认收起
   const defaultOpenKeys = useMemo(() => {
-    return menuItems.filter(item => item.children).map(item => item.key)
+    return ['blog']
   }, [])
 
   const handleMenuClick = ({ key }) => navigate(key)

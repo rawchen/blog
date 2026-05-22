@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Button, Modal, Form, Input, message, Popconfirm, Space, Select, InputNumber, Switch } from 'antd'
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { Table, Button, Modal, Form, Input, message, Popconfirm, Space, Select, InputNumber, Switch, Tag, Tooltip } from 'antd'
+import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons'
 import { getPageListAdmin, createPage, updatePage, deletePage, updatePageStatus } from '../../../api/article'
 
 // 模板选项
@@ -49,7 +49,6 @@ function PageList() {
     form.setFieldsValue({
       title: record.title,
       slug: record.slug,
-      summary: record.summary,
       content: record.content,
       template: record.template || '',
       sortOrder: record.sortOrder || 0,
@@ -111,7 +110,13 @@ function PageList() {
       width: 120,
       render: (template) => {
         const option = templateOptions.find(opt => opt.value === template)
-        return option ? option.label.split('（')[0] : '默认'
+        const label = option ? option.label.split('（')[0] : '默认'
+        if (!template) return <Tag color="default">{label}</Tag>
+        const colors = ['blue', 'green', 'orange', 'purple', 'cyan', 'magenta', 'geekblue', 'volcano']
+        let hash = 0
+        for (let i = 0; i < template.length; i++) hash = template.charCodeAt(i) + ((hash << 5) - hash)
+        const color = colors[Math.abs(hash) % colors.length]
+        return <Tag color={color}>{label}</Tag>
       }
     },
     { title: '排序', dataIndex: 'sortOrder', width: 80 },
@@ -131,9 +136,17 @@ function PageList() {
     { title: '浏览量', dataIndex: 'viewCount', width: 80 },
     {
       title: '操作',
-      width: 180,
+      width: 200,
       render: (_, record) => (
         <Space>
+          <Tooltip title="在新窗口查看页面">
+            <Button
+              type="primary"
+              size="small"
+              icon={<ExportOutlined />}
+              onClick={() => window.open(`/${record.slug}`, '_blank')}
+            />
+          </Tooltip>
           <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>编辑</Button>
           <Popconfirm title="确定要删除吗?" onConfirm={() => handleDelete(record.id)}>
             <Button type="primary" size="small" danger icon={<DeleteOutlined />}>删除</Button>
@@ -187,9 +200,6 @@ function PageList() {
             ]}
           >
             <Input placeholder="用于URL访问，如: about, friends" maxLength={50} />
-          </Form.Item>
-          <Form.Item label="摘要" name="summary">
-            <Input.TextArea rows={2} placeholder="页面摘要（选填）" maxLength={200} />
           </Form.Item>
           <Form.Item label="模板" name="template">
             <Select options={templateOptions} placeholder="选择页面模板" />

@@ -7,7 +7,6 @@ import {faEnvelope, faComments, faRss, faComment, faGlobe, faEarthAsia} from '@f
 import { getRecentArticles } from '../../api/article'
 import { getRecentComments } from '../../api/comment'
 import { renderSmilies } from '../../utils/smilies'
-import { getSiteStat } from '../../api/stat'
 import './index.css'
 
 // 打字机效果
@@ -87,15 +86,14 @@ function startTypewriter(element) {
 
 function Footer() {
   const siteConfig = useSelector(state => state.siteConfig.data) || {}
+  const siteStat = useSelector(state => state.siteStat.data) || {}
   const [recentArticles, setRecentArticles] = useState([])
   const [recentComments, setRecentComments] = useState([])
-  const [siteStat, setSiteStat] = useState({})
   const descriptionRef = useRef(null)
 
   useEffect(() => {
     loadRecentArticles()
     loadRecentComments()
-    loadSiteStat()
   }, [])
 
   useEffect(() => {
@@ -123,17 +121,6 @@ function Footer() {
       }
     } catch (e) {
       console.error('加载最近评论失败', e)
-    }
-  }
-
-  const loadSiteStat = async () => {
-    try {
-      const res = await getSiteStat()
-      if (res.code === 200) {
-        setSiteStat(res.data || {})
-      }
-    } catch (e) {
-      console.error('加载站点统计失败', e)
     }
   }
 
@@ -226,7 +213,7 @@ function Footer() {
                 )}
                 <p>已在世界的角落里存活了<b> {getRunningYears()} </b>年</p>
                 <p>博主共写了<b> {siteStat.articleCount || 0} </b>篇文章</p>
-                <p>网站已经被<b> {siteStat.visitCount || 0} </b>人踩踏</p>
+                <p>网站已经被<b> {siteStat.totalViewCount || 0} </b>人踩踏</p>
                 <p className="footer-icons">
                   {siteConfig.githubUrl && (
                     <a href={siteConfig.githubUrl} title="GitHub" target="_blank" rel="noopener noreferrer">

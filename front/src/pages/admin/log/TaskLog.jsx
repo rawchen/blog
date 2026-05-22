@@ -55,7 +55,7 @@ function TaskLog() {
     { title: 'ID', dataIndex: 'id', width: 80 },
     { title: '任务ID', dataIndex: 'jobId', width: 80 },
     { title: '任务名称', dataIndex: 'jobName', width: 150 },
-    { title: '执行ID', dataIndex: 'executionId', width: 120 },
+    { title: '执行ID', dataIndex: 'executionId', width: 130 },
     {
       title: '状态',
       dataIndex: 'status',

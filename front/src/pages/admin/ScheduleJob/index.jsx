@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import {
   Table, Button, Modal, Form, Input, Select, InputNumber, message,
-  Tag, Space, Popconfirm, Drawer, DatePicker
+  Tag, Space, Popconfirm, Drawer, DatePicker, Tooltip
 } from 'antd'
 import {
   PlusOutlined, EditOutlined, DeleteOutlined, CaretRightOutlined,
@@ -96,7 +96,7 @@ function ScheduleJob() {
     setEditingId(null)
     setSelectedJobType('CRON')
     form.resetFields()
-    form.setFieldsValue({ jobGroup: 'DEFAULT', retryCount: 0, timeoutSeconds: 300, enabled: 1 })
+    form.setFieldsValue({ jobType: 'CRON', retryCount: 0, timeoutSeconds: 300, enabled: 1 })
     setModalVisible(true)
   }
 
@@ -247,7 +247,7 @@ function ScheduleJob() {
       render: (enabled) => <Tag color={statusColors[enabled]}>{statusLabels[enabled]}</Tag>
     },
     {
-      title: '最后执行', dataIndex: 'lastRunTime', width: 160,
+      title: '最后执行', dataIndex: 'lastRunTime', width: 200,
       render: (time) => time ? dayjs(time).format('YYYY-MM-DD HH:mm:ss') : '-'
     },
     {
@@ -274,22 +274,48 @@ function ScheduleJob() {
   ]
 
   const logColumns = [
-    { title: '执行ID', dataIndex: 'executionId', width: 100 },
+    { title: '执行ID', dataIndex: 'executionId', width: 120 },
     {
       title: '状态', dataIndex: 'status', width: 80,
       render: (status) => <Tag color={logStatusColors[status]}>{status}</Tag>
     },
     {
-      title: '开始时间', dataIndex: 'startTime', width: 160,
+      title: '开始时间', dataIndex: 'startTime', width: 130,
       render: (time) => time ? dayjs(time).format('YYYY-MM-DD HH:mm:ss') : '-'
     },
     {
-      title: '结束时间', dataIndex: 'endTime', width: 160,
+      title: '结束时间', dataIndex: 'endTime', width: 130,
       render: (time) => time ? dayjs(time).format('YYYY-MM-DD HH:mm:ss') : '-'
     },
     {
-      title: '结果', dataIndex: 'resultMessage', ellipsis: true,
-      render: (text) => text || '-'
+      title: '耗时', dataIndex: 'duration', width: 100,
+      render: (duration, record) => {
+        let seconds = duration
+        if (!seconds && record.startTime && record.endTime) {
+          seconds = Math.floor(dayjs(record.endTime).diff(dayjs(record.startTime)) / 1000)
+        }
+        if (seconds == null) return '-'
+
+        const hours = Math.floor(seconds / 3600)
+        const minutes = Math.floor((seconds % 3600) / 60)
+        const secs = seconds % 60
+
+        if (hours > 0) {
+          return `${hours}小时${minutes}分${secs}秒`
+        }
+        if (minutes > 0) {
+          return `${minutes}分${secs}秒`
+        }
+        return `${secs}秒`
+      }
+    },
+    {
+      title: '结果', dataIndex: 'resultMessage', width: 200, ellipsis: true,
+      render: (text) => text ? (
+        <Tooltip title={text} placement="topLeft">
+          <span style={{ cursor: 'pointer' }}>{text}</span>
+        </Tooltip>
+      ) : '-'
     },
   ]
 
@@ -326,9 +352,6 @@ function ScheduleJob() {
         <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 16 }}>
           <Form.Item label="任务名称" name="jobName" rules={[{ required: true }]}>
             <Input placeholder="请输入任务名称" />
-          </Form.Item>
-          <Form.Item label="任务分组" name="jobGroup">
-            <Input placeholder="DEFAULT" />
           </Form.Item>
           <Form.Item label="任务类型" name="jobType" rules={[{ required: true }]}>
             <Select onChange={setSelectedJobType}
@@ -383,7 +406,7 @@ function ScheduleJob() {
         title={`执行日志 - ${selectedJob?.jobName}`}
         open={logsVisible}
         onClose={() => setLogsVisible(false)}
-        width={700}
+        width={1000}
       >
         <Table
           columns={logColumns}

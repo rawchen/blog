@@ -26,11 +26,6 @@ public class TaskJobVO implements Serializable {
     private String jobName;
 
     /**
-     * 任务分组
-     */
-    private String jobGroup;
-
-    /**
      * 任务类型 CRON/DELAYED_ONCE
      */
     private String jobType;

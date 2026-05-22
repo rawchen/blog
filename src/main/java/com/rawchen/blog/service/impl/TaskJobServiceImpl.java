@@ -91,9 +91,6 @@ public class TaskJobServiceImpl implements TaskJobService {
         BeanUtils.copyProperties(dto, job);
 
         // 默认值
-        if (job.getJobGroup() == null) {
-            job.setJobGroup("DEFAULT");
-        }
         if (job.getRetryCount() == null) {
             job.setRetryCount(0);
         }
@@ -295,7 +292,7 @@ public class TaskJobServiceImpl implements TaskJobService {
      */
     private void scheduleJob(TaskJob job) {
         try {
-            JobKey jobKey = new JobKey(job.getJobName(), job.getJobGroup());
+            JobKey jobKey = new JobKey(job.getJobName());
 
             // 如果已存在，先删除
             if (scheduler.checkExists(jobKey)) {
@@ -319,7 +316,7 @@ public class TaskJobServiceImpl implements TaskJobService {
             if ("CRON".equals(job.getJobType())) {
                 // Cron表达式任务
                 Trigger trigger = TriggerBuilder.newTrigger()
-                        .withIdentity(job.getJobName() + "_trigger", job.getJobGroup())
+                        .withIdentity(job.getJobName() + "_trigger")
                         .withSchedule(CronScheduleBuilder.cronSchedule(job.getCronExpression())
                                 .withMisfireHandlingInstructionDoNothing())
                         .forJob(jobDetail)
@@ -331,7 +328,7 @@ public class TaskJobServiceImpl implements TaskJobService {
                 // 一次性延迟任务
                 Date executeDate = Date.from(job.getExecuteTime().atZone(ZoneId.systemDefault()).toInstant());
                 Trigger trigger = TriggerBuilder.newTrigger()
-                        .withIdentity(job.getJobName() + "_trigger", job.getJobGroup())
+                        .withIdentity(job.getJobName() + "_trigger")
                         .startAt(executeDate)
                         .forJob(jobDetail)
                         .build();
@@ -350,7 +347,7 @@ public class TaskJobServiceImpl implements TaskJobService {
      */
     private void unscheduleJob(TaskJob job) {
         try {
-            JobKey jobKey = new JobKey(job.getJobName(), job.getJobGroup());
+            JobKey jobKey = new JobKey(job.getJobName());
             if (scheduler.checkExists(jobKey)) {
                 scheduler.deleteJob(jobKey);
                 log.info("从Quartz移除任务: {}", job.getJobName());
