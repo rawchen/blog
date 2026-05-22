@@ -140,4 +140,16 @@ public interface AccessLogMapper extends BaseMapper<AccessLog> {
     List<PageTypeCompareVO> findPageTypeCompare(@Param("yesterdayStart") LocalDateTime yesterdayStart,
                                                  @Param("todayStart") LocalDateTime todayStart,
                                                  @Param("limit") int limit);
+
+    /**
+     * 获取全表总访问量(PV)
+     */
+    @Select("SELECT COUNT(*) FROM sys_access_log")
+    long countTotalPv();
+
+    /**
+     * 获取全表独立访客数(UV)
+     */
+    @Select("SELECT COUNT(DISTINCT ip_address) FROM sys_access_log")
+    long countTotalUv();
 }

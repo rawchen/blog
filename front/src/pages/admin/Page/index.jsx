@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Button, Modal, Form, Input, message, Popconfirm, Space, Select, InputNumber, Switch, Tag, Tooltip } from 'antd'
 import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons'
-import { getPageListAdmin, createPage, updatePage, deletePage, updatePageStatus } from '../../../api/article'
+import { getPageListAdmin, createPage, updatePage, deletePage, updatePageStatus, updatePageAllowComment } from '../../../api/article'
 
 // 模板选项
 const templateOptions = [
@@ -78,6 +78,16 @@ function PageList() {
     }
   }
 
+  const handleAllowCommentChange = async (id, allowComment) => {
+    try {
+      await updatePageAllowComment(id, allowComment ? 1 : 0)
+      message.success(allowComment ? '已开启评论' : '已关闭评论')
+      fetchList()
+    } catch (error) {
+      console.error('评论设置失败', error)
+    }
+  }
+
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields()
@@ -130,6 +140,19 @@ function PageList() {
           checkedChildren="公开"
           unCheckedChildren="隐藏"
           onChange={(checked) => handleStatusChange(record.id, checked ? 1 : 3)}
+        />
+      )
+    },
+    {
+      title: '允许评论',
+      dataIndex: 'allowComment',
+      width: 100,
+      render: (allowComment, record) => (
+        <Switch
+          checked={allowComment === 1}
+          checkedChildren="是"
+          unCheckedChildren="否"
+          onChange={(checked) => handleAllowCommentChange(record.id, checked)}
         />
       )
     },

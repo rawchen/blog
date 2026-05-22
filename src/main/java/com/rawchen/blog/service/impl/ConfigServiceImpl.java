@@ -30,6 +30,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     // 配置键常量（数据库存储用下划线格式）
     private static final String KEY_SITE_NAME = "site_name";
+    private static final String KEY_SITE_URL = "site_url";
     private static final String KEY_SITE_DESCRIPTION = "site_description";
     private static final String KEY_SITE_KEYWORDS = "site_keywords";
     private static final String KEY_SITE_LOGO = "site_logo";
@@ -52,12 +53,16 @@ public class ConfigServiceImpl implements ConfigService {
     private static final String KEY_GRAVATAR_DOMAIN = "gravatar_domain";
     private static final String KEY_COMMENT_ENABLED = "comment_enabled";
     private static final String KEY_MAIL_ENABLED = "mail_enabled";
+    private static final String KEY_SITE_CREATE_DATE = "site_create_date";
+    private static final String KEY_SKILL_LIST = "skill_list";
+    private static final String KEY_TYPEWRITER_ENABLED = "typewriter_enabled";
 
     @Override
     public SiteConfigVO getSiteConfig() {
         SiteConfigVO vo = new SiteConfigVO();
 
         vo.setSiteName(getConfigByKey(KEY_SITE_NAME, "我的博客"));
+        vo.setSiteUrl(getConfigByKey(KEY_SITE_URL, "https://example.com"));
         vo.setSiteDescription(getConfigByKey(KEY_SITE_DESCRIPTION, "一个简单的博客系统"));
         vo.setSiteKeywords(getConfigByKey(KEY_SITE_KEYWORDS, "博客,技术"));
         vo.setSiteLogo(getConfigByKey(KEY_SITE_LOGO));
@@ -80,6 +85,11 @@ public class ConfigServiceImpl implements ConfigService {
         vo.setGravatarDomain(getConfigByKey(KEY_GRAVATAR_DOMAIN));
         vo.setCommentEnabled(Boolean.parseBoolean(getConfigByKey(KEY_COMMENT_ENABLED, "false")));
         vo.setMailEnabled(Boolean.parseBoolean(getConfigByKey(KEY_MAIL_ENABLED, "false")));
+        vo.setTotalPv(getConfigByKey("total_pv", "0"));
+        vo.setTotalUv(getConfigByKey("total_uv", "0"));
+        vo.setSiteCreateDate(getConfigByKey(KEY_SITE_CREATE_DATE, "2026-01-01"));
+        vo.setSkillList(getConfigByKey(KEY_SKILL_LIST, "写博客,去看海,极简化"));
+        vo.setTypewriterEnabled(Boolean.parseBoolean(getConfigByKey(KEY_TYPEWRITER_ENABLED, "true")));
 
         return vo;
     }

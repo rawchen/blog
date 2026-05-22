@@ -3,9 +3,11 @@ package com.rawchen.blog.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rawchen.blog.common.PageResult;
+import com.rawchen.blog.dto.ConfigDTO;
 import com.rawchen.blog.entity.AccessLog;
 import com.rawchen.blog.mapper.AccessLogMapper;
 import com.rawchen.blog.service.AccessLogService;
+import com.rawchen.blog.service.ConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ public class AccessLogServiceImpl implements AccessLogService {
 
     @Autowired
     private AccessLogMapper accessLogMapper;
+
+    @Autowired
+    private ConfigService configService;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -71,6 +76,24 @@ public class AccessLogServiceImpl implements AccessLogService {
 
     @Override
     public void clearAccessLog(Integer retainDays) {
+        // 清理前，先保存累积值到配置
+        long configPv = Long.parseLong(configService.getConfigByKey("total_pv", "0"));
+        long configUv = Long.parseLong(configService.getConfigByKey("total_uv", "0"));
+        long logPv = accessLogMapper.countTotalPv();
+        long logUv = accessLogMapper.countTotalUv();
+
+        // 更新配置中的累积值
+        ConfigDTO pvDto = new ConfigDTO();
+        pvDto.setConfigKey("total_pv");
+        pvDto.setConfigValue(String.valueOf(configPv + logPv));
+        configService.updateConfig(pvDto);
+
+        ConfigDTO uvDto = new ConfigDTO();
+        uvDto.setConfigKey("total_uv");
+        uvDto.setConfigValue(String.valueOf(configUv + logUv));
+        configService.updateConfig(uvDto);
+
+        // 执行清理
         LocalDateTime cutoffTime = LocalDateTime.now().minusDays(retainDays);
         LambdaQueryWrapper<AccessLog> wrapper = new LambdaQueryWrapper<>();
         wrapper.lt(AccessLog::getCreateTime, cutoffTime);

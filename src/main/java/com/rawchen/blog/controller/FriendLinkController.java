@@ -51,8 +51,9 @@ public class FriendLinkController {
     @GetMapping("/admin/page")
     public R<Page<FriendLinkVO>> getFriendLinkPage(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return R.ok(friendLinkService.getFriendLinkPage(page, size));
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword) {
+        return R.ok(friendLinkService.getFriendLinkPage(page, size, keyword));
     }
 
     @ApiOperation("根据ID获取友链")

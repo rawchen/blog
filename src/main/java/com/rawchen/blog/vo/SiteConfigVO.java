@@ -20,6 +20,11 @@ public class SiteConfigVO implements Serializable {
     private String siteName;
 
     /**
+     * 网站地址
+     */
+    private String siteUrl;
+
+    /**
      * 站点描述
      */
     private String siteDescription;
@@ -48,6 +53,16 @@ public class SiteConfigVO implements Serializable {
      * 页脚信息
      */
     private String footerInfo;
+
+    /**
+     * 打字机技能列表（逗号分隔）
+     */
+    private String skillList;
+
+    /**
+     * 是否开启打字机效果
+     */
+    private Boolean typewriterEnabled;
 
     /**
      * 备案号
@@ -128,4 +143,19 @@ public class SiteConfigVO implements Serializable {
      * 是否开启邮件通知
      */
     private Boolean mailEnabled;
+
+    /**
+     * 历史累积PV
+     */
+    private String totalPv;
+
+    /**
+     * 历史累积UV
+     */
+    private String totalUv;
+
+    /**
+     * 站点创建日期
+     */
+    private String siteCreateDate;
 }

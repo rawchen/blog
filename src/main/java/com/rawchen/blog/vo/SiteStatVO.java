@@ -58,4 +58,14 @@ public class SiteStatVO implements Serializable {
      * 今日UV
      */
     private Integer todayUv;
+
+    /**
+     * 累积总PV（配置历史PV + 日志表PV）
+     */
+    private Long totalPv;
+
+    /**
+     * 累积总UV（配置历史UV + 日志表UV）
+     */
+    private Long totalUv;
 }

@@ -1073,4 +1073,15 @@ public class ArticleServiceImpl implements ArticleService {
         articleMapper.updateById(article);
         log.info("更新独立页面状态: id={}, status={}", id, status);
     }
+
+    @Override
+    public void updatePageAllowComment(Long id, Integer allowComment) {
+        Article article = articleMapper.selectById(id);
+        if (article == null) {
+            throw new BusinessException(ResultCode.ARTICLE_NOT_FOUND);
+        }
+        article.setAllowComment(allowComment);
+        articleMapper.updateById(article);
+        log.info("更新独立页面允许评论: id={}, allowComment={}", id, allowComment);
+    }
 }

@@ -7,6 +7,7 @@ import com.rawchen.blog.dto.CommentDTO;
 import com.rawchen.blog.enums.OperationType;
 import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.service.CommentService;
+import com.rawchen.blog.util.IpUtil;
 import com.rawchen.blog.vo.CommentVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,6 +31,16 @@ public class CommentController {
 
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private IpUtil ipUtil;
+
+    @ApiOperation("查询IP归属地")
+    @GetMapping("/admin/ip-region")
+    @PreAuthorize("hasRole('ADMIN')")
+    public R<String> getIpRegion(@RequestParam String ip) {
+        return R.ok(ipUtil.getLocation(ip));
+    }
 
     @ApiOperation("分页查询评论列表（前台）")
     @GetMapping("/list/{articleId}")

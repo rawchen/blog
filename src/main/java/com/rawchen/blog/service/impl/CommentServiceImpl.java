@@ -202,8 +202,8 @@ public class CommentServiceImpl implements CommentService {
             if ("true".equalsIgnoreCase(mailEnabled) || "1".equals(mailEnabled)) {
                 Article article = articleMapper.selectById(comment.getArticleId());
                 if (article != null) {
-                    String blogUrl = configService.getConfigByKey("site_url", "");
-                    String blogName = configService.getConfigByKey("site_name", "我的博客");
+                    String blogUrl = configService.getConfigByKey("site_url", "https://example.com");
+                    String blogName = configService.getConfigByKey("site_name", "Blog");
                     mailService.sendNewCommentMail(comment, article, blogUrl, blogName);
                 }
             }
@@ -273,8 +273,8 @@ public class CommentServiceImpl implements CommentService {
                 Comment parentComment = commentMapper.selectById(commentDTO.getParentId());
                 Article article = articleMapper.selectById(comment.getArticleId());
                 if (parentComment != null && article != null) {
-                    String blogUrl = configService.getConfigByKey("site_url", "");
-                    String blogName = configService.getConfigByKey("site_name", "我的博客");
+                    String blogUrl = configService.getConfigByKey("site_url", "https://example.com");
+                    String blogName = configService.getConfigByKey("site_name", "Blog");
                     mailService.sendReplyMail(comment, parentComment, article, blogUrl, blogName);
                 }
             }
@@ -398,6 +398,14 @@ public class CommentServiceImpl implements CommentService {
             User replyUser = userMapper.selectById(comment.getReplyUserId());
             if (replyUser != null) {
                 vo.setReplyUserName(replyUser.getNickname());
+            }
+        }
+
+        // 设置文章slug（独立页面使用slug作为路径）
+        if (comment.getArticleId() != null) {
+            Article article = articleMapper.selectById(comment.getArticleId());
+            if (article != null && article.getType() == Article.ArticleType.PAGE) {
+                vo.setArticleSlug(article.getSlug());
             }
         }
 

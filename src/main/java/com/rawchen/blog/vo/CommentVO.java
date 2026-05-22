@@ -20,6 +20,11 @@ public class CommentVO implements Serializable {
 
     private Long articleId;
 
+    /**
+     * 文章别名（独立页面使用slug，文章使用articleId）
+     */
+    private String articleSlug;
+
     private Long parentId;
 
     private Long replyUserId;

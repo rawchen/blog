@@ -7,6 +7,7 @@ import com.rawchen.blog.entity.SiteStat;
 import com.rawchen.blog.entity.Tag;
 import com.rawchen.blog.entity.User;
 import com.rawchen.blog.mapper.*;
+import com.rawchen.blog.service.ConfigService;
 import com.rawchen.blog.service.StatService;
 import com.rawchen.blog.vo.AccessTrendVO;
 import com.rawchen.blog.vo.ChartItemVO;
@@ -56,6 +57,9 @@ public class StatServiceImpl implements StatService {
     @Autowired
     private AccessLogMapper accessLogMapper;
 
+    @Autowired
+    private ConfigService configService;
+
     @Override
     public SiteStatVO getSiteStat() {
         SiteStatVO vo = new SiteStatVO();
@@ -81,13 +85,16 @@ public class StatServiceImpl implements StatService {
         Long userCount = userMapper.selectCount(null);
         vo.setUserCount(userCount);
 
-        // 总浏览量
-        Long totalViewCount = articleMapper.selectList(new LambdaQueryWrapper<Article>()
-                .eq(Article::getStatus, 1))
-                .stream()
-                .mapToLong(a -> a.getViewCount() != null ? a.getViewCount() : 0)
-                .sum();
-        vo.setTotalViewCount(totalViewCount);
+        // 累积PV/UV = 配置历史值 + 日志表当前值
+        long configPv = Long.parseLong(configService.getConfigByKey("total_pv", "0"));
+        long configUv = Long.parseLong(configService.getConfigByKey("total_uv", "0"));
+        long logPv = accessLogMapper.countTotalPv();
+        long logUv = accessLogMapper.countTotalUv();
+
+        // 总浏览量 = 配置历史值 + 日志表当前值
+        vo.setTotalViewCount(configPv + logPv);
+        vo.setTotalPv(configPv + logPv);
+        vo.setTotalUv(configUv + logUv);
 
         // 总点赞量
         Long totalLikeCount = articleMapper.selectList(new LambdaQueryWrapper<Article>()
@@ -206,13 +213,9 @@ public class StatServiceImpl implements StatService {
         Long userCount = userMapper.selectCount(null);
         vo.setUserCount(userCount);
 
-        // 总浏览量 (从文章表)
-        Long totalViewCount = articleMapper.selectList(new LambdaQueryWrapper<Article>()
-                .eq(Article::getStatus, 1))
-                .stream()
-                .mapToLong(a -> a.getViewCount() != null ? a.getViewCount() : 0)
-                .sum();
-        vo.setTotalViewCount(totalViewCount);
+        // 总浏览量 = 配置历史值 + 日志表当前值
+        long configPv = Long.parseLong(configService.getConfigByKey("total_pv", "0"));
+        vo.setTotalViewCount(configPv + accessLogMapper.countTotalPv());
 
         // 总点赞量
         Long totalLikeCount = articleMapper.selectList(new LambdaQueryWrapper<Article>()

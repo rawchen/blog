@@ -174,4 +174,6 @@ public interface ArticleService {
      * 更新独立页面状态
      */
     void updatePageStatus(Long id, Integer status);
+
+    void updatePageAllowComment(Long id, Integer allowComment);
 }

@@ -41,12 +41,20 @@ public class FriendLinkServiceImpl implements FriendLinkService {
     }
 
     @Override
-    public Page<FriendLinkVO> getFriendLinkPage(int page, int size) {
+    public Page<FriendLinkVO> getFriendLinkPage(int page, int size, String keyword) {
         Page<FriendLink> pageParam = new Page<>(page, size);
-        // 待审核(status=0)优先，然后按创建时间倒序
-        Page<FriendLink> result = friendLinkMapper.selectPage(pageParam, new LambdaQueryWrapper<FriendLink>()
-                .orderByAsc(FriendLink::getStatus) // status 0(待审核) 排在最前
-                .orderByDesc(FriendLink::getCreateTime));
+        LambdaQueryWrapper<FriendLink> wrapper = new LambdaQueryWrapper<FriendLink>()
+                .orderByAsc(FriendLink::getStatus)
+                .orderByDesc(FriendLink::getCreateTime);
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            wrapper.and(w -> w
+                    .like(FriendLink::getSiteName, keyword)
+                    .or().like(FriendLink::getSiteUrl, keyword)
+                    .or().like(FriendLink::getDescription, keyword));
+        }
+
+        Page<FriendLink> result = friendLinkMapper.selectPage(pageParam, wrapper);
 
         Page<FriendLinkVO> voPage = new Page<>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream().map(this::convertToVO).collect(Collectors.toList()));

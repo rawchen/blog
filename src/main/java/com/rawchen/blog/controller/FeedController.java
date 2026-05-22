@@ -43,9 +43,9 @@ public class FeedController {
     @AccessLogAnnotation("RSS")
     public String getRssFeed() {
         // 获取站点配置
-        String siteName = getConfigValue("site_name", "RawChen · Blog");
+        String siteName = getConfigValue("site_name", "Blog");
         String siteDescription = getConfigValue("site_description", "大道至简 大简至极");
-        String siteUrl = getConfigValue("site_url", "https://rawchen.com");
+        String siteUrl = getConfigValue("site_url", "https://example.com");
 
         // 获取最新文章
         List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
@@ -85,7 +85,7 @@ public class FeedController {
     @ApiOperation("SiteMap")
     @GetMapping(value = "/sitemap.xml", produces = MediaType.APPLICATION_XML_VALUE)
     public String getSiteMap() {
-        String siteUrl = getConfigValue("site_url", "https://rawchen.com");
+        String siteUrl = getConfigValue("site_url", "https://example.com");
 
         // 获取所有已发布文章
         List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()

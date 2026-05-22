@@ -405,4 +405,10 @@ public class ArticleController {
         articleService.updatePageStatus(id, status);
         return R.ok();
     }
+
+    @PutMapping("/admin/pages/{id}/allow-comment")
+    public R<Void> updatePageAllowComment(@PathVariable Long id, @RequestParam Integer allowComment) {
+        articleService.updatePageAllowComment(id, allowComment);
+        return R.ok();
+    }
 }

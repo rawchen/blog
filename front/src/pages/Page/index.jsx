@@ -27,7 +27,14 @@ function PageDetail({ page, commentPage = 1, anchorCommentId = null }) {
   // 如果有模板，使用模板组件
   if (page.template && templateComponents[page.template]) {
     const TemplateComponent = templateComponents[page.template]
-    return <TemplateComponent pageContent={page} />
+    return (
+      <>
+        <TemplateComponent pageContent={page} />
+        {page.id && page.allowComment === 1 && (
+          <CommentList articleId={String(page.id)} initialPage={commentPage} anchorCommentId={anchorCommentId} />
+        )}
+      </>
+    )
   }
 
   // 默认模板：渲染Markdown内容
@@ -35,12 +42,6 @@ function PageDetail({ page, commentPage = 1, anchorCommentId = null }) {
     <div className="page-detail">
       <div className="page-header">
         <h1 className="page-title">{page.title}</h1>
-        {/*<div className="page-meta">*/}
-        {/*  <span>浏览：{page.viewCount || 0}</span>*/}
-        {/*  {page.updateTime && (*/}
-        {/*    <span>更新于：{new Date(page.updateTime).toLocaleDateString('zh-CN')}</span>*/}
-        {/*  )}*/}
-        {/*</div>*/}
         <div className="page-meta">
           <span className="meta-item">
             <FontAwesomeIcon icon={faClock} className="fa-icon" />
@@ -65,7 +66,7 @@ function PageDetail({ page, commentPage = 1, anchorCommentId = null }) {
       </div>
 
       {/* Comments */}
-      {page.id && (
+      {page.id && page.allowComment === 1 && (
         <CommentList articleId={String(page.id)} initialPage={commentPage} anchorCommentId={anchorCommentId} />
       )}
     </div>

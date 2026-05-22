@@ -157,3 +157,8 @@ export function deletePage(id) {
 export function updatePageStatus(id, status) {
   return request({ url: `/article/admin/pages/${id}/status`, method: 'put', params: { status } })
 }
+
+// 更新独立页面允许评论
+export function updatePageAllowComment(id, allowComment) {
+  return request({ url: `/article/admin/pages/${id}/allow-comment`, method: 'put', params: { allowComment } })
+}

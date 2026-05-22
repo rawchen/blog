@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { Table, Button, Modal, Form, Input, Select, message, Tag, Popconfirm, Space } from 'antd'
-import { CheckOutlined, CloseOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import React, { useState, useEffect, useRef } from 'react'
+import { Table, Button, Modal, Form, Input, Select, message, Tag, Popconfirm, Space, Tooltip } from 'antd'
+import { CheckOutlined, CloseOutlined, EditOutlined, DeleteOutlined, PlusOutlined, SearchOutlined, ExportOutlined } from '@ant-design/icons'
 import { getFriendLinkPage, createFriendLink, updateFriendLink, deleteFriendLink, auditFriendLink } from '../../../api/friendLink'
 
 const statusMap = {
@@ -16,15 +16,30 @@ function FriendLinkList() {
   const [modalVisible, setModalVisible] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [form] = Form.useForm()
+  const [keyword, setKeyword] = useState('')
+  const searchTimerRef = useRef(null)
 
   useEffect(() => {
     fetchList()
   }, [])
 
-  const fetchList = async (page = 1, size = 10) => {
+  const handleKeywordChange = (e) => {
+    const value = e.target.value
+    setKeyword(value)
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current)
+    }
+    searchTimerRef.current = setTimeout(() => {
+      fetchList(1, pagination.pageSize, value)
+    }, 300)
+  }
+
+  const fetchList = async (page = 1, size = pagination.pageSize, kw = keyword) => {
     setLoading(true)
     try {
-      const res = await getFriendLinkPage({ page, size })
+      const params = { page, size }
+      if (kw) params.keyword = kw
+      const res = await getFriendLinkPage(params)
       setDataSource(res.data?.records || [])
       setPagination(prev => ({
         ...prev,
@@ -38,7 +53,7 @@ function FriendLinkList() {
   }
 
   const handleTableChange = (pagination) => {
-    fetchList(pagination.current, pagination.pageSize)
+    fetchList(pagination.current, pagination.pageSize, keyword)
   }
 
   const handleAdd = () => {
@@ -94,6 +109,7 @@ function FriendLinkList() {
     { title: 'ID', dataIndex: 'id', width: 60 },
     {
       title: '网站名称',
+      width: 200,
       dataIndex: 'siteName',
       render: (text, record) => (
         <a href={record.siteUrl} target="_blank" rel="noopener noreferrer">{text}</a>
@@ -102,10 +118,19 @@ function FriendLinkList() {
     {
       title: 'Logo',
       dataIndex: 'logo',
-      width: 70,
+      width: 80,
       render: (url) => url ? <img src={url} alt="" style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover' }} /> : null
     },
-    { title: '描述', dataIndex: 'description', ellipsis: true },
+    {
+      title: '链接',
+      dataIndex: 'siteUrl',
+      width: 200,
+      ellipsis: true,
+      render: (url) => (
+          <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>
+      )
+    },
+    { title: '描述', dataIndex: 'description', width: 200, ellipsis: true },
     { title: '站长', dataIndex: 'ownerName', width: 100 },
     {
       title: '状态',
@@ -116,18 +141,26 @@ function FriendLinkList() {
         return <Tag color={item.color}>{item.text}</Tag>
       }
     },
-    { title: '排序', dataIndex: 'sortOrder', width: 60 },
+    { title: '排序', dataIndex: 'sortOrder', width: 80 },
     {
       title: '申请时间',
       dataIndex: 'createTime',
-      width: 160,
+      width: 180,
       render: (time) => time ? new Date(time).toLocaleString('zh-CN') : '-'
     },
     {
       title: '操作',
-      width: 240,
+      width: 280,
       render: (_, record) => (
         <Space size="small">
+          <Tooltip title="在新窗口打开网站">
+            <Button
+              type="primary"
+              size="small"
+              icon={<ExportOutlined />}
+              onClick={() => window.open(record.siteUrl, '_blank')}
+            />
+          </Tooltip>
           {record.status === 0 && (
             <>
               <Button type="primary" size="small" icon={<CheckOutlined />} onClick={() => handleAudit(record.id, 1)}>通过</Button>
@@ -144,9 +177,25 @@ function FriendLinkList() {
   ]
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <Button type="primary" onClick={handleAdd}>新增友链</Button>
+    <div className="friend-link-list">
+      <style>{`
+        .friend-link-list .ant-table-tbody > tr > td {
+          padding: 8px 16px;
+        }
+        .friend-link-list .ant-table-thead > tr > th {
+          padding: 8px 16px;
+        }
+      `}</style>
+      <div style={{ marginBottom: 16, display: 'flex', gap: 12 }}>
+        <Input
+          placeholder="搜索网站名称/链接/描述"
+          prefix={<SearchOutlined />}
+          allowClear
+          value={keyword}
+          style={{ width: 240 }}
+          onChange={handleKeywordChange}
+        />
+        <Button type="primary" icon={<PlusOutlined />} onClick={handleAdd}>新增友链</Button>
       </div>
 
       <Table

@@ -22,7 +22,7 @@ public interface FriendLinkService {
     /**
      * 获取友链分页列表（后台）
      */
-    Page<FriendLinkVO> getFriendLinkPage(int page, int size);
+    Page<FriendLinkVO> getFriendLinkPage(int page, int size, String keyword);
 
     /**
      * 根据ID获取友链

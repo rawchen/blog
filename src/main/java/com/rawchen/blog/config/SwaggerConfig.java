@@ -41,7 +41,7 @@ public class SwaggerConfig {
         return new ApiInfoBuilder()
                 .title("博客系统API文档")
                 .description("博客系统RESTful API接口文档")
-                .contact(new Contact("RawChen", "https://rawchen.com", "admin@rawchen.com"))
+                .contact(new Contact("RawChen", "https://rawchen.com", "rawchen@qq.com"))
                 .version("1.0.0")
                 .build();
     }

@@ -50,3 +50,7 @@ export function batchAuditComment(ids, status) {
 export function batchDeleteComment(ids) {
   return request({ url: '/comment/admin/batch-delete', method: 'post', data: { ids } })
 }
+
+export function getIpRegion(ip) {
+  return request({ url: '/comment/admin/ip-region', method: 'get', params: { ip } })
+}
