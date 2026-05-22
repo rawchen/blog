@@ -108,7 +108,7 @@ public class AccessLogAspect {
         logEntity.setBrowser(uaInfo.getBrowser());
         logEntity.setBrowserVersion(uaInfo.getBrowserVersion());
         logEntity.setOs(uaInfo.getOs());
-        logEntity.setOsVersion(uaInfo.getOsVersion());
+        logEntity.setOsVersion(simplifyOsVersion(uaInfo.getOsVersion()));
 
         // 机器人信息
         logEntity.setIsRobot(uaInfo.getIsRobot());
@@ -132,6 +132,23 @@ public class AccessLogAspect {
         accessLogService.saveAccessLog(logEntity);
 
         log.debug("访问日志记录成功: {} - {} - {}", accessLogAnnotation.value(), ip, requestURI);
+    }
+
+    /**
+     * 简化操作系统版本名称，去除Hutool解析出的服务器版本后缀
+     */
+    private String simplifyOsVersion(String osVersion) {
+        if (osVersion == null) {
+            return null;
+        }
+        if (osVersion.contains(" or ")) {
+            return osVersion.substring(0, osVersion.indexOf(" or "));
+        }
+        // Windows 10 实际上可能是 Windows 11（相同内核版本）
+        if ("Windows 10".equals(osVersion)) {
+            return "Windows 11";
+        }
+        return osVersion;
     }
 
     /**

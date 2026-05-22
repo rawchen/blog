@@ -126,7 +126,7 @@ function MarkdownRenderer({ content, className = '' }) {
         return <img src={src} alt={alt} className={className} {...props} />
       }
       return (
-        <a data-fancybox="article-gallery" draggable="false" href={src}>
+        <a data-fancybox="article-gallery" style={{ display: 'contents' }} draggable="false" href={src}>
           <img src={src} alt={alt} draggable="false" {...props} />
         </a>
       )
