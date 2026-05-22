@@ -122,6 +122,12 @@
             <version>${ip2region.version}</version>
         </dependency>
 
+        <!-- Spring Boot Quartz -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+
         <!-- Aliyun OSS SDK -->
         <dependency>
             <groupId>com.aliyun</groupId>

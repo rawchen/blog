@@ -35,6 +35,8 @@ const PageList = lazy(() => import('./pages/admin/Page'))
 const LoginLog = lazy(() => import('./pages/admin/log/LoginLog'))
 const OperationLog = lazy(() => import('./pages/admin/log/OperationLog'))
 const AccessLog = lazy(() => import('./pages/admin/log/AccessLog'))
+const TaskLog = lazy(() => import('./pages/admin/log/TaskLog'))
+const ScheduleJob = lazy(() => import('./pages/admin/ScheduleJob'))
 
 // API
 import { getPageList } from './api/article'
@@ -172,12 +174,14 @@ function App() {
         <Route path="tag" element={<TagList />} />
         <Route path="comment" element={<CommentList />} />
         <Route path="friend-link" element={<FriendLinkList />} />
+        <Route path="schedule" element={<ScheduleJob />} />
         <Route path="user" element={<UserList />} />
         <Route path="setting" element={<Setting />} />
         <Route path="tool" element={<Tool />} />
         <Route path="log">
           <Route path="login" element={<LoginLog />} />
           <Route path="operation" element={<OperationLog />} />
+          <Route path="task" element={<TaskLog />} />
           <Route path="access" element={<AccessLog />} />
         </Route>
       </Route>

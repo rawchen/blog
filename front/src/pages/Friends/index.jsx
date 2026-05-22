@@ -121,6 +121,7 @@ function FriendsPage({ pageContent }) {
                 />
                 <div className="friend-name">{friend.siteName}</div>
                 <div className="friend-desc">{friend.description || friend.siteUrl}</div>
+                <span className={`status-dot ${friend.status === 1 ? 'normal' : 'invalid'}`}></span>
               </a>
             </li>
           ))}

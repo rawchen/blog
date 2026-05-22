@@ -21,7 +21,8 @@ import {
   LoginOutlined,
   ProfileOutlined,
   GlobalOutlined,
-  HomeOutlined
+  HomeOutlined,
+  ClockCircleOutlined
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -67,6 +68,7 @@ function AdminLayout() {
     { key: '/admin/tag', icon: <TagsOutlined />, label: '标签管理' },
     { key: '/admin/comment', icon: <CommentOutlined />, label: '评论管理' },
     { key: '/admin/friend-link', icon: <LinkOutlined />, label: '友链管理' },
+    { key: '/admin/schedule', icon: <ClockCircleOutlined />, label: '任务管理' },
     { key: '/admin/user', icon: <UserOutlined />, label: '用户管理' },
     {
       key: 'log',
@@ -75,6 +77,7 @@ function AdminLayout() {
       children: [
         { key: '/admin/log/login', icon: <LoginOutlined />, label: '登录日志' },
         { key: '/admin/log/operation', icon: <ProfileOutlined />, label: '操作日志' },
+        { key: '/admin/log/task', icon: <ClockCircleOutlined />, label: '任务日志' },
         { key: '/admin/log/access', icon: <GlobalOutlined />, label: '访问日志' }
       ]
     },

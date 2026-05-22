@@ -32,6 +32,8 @@ public class FriendLinkServiceImpl implements FriendLinkService {
     public List<FriendLinkVO> getFriendLinkList() {
         List<FriendLink> list = friendLinkMapper.selectList(new LambdaQueryWrapper<FriendLink>()
                 .eq(FriendLink::getStatus, 1)
+                .or()
+                .eq(FriendLink::getStatus, 2)
                 .orderByAsc(FriendLink::getSortOrder)
                 .orderByAsc(FriendLink::getCreateTime));
 

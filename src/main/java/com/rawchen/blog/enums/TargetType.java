@@ -38,6 +38,11 @@ public enum TargetType {
     FRIEND("友链"),
 
     /**
+     * 任务
+     */
+    TASK("任务"),
+
+    /**
      * 用户
      */
     USER("用户"),

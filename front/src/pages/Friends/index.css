@@ -140,16 +140,35 @@
   text-overflow: ellipsis;
 }
 
+/* Status Dot */
+.status-dot {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-dot.normal {
+  background-color: #52c41a;
+}
+
+.status-dot.invalid {
+  background-color: #ff4d4f;
+}
+
 /* Hidden/Inactive Friends */
 .friend-card.hidden {
-  opacity: 0.5;
+  /* opacity: 0.5; */
   text-decoration: line-through;
 }
 
-.friend-card.hidden .friend-name,
-.friend-card.hidden .friend-desc {
-  color: #ccc;
-}
+/* .friend-card.hidden .friend-name, */
+/* .friend-card.hidden .friend-desc { */
+/*   color: #363636; */
+/* } */
 
 /* Apply Link */
 .apply-section {

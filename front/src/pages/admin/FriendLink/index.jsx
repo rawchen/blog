@@ -102,7 +102,7 @@ function FriendLinkList() {
     {
       title: 'Logo',
       dataIndex: 'logo',
-      width: 60,
+      width: 70,
       render: (url) => url ? <img src={url} alt="" style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover' }} /> : null
     },
     { title: '描述', dataIndex: 'description', ellipsis: true },
