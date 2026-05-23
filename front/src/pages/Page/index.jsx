@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import MarkdownRenderer from '../../components/MarkdownRenderer'
 import CommentList from '../../components/Comment'
 import FriendsPage from '../Friends'
@@ -24,7 +24,7 @@ function PageDetail({ page, commentPage = 1, anchorCommentId = null }) {
     return <NotFoundPage />
   }
 
-  // 如果有模板，使用模板组件
+  // 如果有模板，使用模板组件（模板组件自行处理滚动恢复）
   if (page.template && templateComponents[page.template]) {
     const TemplateComponent = templateComponents[page.template]
     return (
@@ -36,6 +36,27 @@ function PageDetail({ page, commentPage = 1, anchorCommentId = null }) {
       </>
     )
   }
+
+  // 默认模板：恢复刷新前的滚动位置
+  useEffect(() => {
+    const key = `scroll_page_${page.slug}`
+    const saved = sessionStorage.getItem(key)
+    if (saved) {
+      sessionStorage.removeItem(key)
+      requestAnimationFrame(() => {
+        window.scrollTo(0, parseInt(saved, 10))
+      })
+    }
+  }, [page.slug])
+
+  // 页面卸载前保存滚动位置
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem(`scroll_page_${page.slug}`, String(window.scrollY))
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [page.slug])
 
   // 默认模板：渲染Markdown内容
   return (

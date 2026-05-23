@@ -44,7 +44,6 @@ public class ConfigServiceImpl implements ConfigService {
     private static final String KEY_ZHIHU_URL = "zhihu_url";
     private static final String KEY_TWITTER_URL = "twitter_url";
     private static final String KEY_EMAIL = "email";
-    private static final String KEY_WECHAT_QRCODE = "wechat_qrcode";
     private static final String KEY_QQ_NUMBER = "qq_number";
     private static final String KEY_STATS_URL = "stats_url";
     private static final String KEY_TRACKING_CODE = "tracking_code";
@@ -57,6 +56,7 @@ public class ConfigServiceImpl implements ConfigService {
     private static final String KEY_SKILL_LIST = "skill_list";
     private static final String KEY_TYPEWRITER_ENABLED = "typewriter_enabled";
     private static final String KEY_HTML_RENDER_ENABLED = "html_render_enabled";
+    private static final String KEY_REWARD_ENABLED = "reward_enabled";
 
     @Override
     public SiteConfigVO getSiteConfig() {
@@ -77,7 +77,6 @@ public class ConfigServiceImpl implements ConfigService {
         vo.setZhihuUrl(getConfigByKey(KEY_ZHIHU_URL));
         vo.setTwitterUrl(getConfigByKey(KEY_TWITTER_URL));
         vo.setEmail(getConfigByKey(KEY_EMAIL));
-        vo.setWechatQrcode(getConfigByKey(KEY_WECHAT_QRCODE));
         vo.setQqNumber(getConfigByKey(KEY_QQ_NUMBER));
         vo.setStatsUrl(getConfigByKey(KEY_STATS_URL));
         vo.setTrackingCode(getConfigByKey(KEY_TRACKING_CODE));
@@ -92,6 +91,7 @@ public class ConfigServiceImpl implements ConfigService {
         vo.setSkillList(getConfigByKey(KEY_SKILL_LIST, "写博客,去看海,极简化"));
         vo.setTypewriterEnabled(Boolean.parseBoolean(getConfigByKey(KEY_TYPEWRITER_ENABLED, "true")));
         vo.setHtmlRenderEnabled(Boolean.parseBoolean(getConfigByKey(KEY_HTML_RENDER_ENABLED, "false")));
+        vo.setRewardEnabled(Boolean.parseBoolean(getConfigByKey(KEY_REWARD_ENABLED, "true")));
 
         return vo;
     }

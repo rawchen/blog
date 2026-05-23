@@ -10,7 +10,7 @@ import './index.css'
 const bgColors = ['bg-blue', 'bg-orange', 'bg-green', 'bg-yellow', 'bg-purple', 'bg-red']
 const getBgColor = (index) => bgColors[index % bgColors.length]
 
-function SearchPage() {
+function SearchPage({ pageContent }) {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const keyword = searchParams.get('q') || ''
@@ -28,6 +28,28 @@ function SearchPage() {
       handleSearch(keyword)
     }
   }, [keyword])
+
+  // 恢复刷新前的滚动位置
+  useEffect(() => {
+    if (loading) return
+    const key = `scroll_page_${pageContent?.slug || 'search'}`
+    const saved = sessionStorage.getItem(key)
+    if (saved) {
+      sessionStorage.removeItem(key)
+      requestAnimationFrame(() => {
+        window.scrollTo(0, parseInt(saved, 10))
+      })
+    }
+  }, [loading, pageContent?.slug])
+
+  // 页面卸载前保存滚动位置
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem(`scroll_page_${pageContent?.slug || 'search'}`, String(window.scrollY))
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [pageContent?.slug])
 
   const fetchTags = async () => {
     try {

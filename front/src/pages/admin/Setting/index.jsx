@@ -35,7 +35,8 @@ const camelToSnake = {
   totalPv: 'total_pv',
   totalUv: 'total_uv',
   siteCreateDate: 'site_create_date',
-  htmlRenderEnabled: 'html_render_enabled'
+  htmlRenderEnabled: 'html_render_enabled',
+  rewardEnabled: 'reward_enabled'
 }
 
 // 字段映射：下划线 -> 驼峰
@@ -51,6 +52,7 @@ function Setting() {
   const [mailEnabled, setMailEnabled] = useState(false)
   const [typewriterEnabled, setTypewriterEnabled] = useState(true)
   const [htmlRenderEnabled, setHtmlRenderEnabled] = useState(false)
+  const [rewardEnabled, setRewardEnabled] = useState(false)
   const [form] = Form.useForm()
 
   useEffect(() => {
@@ -67,7 +69,7 @@ function Setting() {
         Object.entries(camelToSnake).forEach(([camelKey, snakeKey]) => {
           let value = res.data[camelKey]
           // 布尔值字段特殊处理
-          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled' || camelKey === 'mailEnabled' || camelKey === 'typewriterEnabled' || camelKey === 'htmlRenderEnabled') {
+          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled' || camelKey === 'mailEnabled' || camelKey === 'typewriterEnabled' || camelKey === 'htmlRenderEnabled' || camelKey === 'rewardEnabled') {
             value = value === true || value === 'true'
           }
           // 日期字段转为dayjs对象
@@ -82,6 +84,7 @@ function Setting() {
         setMailEnabled(formValues['mail_enabled'])
         setTypewriterEnabled(formValues['typewriter_enabled'])
         setHtmlRenderEnabled(formValues['html_render_enabled'])
+        setRewardEnabled(formValues['reward_enabled'])
       }
     } catch (e) {
       console.error('加载配置失败', e)
@@ -110,6 +113,9 @@ function Setting() {
       if (values.html_render_enabled !== undefined) {
         values.html_render_enabled = String(values.html_render_enabled)
       }
+      if (values.reward_enabled !== undefined) {
+        values.reward_enabled = String(values.reward_enabled)
+      }
       // 处理数字字段转字符串
       if (values.total_pv !== undefined && values.total_pv !== null) {
         values.total_pv = String(values.total_pv)
@@ -133,7 +139,7 @@ function Setting() {
         const camelKey = snakeToCamel[key]
         if (camelKey) {
           // 布尔值字段保持布尔值
-          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled' || camelKey === 'mailEnabled' || camelKey === 'typewriterEnabled' || camelKey === 'htmlRenderEnabled') {
+          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled' || camelKey === 'mailEnabled' || camelKey === 'typewriterEnabled' || camelKey === 'htmlRenderEnabled' || camelKey === 'rewardEnabled') {
             cacheData[camelKey] = value === 'true'
           } else {
             cacheData[camelKey] = value
@@ -201,9 +207,6 @@ function Setting() {
               <Form.Item label="邮箱" name="email">
                 <Input placeholder="联系邮箱" />
               </Form.Item>
-              <Form.Item label="微信二维码" name="wechat_qrcode">
-                <Input placeholder="微信二维码图片URL" />
-              </Form.Item>
               <Form.Item label="QQ号" name="qq_number">
                 <Input placeholder="QQ号码" />
               </Form.Item>
@@ -231,6 +234,9 @@ function Setting() {
               </Form.Item>
               <Form.Item label="开启邮件通知" name="mail_enabled" valuePropName="checked">
                 <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setMailEnabled(checked)} />
+              </Form.Item>
+              <Form.Item label={<span><Tooltip title="开启后文章底部显示打赏按钮，点击弹出二维码。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 开启文章打赏</span>} name="reward_enabled" valuePropName="checked">
+                <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setRewardEnabled(checked)} />
               </Form.Item>
               <Form.Item label={<span><Tooltip title="开启后文章中的HTML标签将被渲染为真实元素，关闭则HTML标签以纯文本显示。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 渲染HTML</span>} name="html_render_enabled" valuePropName="checked">
                 <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setHtmlRenderEnabled(checked)} />

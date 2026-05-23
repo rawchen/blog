@@ -100,11 +100,6 @@ public class SiteConfigVO implements Serializable {
     private String email;
 
     /**
-     * 微信二维码
-     */
-    private String wechatQrcode;
-
-    /**
      * QQ号
      */
     private String qqNumber;
@@ -148,6 +143,11 @@ public class SiteConfigVO implements Serializable {
      * 是否开启HTML渲染
      */
     private Boolean htmlRenderEnabled;
+
+    /**
+     * 是否开启文章打赏
+     */
+    private Boolean rewardEnabled;
 
     /**
      * 历史累积PV

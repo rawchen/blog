@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClock, faTags, faComment, faEye, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons'
 import { getArticleDetail, incrementViewCount } from '../../api/article'
@@ -8,6 +9,7 @@ import MarkdownRenderer from '../../components/MarkdownRenderer'
 import RelatedPosts from '../../components/RelatedPosts'
 import NotFoundPage from '../NotFound'
 import Headroom from 'headroom.js'
+import eyeIcon from '../../assets/images/eye.png'
 import './index.css'
 
 // Random background colors for posts
@@ -26,11 +28,46 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
   const { slug: id } = useParams()
   const [article, setArticle] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [showReward, setShowReward] = useState(false)
+  const [rewardEnabled, setRewardEnabled] = useState(false)
   const bottomBarRef = useRef(null)
   const headroomRef = useRef(null)
+  const { isAuthenticated } = useSelector(state => state.auth)
+
+  useEffect(() => {
+    const config = localStorage.getItem('site_config')
+    if (config) {
+      try {
+        const parsed = JSON.parse(config)
+        setRewardEnabled(parsed.rewardEnabled === true)
+      } catch (e) {}
+    }
+  }, [])
 
   useEffect(() => {
     fetchArticle()
+  }, [id])
+
+  // 恢复刷新前的滚动位置
+  useEffect(() => {
+    if (!article) return
+    const key = `scroll_${id}`
+    const saved = sessionStorage.getItem(key)
+    if (saved) {
+      sessionStorage.removeItem(key)
+      requestAnimationFrame(() => {
+        window.scrollTo(0, parseInt(saved, 10))
+      })
+    }
+  }, [article, id])
+
+  // 页面卸载前保存滚动位置
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem(`scroll_${id}`, String(window.scrollY))
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [id])
 
   useEffect(() => {
@@ -109,7 +146,14 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
                 </span>
                 <span className="meta-item">
                   <FontAwesomeIcon icon={faEye} className="fa-icon" />
-                  {article.viewCount || 0} 浏览
+                  {isAuthenticated ? (
+                    <a href={`/admin/article/edit/${article.id}`} target="_blank" rel="noopener noreferrer" title="编辑文章">
+                      {article.viewCount || 0} 浏览
+                    </a>
+                  ) : (
+                      <span>{article.viewCount || 0} 浏览</span>
+                  )}
+
                 </span>
               </div>
               <div className="post-tags">
@@ -145,7 +189,13 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
               </span>
               <span className="meta-item">
                 <FontAwesomeIcon icon={faEye} className="fa-icon" />
-                {article.viewCount || 0} 浏览
+                {isAuthenticated ? (
+                  <a href={`/admin/article/edit/${article.id}`} target="_blank" rel="noopener noreferrer" title="编辑文章">
+                    {article.viewCount || 0} 浏览
+                  </a>
+                ) : (
+                    <span>{article.viewCount || 0} 浏览</span>
+                )}
               </span>
             </div>
           </header>
@@ -166,24 +216,41 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
 
           {/* Post Info */}
           <div className="post-info">
-            <div style={{ textAlign: 'center' }}>
-              本文由 <a href="/">{article.authorName || 'RawChen'}</a> 发表
-              {article.updateTime && (
-                <>， 最后编辑时间为：{formatDate(article.updateTime)}</>
-              )}
+            {isAuthenticated && (
+              <a class="post-info-edit" href={`/admin/article/edit/${article.id}`} target="_blank" rel="noopener noreferrer">
+                <img src={eyeIcon} height="16px" width="16px" alt="编辑" />
+              </a>
+            )}
+            <div className="post-info-author">
+              本文由 <a href="/">{article.authorName || 'RawChen'}</a> 发表， 最后编辑时间为：{article.updateTime}
+              <br/>如果你觉得我的文章不错，不妨鼓励我继续写作。
             </div>
           </div>
+
+          {/* 打赏支持按钮 */}
+          {rewardEnabled && (
+            <div className="reward-button">
+              <button onClick={() => setShowReward(true)}>支持</button>
+            </div>
+          )}
+          {showReward && (
+            <div className="reward-overlay" onClick={() => setShowReward(false)}>
+              <div className="reward-qr-code" onClick={e => e.stopPropagation()}>
+                <img src="/reward.jpg" alt="打赏二维码" />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Related Posts */}
-        <RelatedPosts articleId={id} limit={5} />
+        <RelatedPosts articleId={id} limit={5}/>
 
         {/* Next/Prev Navigation */}
         <div className="post-next-prev">
           <div className="padd">
             {article.prevArticle && (
-              <div className="next-prev">
-                <Link to={`/${article.prevArticle.id}`} title={article.prevArticle.title}>
+                <div className="next-prev">
+                  <Link to={`/${article.prevArticle.id}`} title={article.prevArticle.title}>
                   <div className="card">
                     <div className="card-img">
                       <img

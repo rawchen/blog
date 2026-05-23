@@ -123,6 +123,11 @@ public class ArticleVO implements Serializable {
     private LocalDateTime createTime;
 
     /**
+     * 更新时间
+     */
+    private LocalDateTime updateTime;
+
+    /**
      * 文章类型: POST-文章, PAGE-独立页面
      */
     private Article.ArticleType type;
