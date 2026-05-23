@@ -30,6 +30,7 @@ const CommentList = lazy(() => import('./pages/admin/Comment'))
 const UserList = lazy(() => import('./pages/admin/User'))
 const FriendLinkList = lazy(() => import('./pages/admin/FriendLink'))
 const Setting = lazy(() => import('./pages/admin/Setting'))
+const Profile = lazy(() => import('./pages/admin/Profile'))
 const Tool = lazy(() => import('./pages/admin/Tool'))
 const PageList = lazy(() => import('./pages/admin/Page'))
 const LoginLog = lazy(() => import('./pages/admin/log/LoginLog'))
@@ -177,6 +178,7 @@ function App() {
         <Route path="schedule" element={<ScheduleJob />} />
         <Route path="user" element={<UserList />} />
         <Route path="setting" element={<Setting />} />
+        <Route path="profile" element={<Profile />} />
         <Route path="tool" element={<Tool />} />
         <Route path="log">
           <Route path="login" element={<LoginLog />} />

@@ -6,6 +6,7 @@ import com.rawchen.blog.service.MigrationService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -28,12 +29,14 @@ public class MigrationController {
 
     @ApiOperation("获取数据库列表")
     @PostMapping("/admin/databases")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<List<String>> getDatabases(@Valid @RequestBody MigrationConnectDTO dto) {
         return R.ok(migrationService.getDatabases(dto));
     }
 
     @ApiOperation("测试数据库连接")
     @PostMapping("/admin/connect")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<MigrationConnectResponseDTO> testConnection(@Valid @RequestBody MigrationConnectDTO dto) {
         return R.ok(migrationService.testConnection(dto));
     }
@@ -46,6 +49,7 @@ public class MigrationController {
 
     @ApiOperation("开始迁移")
     @PostMapping("/admin/start")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> startMigration(@Valid @RequestBody MigrationConnectDTO dto,
                                    @AuthenticationPrincipal UserDetails userDetails) {
         // 获取当前用户ID，这里简化处理

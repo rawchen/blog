@@ -37,11 +37,6 @@ public class UserVO implements Serializable {
     private String phone;
 
     /**
-     * 头像
-     */
-    private String avatar;
-
-    /**
      * 昵称
      */
     private String nickname;

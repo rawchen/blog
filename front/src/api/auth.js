@@ -15,3 +15,11 @@ export function getCurrentUser() {
 export function logout() {
   return request({ url: '/auth/logout', method: 'post' })
 }
+
+export function changePassword(data) {
+  return request({ url: '/auth/password', method: 'put', data })
+}
+
+export function updateProfile(data) {
+  return request({ url: '/auth/profile', method: 'put', data })
+}

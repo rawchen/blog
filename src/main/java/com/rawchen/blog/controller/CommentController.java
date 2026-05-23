@@ -99,6 +99,7 @@ public class CommentController {
 
     @ApiOperation("审核评论")
     @PutMapping("/admin/audit/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.AUDIT, target = TargetType.COMMENT, description = "审核评论")
     public R<Void> auditComment(@PathVariable Long id, @RequestParam Integer status) {
         commentService.auditComment(id, status);
@@ -107,6 +108,7 @@ public class CommentController {
 
     @ApiOperation("批量审核评论")
     @PutMapping("/admin/batch-audit")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.AUDIT, target = TargetType.COMMENT, description = "批量审核评论")
     public R<Void> batchAuditComment(@RequestBody List<Long> ids, @RequestParam Integer status) {
         commentService.batchAuditComments(ids, status);

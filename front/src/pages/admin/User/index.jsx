@@ -1,12 +1,21 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Button, Tag, message, Popconfirm, Space } from 'antd'
-import { StopOutlined, PlayCircleOutlined, KeyOutlined } from '@ant-design/icons'
+import { Table, Button, Tag, message, Popconfirm, Space, Avatar } from 'antd'
+import { StopOutlined, PlayCircleOutlined, KeyOutlined, UserOutlined } from '@ant-design/icons'
 import { getUserList, updateUserStatus, resetPassword } from '../../../api/user'
+import { useSelector } from 'react-redux'
+import Md5 from 'md5'
+
+const getAvatarUrl = (email, domain) => {
+  const hash = email ? Md5(email.toLowerCase()) : 'default'
+  const gravatarDomain = domain || 'weavatar.com'
+  return `https://${gravatarDomain}/avatar/${hash}?d=mp`
+}
 
 function UserList() {
   const [loading, setLoading] = useState(false)
   const [dataSource, setDataSource] = useState([])
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
+  const siteConfig = useSelector(state => state.siteConfig.data) || {}
 
   useEffect(() => {
     fetchList()
@@ -44,6 +53,14 @@ function UserList() {
 
   const columns = [
     { title: 'ID', dataIndex: 'id', width: 80 },
+    {
+      title: '头像',
+      dataIndex: 'email',
+      width: 70,
+      render: (email) => (
+        <Avatar src={email ? getAvatarUrl(email, siteConfig.gravatarDomain) : null} icon={!email && <UserOutlined />} size={32} />
+      )
+    },
     { title: '用户名', dataIndex: 'username', width: 120 },
     { title: '昵称', dataIndex: 'nickname', width: 120 },
     { title: '邮箱', dataIndex: 'email', width: 200 },

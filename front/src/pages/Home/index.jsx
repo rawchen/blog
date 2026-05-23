@@ -42,6 +42,28 @@ function Home() {
     fetchArticles()
   }, [current])
 
+  // 恢复刷新前的滚动位置
+  useEffect(() => {
+    if (loading) return
+    const key = `scroll_home_${current}`
+    const saved = sessionStorage.getItem(key)
+    if (saved) {
+      sessionStorage.removeItem(key)
+      requestAnimationFrame(() => {
+        window.scrollTo(0, parseInt(saved, 10))
+      })
+    }
+  }, [loading, current])
+
+  // 页面卸载前保存滚动位置
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem(`scroll_home_${current}`, String(window.scrollY))
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [current])
+
   useEffect(() => {
     // 初始化打字机效果
     if (typingRef.current && window.yephy && siteConfig.siteDescription) {

@@ -52,6 +52,7 @@ public class ConfigController {
 
     @ApiOperation("更新配置")
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.CONFIG, description = "更新配置")
     public R<Void> updateConfig(@Valid @RequestBody ConfigDTO dto) {
         configService.updateConfig(dto);
@@ -60,6 +61,7 @@ public class ConfigController {
 
     @ApiOperation("批量更新配置")
     @PutMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.CONFIG, description = "批量更新配置")
     public R<Void> updateConfigs(@Valid @RequestBody List<ConfigDTO> configs) {
         configService.updateConfigs(configs);

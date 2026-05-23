@@ -13,6 +13,7 @@ import com.rawchen.blog.vo.TaskJobVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -53,6 +54,7 @@ public class TaskJobController {
 
     @ApiOperation("创建任务")
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.TASK, description = "创建调度任务")
     public R<Long> createJob(@Valid @RequestBody TaskJobDTO dto) {
         return R.ok(taskJobService.createJob(dto));
@@ -60,6 +62,7 @@ public class TaskJobController {
 
     @ApiOperation("更新任务")
     @PutMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.TASK, description = "更新调度任务")
     public R<Void> updateJob(@Valid @RequestBody TaskJobDTO dto) {
         taskJobService.updateJob(dto);
@@ -68,6 +71,7 @@ public class TaskJobController {
 
     @ApiOperation("删除任务")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.TASK, description = "删除调度任务")
     public R<Void> deleteJob(@PathVariable Long id) {
         taskJobService.deleteJob(id);
@@ -76,6 +80,7 @@ public class TaskJobController {
 
     @ApiOperation("手动触发任务")
     @PostMapping("/trigger/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> triggerJob(@PathVariable Long id) {
         taskJobService.triggerJob(id);
         return R.ok();
@@ -83,6 +88,7 @@ public class TaskJobController {
 
     @ApiOperation("启用/禁用任务")
     @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.TASK, description = "更新任务状态")
     public R<Void> updateJobStatus(@PathVariable Long id, @RequestParam Integer enabled) {
         taskJobService.updateJobStatus(id, enabled);

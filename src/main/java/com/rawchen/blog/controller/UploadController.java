@@ -24,21 +24,21 @@ public class UploadController {
 
     @ApiOperation("上传图片")
     @PostMapping("/image")
-    @PreAuthorize("hasAuthority('content:article:add')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<String> uploadImage(@RequestParam("file") MultipartFile file) {
         return R.ok(uploadService.uploadImage(file));
     }
 
     @ApiOperation("上传文件")
     @PostMapping("/file")
-    @PreAuthorize("hasAuthority('content:article:add')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<String> uploadFile(@RequestParam("file") MultipartFile file) {
         return R.ok(uploadService.uploadFile(file));
     }
 
     @ApiOperation("删除文件")
     @DeleteMapping("/{filename}")
-    @PreAuthorize("hasAuthority('content:article:delete')")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> deleteFile(@PathVariable String filename) {
         uploadService.deleteFile(filename);
         return R.ok();

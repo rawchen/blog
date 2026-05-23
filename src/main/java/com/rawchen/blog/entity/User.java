@@ -44,11 +44,6 @@ public class User extends BaseEntity implements UserDetails {
     private String phone;
 
     /**
-     * 头像
-     */
-    private String avatar;
-
-    /**
      * 昵称
      */
     private String nickname;
@@ -74,7 +69,7 @@ public class User extends BaseEntity implements UserDetails {
     private Integer status;
 
     /**
-     * 角色: ADMIN-超管, STAFF-管理员
+     * 角色: ADMIN-超管, STAFF-管理员, VISITOR-访客
      */
     @TableField("role")
     private UserRole role = UserRole.STAFF;
@@ -89,7 +84,7 @@ public class User extends BaseEntity implements UserDetails {
      * 用户角色枚举
      */
     public enum UserRole {
-        ADMIN, STAFF
+        ADMIN, STAFF, VISITOR
     }
 
     // ========== UserDetails 接口实现 ==========

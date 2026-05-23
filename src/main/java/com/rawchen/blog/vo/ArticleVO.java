@@ -68,9 +68,9 @@ public class ArticleVO implements Serializable {
     private String authorName;
 
     /**
-     * 作者头像
+     * 作者邮箱（用于生成Gravatar头像）
      */
-    private String authorAvatar;
+    private String authorEmail;
 
     /**
      * 浏览次数

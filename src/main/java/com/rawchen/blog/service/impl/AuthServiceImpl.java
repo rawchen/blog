@@ -2,8 +2,10 @@ package com.rawchen.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.rawchen.blog.common.ResultCode;
+import com.rawchen.blog.dto.ChangePasswordDTO;
 import com.rawchen.blog.dto.LoginDTO;
 import com.rawchen.blog.dto.RegisterDTO;
+import com.rawchen.blog.dto.UpdateProfileDTO;
 import com.rawchen.blog.entity.User;
 import com.rawchen.blog.exception.BusinessException;
 import com.rawchen.blog.mapper.UserMapper;
@@ -132,5 +134,61 @@ public class AuthServiceImpl implements AuthService {
     public void logout() {
         SecurityContextHolder.clearContext();
         log.info("用户退出登录");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void changePassword(Long userId, ChangePasswordDTO dto) {
+        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            throw new BusinessException("两次密码不一致");
+        }
+
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        if (!passwordEncoder.matches(dto.getOldPassword(), user.getPassword())) {
+            throw new BusinessException("旧密码不正确");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userMapper.updateById(user);
+        log.info("用户修改密码: {}", user.getUsername());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateProfile(Long userId, UpdateProfileDTO dto) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+
+        if (dto.getNickname() != null) {
+            user.setNickname(dto.getNickname());
+        }
+        if (dto.getEmail() != null) {
+            // 检查邮箱是否已被其他用户使用
+            Long count = userMapper.selectCount(new LambdaQueryWrapper<User>()
+                    .eq(User::getEmail, dto.getEmail())
+                    .ne(User::getId, userId));
+            if (count > 0) {
+                throw new BusinessException("该邮箱已被使用");
+            }
+            user.setEmail(dto.getEmail());
+        }
+        if (dto.getSignature() != null) {
+            user.setSignature(dto.getSignature());
+        }
+        if (dto.getGender() != null) {
+            user.setGender(dto.getGender());
+        }
+        if (dto.getBirthday() != null) {
+            user.setBirthday(dto.getBirthday());
+        }
+
+        userMapper.updateById(user);
+        log.info("用户更新资料: {}", user.getUsername());
     }
 }

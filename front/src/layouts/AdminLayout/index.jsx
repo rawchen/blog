@@ -22,7 +22,8 @@ import {
   ProfileOutlined,
   GlobalOutlined,
   HomeOutlined,
-  ClockCircleOutlined
+  ClockCircleOutlined,
+  LockOutlined
 } from '@ant-design/icons'
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
@@ -49,8 +50,8 @@ function AdminLayout() {
   const siteConfig = useSelector(state => state.siteConfig.data) || {}
   const gravatarDomain = siteConfig.gravatarDomain
 
-  // 获取用户头像，优先使用用户设置的头像，否则使用邮箱生成
-  const userAvatar = userInfo?.avatar || (userInfo?.email ? getAvatarUrl(userInfo.email, gravatarDomain) : null)
+  // 获取用户头像（使用邮箱生成Gravatar）
+  const userAvatar = userInfo?.email ? getAvatarUrl(userInfo.email, gravatarDomain) : null
 
   const menuItems = [
     { key: '/admin', icon: <DashboardOutlined />, label: '仪表盘' },
@@ -82,6 +83,7 @@ function AdminLayout() {
       ]
     },
     { key: '/admin/setting', icon: <SettingOutlined />, label: '网站设置' },
+    { key: '/admin/profile', icon: <LockOutlined />, label: '个人设置' },
     { key: '/admin/tool', icon: <ToolOutlined />, label: '工具库' }
   ]
 

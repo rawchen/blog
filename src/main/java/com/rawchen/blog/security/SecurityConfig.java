@@ -33,6 +33,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
+    @Autowired
+    private JwtAccessDeniedHandler jwtAccessDeniedHandler;
+
     /**
      * 密码编码器
      */
@@ -135,8 +138,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/friends",
                         "/admin/**"
                 ).permitAll()
-                // 后台管理接口需要 ADMIN 或 STAFF 角色
-                .antMatchers("/api/**/admin/**").hasAnyRole("ADMIN", "STAFF")
+                // 后台管理接口需要 ADMIN、STAFF 或 VISITOR 角色（写操作由方法级权限控制）
+                .antMatchers("/api/**/admin/**", "/api/admin/**").hasAnyRole("ADMIN", "STAFF", "VISITOR")
                 // 其他请求需要认证
                 .anyRequest().authenticated()
                 .and()
@@ -147,6 +150,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 // 异常处理
                 .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint);
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler);
     }
 }

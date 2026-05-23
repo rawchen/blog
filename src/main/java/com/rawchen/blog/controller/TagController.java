@@ -56,6 +56,7 @@ public class TagController {
 
     @ApiOperation("创建标签")
     @PostMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.TAG, description = "创建标签", recordDetail = true)
     public R<Long> createTag(@RequestBody Tag tag) {
         return R.ok(tagService.createTag(tag));
@@ -63,6 +64,7 @@ public class TagController {
 
     @ApiOperation("更新标签")
     @PutMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.TAG, description = "更新标签")
     public R<Void> updateTag(@RequestBody Tag tag) {
         tagService.updateTag(tag);

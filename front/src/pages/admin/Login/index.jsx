@@ -26,7 +26,7 @@ function Login() {
   return (
     <div className="login-container">
       <Card className="login-card" title="博客后台管理系统">
-        <Form form={form} onFinish={handleSubmit}>
+        <Form form={form} onFinish={handleSubmit} initialValues={{ username: 'visitor', password: '123456' }}>
           <Form.Item
             name="username"
             rules={[{ required: true, message: '请输入用户名' }]}
@@ -46,7 +46,7 @@ function Login() {
           </Form.Item>
         </Form>
         <div className="login-tip">
-          默认账号: admin / admin123
+          访客账号: visitor / 123456
         </div>
       </Card>
     </div>

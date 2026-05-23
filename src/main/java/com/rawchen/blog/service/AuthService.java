@@ -1,7 +1,9 @@
 package com.rawchen.blog.service;
 
+import com.rawchen.blog.dto.ChangePasswordDTO;
 import com.rawchen.blog.dto.LoginDTO;
 import com.rawchen.blog.dto.RegisterDTO;
+import com.rawchen.blog.dto.UpdateProfileDTO;
 import com.rawchen.blog.vo.LoginVO;
 import com.rawchen.blog.vo.UserVO;
 
@@ -31,4 +33,14 @@ public interface AuthService {
      * 退出登录
      */
     void logout();
+
+    /**
+     * 修改密码
+     */
+    void changePassword(Long userId, ChangePasswordDTO dto);
+
+    /**
+     * 更新个人资料
+     */
+    void updateProfile(Long userId, UpdateProfileDTO dto);
 }

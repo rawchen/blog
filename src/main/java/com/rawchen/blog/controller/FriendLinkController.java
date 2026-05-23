@@ -64,6 +64,7 @@ public class FriendLinkController {
 
     @ApiOperation("添加友链")
     @PostMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.FRIEND, description = "添加友链", recordDetail = true)
     public R<Long> addFriendLink(@Valid @RequestBody FriendLinkDTO dto) {
         return R.ok(friendLinkService.addFriendLink(dto));
@@ -71,6 +72,7 @@ public class FriendLinkController {
 
     @ApiOperation("更新友链")
     @PutMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.FRIEND, description = "更新友链")
     public R<Void> updateFriendLink(@Valid @RequestBody FriendLinkDTO dto) {
         friendLinkService.updateFriendLink(dto);
@@ -88,6 +90,7 @@ public class FriendLinkController {
 
     @ApiOperation("审核友链")
     @PutMapping("/admin/{id}/audit")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.AUDIT, target = TargetType.FRIEND, description = "审核友链")
     public R<Void> auditFriendLink(@PathVariable Long id, @RequestParam Integer status) {
         friendLinkService.auditFriendLink(id, status);
@@ -96,6 +99,7 @@ public class FriendLinkController {
 
     @ApiOperation("检测友链状态")
     @PostMapping("/admin/check/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> checkFriendLinkStatus(@PathVariable Long id) {
         friendLinkService.checkFriendLinkStatus(id);
         return R.ok();

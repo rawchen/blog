@@ -171,6 +171,7 @@ public class ArticleController {
 
     @ApiOperation("创建文章")
     @PostMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.ARTICLE, description = "创建文章", recordDetail = true)
     public R<Long> createArticle(@Valid @RequestBody ArticleDTO articleDTO) {
         return R.ok(articleService.createArticle(articleDTO));
@@ -178,6 +179,7 @@ public class ArticleController {
 
     @ApiOperation("更新文章")
     @PutMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.ARTICLE, description = "更新文章")
     public R<Void> updateArticle(@Valid @RequestBody ArticleDTO articleDTO) {
         articleService.updateArticle(articleDTO);
@@ -204,6 +206,7 @@ public class ArticleController {
 
     @ApiOperation("保存草稿")
     @PostMapping("/admin/draft")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Long> saveDraft(@Valid @RequestBody ArticleDTO articleDTO) {
         return R.ok(articleService.saveDraft(articleDTO));
     }
@@ -222,6 +225,7 @@ public class ArticleController {
 
     @ApiOperation("恢复文章版本")
     @PostMapping("/admin/{articleId}/restore/{versionId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> restoreArticleVersion(@PathVariable Long articleId, @PathVariable Long versionId) {
         articleService.restoreArticleVersion(articleId, versionId);
         return R.ok();
@@ -229,6 +233,7 @@ public class ArticleController {
 
     @ApiOperation("更新文章置顶状态")
     @PutMapping("/admin/{id}/top")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> updateTopStatus(@PathVariable Long id, @RequestParam Integer isTop) {
         articleService.updateTopStatus(id, isTop);
         return R.ok();
@@ -236,6 +241,7 @@ public class ArticleController {
 
     @ApiOperation("更新文章推荐状态")
     @PutMapping("/admin/{id}/recommend")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> updateRecommendStatus(@PathVariable Long id, @RequestParam Integer isRecommend) {
         articleService.updateRecommendStatus(id, isRecommend);
         return R.ok();
@@ -243,6 +249,7 @@ public class ArticleController {
 
     @ApiOperation("AI生成文章摘要")
     @PostMapping("/admin/ai/summary")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<String> generateSummary(@RequestBody Map<String, Object> request) {
         try {
             String content = (String) request.get("content");
@@ -386,6 +393,7 @@ public class ArticleController {
 
     @ApiOperation("创建独立页面")
     @PostMapping("/admin/pages")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.PAGE, description = "创建独立页面", recordDetail = true)
     public R<Long> createPage(@Valid @RequestBody ArticleDTO articleDTO) {
         return R.ok(articleService.createPage(articleDTO));
@@ -393,6 +401,7 @@ public class ArticleController {
 
     @ApiOperation("更新独立页面")
     @PutMapping("/admin/pages")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.PAGE, description = "更新独立页面")
     public R<Void> updatePage(@Valid @RequestBody ArticleDTO articleDTO) {
         articleService.updatePage(articleDTO);
@@ -401,6 +410,7 @@ public class ArticleController {
 
     @ApiOperation("删除独立页面")
     @DeleteMapping("/admin/pages/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.DELETE, target = TargetType.PAGE, description = "删除独立页面")
     public R<Void> deletePage(@PathVariable Long id) {
         articleService.deleteArticle(id);
@@ -409,12 +419,14 @@ public class ArticleController {
 
     @ApiOperation("更新独立页面状态")
     @PutMapping("/admin/pages/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> updatePageStatus(@PathVariable Long id, @RequestParam Integer status) {
         articleService.updatePageStatus(id, status);
         return R.ok();
     }
 
     @PutMapping("/admin/pages/{id}/allow-comment")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> updatePageAllowComment(@PathVariable Long id, @RequestParam Integer allowComment) {
         articleService.updatePageAllowComment(id, allowComment);
         return R.ok();

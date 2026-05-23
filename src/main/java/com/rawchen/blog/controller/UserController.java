@@ -34,7 +34,7 @@ public class UserController {
 
     @ApiOperation("分页查询用户列表")
     @GetMapping("/admin/list")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public R<PageResult<User>> getUserList(
             @RequestParam(defaultValue = "1") Long current,
             @RequestParam(defaultValue = "10") Long size,

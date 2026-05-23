@@ -250,6 +250,15 @@ public class ArticleServiceImpl implements ArticleService {
             vo.setTagIds(tagIds);
         }
 
+        // 访客角色隐藏密码字段
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof User) {
+            User user = (User) auth.getPrincipal();
+            if (user.getRole() == User.UserRole.VISITOR) {
+                vo.setPassword(null);
+            }
+        }
+
         return vo;
     }
 
@@ -853,7 +862,7 @@ public class ArticleServiceImpl implements ArticleService {
                 User author = userMap.get(article.getAuthorId());
                 if (author != null) {
                     vo.setAuthorName(author.getNickname());
-                    vo.setAuthorAvatar(author.getAvatar());
+                    vo.setAuthorEmail(author.getEmail());
                 }
             }
 
@@ -997,7 +1006,6 @@ public class ArticleServiceImpl implements ArticleService {
             User author = userMap.get(article.getAuthorId());
             if (author != null) {
                 vo.setAuthorName(author.getNickname());
-                vo.setAuthorAvatar(author.getAvatar());
             }
         }
 
@@ -1038,7 +1046,6 @@ public class ArticleServiceImpl implements ArticleService {
             User author = userMapper.selectById(article.getAuthorId());
             if (author != null) {
                 vo.setAuthorName(author.getNickname());
-                vo.setAuthorAvatar(author.getAvatar());
             }
         }
 

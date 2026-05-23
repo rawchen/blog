@@ -56,6 +56,7 @@ public class CategoryController {
 
     @ApiOperation("创建分类")
     @PostMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.CATEGORY, description = "创建分类", recordDetail = true)
     public R<Long> createCategory(@RequestBody Category category) {
         return R.ok(categoryService.createCategory(category));
@@ -63,6 +64,7 @@ public class CategoryController {
 
     @ApiOperation("更新分类")
     @PutMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.UPDATE, target = TargetType.CATEGORY, description = "更新分类")
     public R<Void> updateCategory(@RequestBody Category category) {
         categoryService.updateCategory(category);

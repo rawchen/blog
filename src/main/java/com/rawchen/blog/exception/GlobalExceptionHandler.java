@@ -2,7 +2,13 @@ package com.rawchen.blog.exception;
 
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.common.ResultCode;
+import com.rawchen.blog.entity.User;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,6 +36,44 @@ public class GlobalExceptionHandler {
     public R<?> handleBusinessException(BusinessException e) {
         log.error("业务异常: {}", e.getMessage(), e);
         return R.fail(e.getCode(), e.getMessage());
+    }
+
+    /**
+     * Spring Security 认证异常 - 用户名或密码错误
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public R<?> handleBadCredentialsException(BadCredentialsException e) {
+        log.warn("认证失败: {}", e.getMessage());
+        return R.fail(ResultCode.USER_PASSWORD_ERROR.getCode(), "用户名或密码错误");
+    }
+
+    /**
+     * Spring Security 其他认证异常
+     */
+    @ExceptionHandler(AuthenticationException.class)
+    public R<?> handleAuthenticationException(AuthenticationException e) {
+        log.warn("认证异常: {}", e.getMessage());
+        return R.fail(ResultCode.UNAUTHORIZED.getCode(), "认证失败");
+    }
+
+    /**
+     * Spring Security 权限不足异常
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public R<?> handleAccessDeniedException(AccessDeniedException e) {
+        log.warn("权限不足: {}", e.getMessage());
+
+        // 检查是否是访客用户
+        String message = "权限不足";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User) {
+            User user = (User) authentication.getPrincipal();
+            if ("VISITOR".equals(user.getRole().name())) {
+                message = "访客用户，不允许操作";
+            }
+        }
+
+        return R.fail(403, message);
     }
 
     /**
@@ -93,6 +137,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public R handleException(Exception e) {
         log.error("系统异常: {}", e.getMessage(), e);
-        return R.fail(String.valueOf(ResultCode.INTERNAL_SERVER_ERROR));
+        return R.fail(ResultCode.INTERNAL_SERVER_ERROR.getCode(), ResultCode.INTERNAL_SERVER_ERROR.getMessage());
     }
 }

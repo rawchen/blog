@@ -50,6 +50,7 @@ public class MomentController {
 
     @ApiOperation("添加动态")
     @PostMapping("/admin")
+    @PreAuthorize("hasRole('ADMIN')")
     @OperationLogAnnotation(type = OperationType.CREATE, target = TargetType.MOMENT, description = "添加动态", recordDetail = true)
     public R<Long> addMoment(@Valid @RequestBody MomentDTO dto) {
         return R.ok(momentService.addMoment(dto));
@@ -57,6 +58,7 @@ public class MomentController {
 
     @ApiOperation("从RSS订阅拉取")
     @PostMapping("/admin/fetch")
+    @PreAuthorize("hasRole('ADMIN')")
     public R<Void> fetchFromRss(@RequestParam String rssUrl) {
         momentService.fetchFromRss(rssUrl);
         return R.ok();
