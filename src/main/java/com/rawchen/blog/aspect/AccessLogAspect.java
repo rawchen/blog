@@ -142,11 +142,11 @@ public class AccessLogAspect {
             return null;
         }
         if (os.contains(" or ")) {
+            // Windows 10 实际上可能是 Windows 11（相同内核版本）
+            if ("Windows 10".equals(os.substring(0, os.indexOf(" or ")))) {
+                return "Windows 11";
+            }
             return os.substring(0, os.indexOf(" or "));
-        }
-        // Windows 10 实际上可能是 Windows 11（相同内核版本）
-        if ("Windows 10".equals(os)) {
-            return "Windows 11";
         }
         return os;
     }
