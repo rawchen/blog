@@ -7,6 +7,118 @@
   background: #f9f9f9;
 }
 
+/* TOC Directory - fixed on right side */
+.directory-content {
+  position: relative;
+  /* z-index: 0; */
+  max-width: 720px;
+  margin-right: auto!important;
+  margin-left: auto!important;
+  text-align: right;
+  opacity: 0;
+  /* visibility: hidden; */
+  -webkit-transition: .5s;
+  transition: .5s
+}
+
+.directory-content.headroom-not-top {
+  opacity: 1;
+  visibility: visible
+}
+
+#directory {
+  max-width: 247px;
+  height: 557px;
+  position: fixed;
+  /* z-index: 0; */
+  top: 100px;
+  display: inline-block;
+  text-align: left;
+  /*
+    padding-left:120px;
+*/
+  padding-right:0px;
+  margin-left: 134px;
+}
+
+#directory li {
+  font-size: 14px;
+}
+
+#directory li,#directory ul {
+  margin: 0 -6px 0 0;
+  padding-left: 14px;
+  list-style: none
+}
+
+#directory>ul {
+  padding-left: 16px;
+  min-width: 200px;
+  padding-top: 10px;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  position: relative;
+  border-left: 1px solid #ddd;
+  border-top: 2px dashed #ddd;
+  border-bottom: 2px dashed #ddd;
+  box-shadow: 6px 6px 1px #e8e8e8;
+}
+
+#directory>ul>li::before {
+  position: relative;
+  top: -1px;
+  left: -41px;
+  display: inline-block;
+  width: 19px;
+  height: 8px;
+  content: '';
+  background-color: #eb5055;
+}
+
+#directory ul li a {
+  /*
+	display: inline-table;
+  */
+  margin-left: -30px;
+  white-space: break-spaces;
+}
+
+#directory ul li a a {
+  margin-left: 0!important
+}
+
+#directory li ul li {
+  margin-left: -11px;
+}
+
+#directory ul li ul li a {
+  /*
+      margin-left: -17px;
+      white-space: nowrap;
+   */
+  color: #5f5f5f;
+}
+
+#directory ul > li > ul > li > a {
+  margin-left: -19px;
+}
+
+#directory ul li ul li ul li a {
+  margin-left: -24px;
+  color: #5f5f5f
+}
+
+#directory ul li ul li ul li ul li a {
+  margin-left: -31px;
+  color: #5f5f5f
+}
+
+#directory a:hover {
+  /* font-weight: 600; */
+  color: #eb5055
+}
+
 /* Post Header with Thumbnail */
 .post-header-thumb {
   position: relative;
@@ -863,6 +975,12 @@
 
   .post-header-thumb-container {
     top: 70px;
+  }
+}
+
+@media (max-width: 1350px) {
+  .directory-content {
+    display: none;
   }
 }
 

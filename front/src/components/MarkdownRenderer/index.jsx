@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -52,7 +52,7 @@ function CodeBlock({ className, children }) {
   )
 }
 
-function MarkdownRenderer({ content, className = '' }) {
+function MarkdownRenderer({ content, className = '', onTocReady }) {
   const [fancyboxRef] = useFancybox({
     Thumbs: {
       type: 'classic',
@@ -71,17 +71,144 @@ function MarkdownRenderer({ content, className = '' }) {
     return false
   })()
 
-  // 生成目录数据
-  const tocItems = useMemo(() => {
-    if (!content) return []
-    const headings = content.match(/^#{1,6}\s+.+$/gm) || []
-    return headings.map((heading, index) => {
-      const level = heading.match(/^#+/)[0].length
-      const text = heading.replace(/^#+\s+/, '')
-      const id = `heading-${index}`
-      return { level, text, id }
+  // 预处理函数（纯函数，移到组件外部使用）
+  const preprocessContent = useMemo(() => {
+    if (!content) return { processed: '', tocItems: [] }
+
+    let text = content
+
+    // 解析短代码
+    text = text.replace(/\[dplayer\s+([^\]]*)\/\]/g, (match, attrs) => {
+      const urlMatch = attrs.match(/url="([^"]*)"/)
+      const picMatch = attrs.match(/pic="([^"]*)"/)
+      const danmuMatch = attrs.match(/danmu="([^"]*)"/)
+      const autoplayMatch = attrs.match(/autoplay="([^"]*)"/)
+      const additionMatch = attrs.match(/addition="([^"]*)"/)
+      const url = urlMatch ? urlMatch[1] : ''
+      const pic = picMatch ? picMatch[1] : ''
+      const danmu = danmuMatch ? danmuMatch[1] : 'true'
+      const autoplay = autoplayMatch ? autoplayMatch[1] : 'false'
+      const addition = additionMatch ? additionMatch[1] : ''
+      return `<dplayer-data url="${url}" pic="${pic}" danmu="${danmu}" autoplay="${autoplay}" addition="${addition}"></dplayer-data>`
     })
-  }, [content])
+    text = text.replace(/\[player\s+([^\]]*)\/\]/g, (match, attrs) => {
+      const idMatch = attrs.match(/id="([^"]*)"/)
+      const typeMatch = attrs.match(/type="([^"]*)"/)
+      const autoplayMatch = attrs.match(/autoplay="([^"]*)"/)
+      const id = idMatch ? idMatch[1] : ''
+      const type = typeMatch ? typeMatch[1] : 'song'
+      const autoplay = autoplayMatch ? autoplayMatch[1] : 'false'
+      return `<player-data id="${id}" type="${type}" autoplay="${autoplay}"></player-data>`
+    })
+
+    // 修复标题格式
+    text = text.replace(/^(#{1,6})([^\s#])/gm, '$1 $2')
+
+    // 修复换行
+    const fixLineBreaks = (txt) => {
+      const lines = txt.split('\n')
+      let inCodeBlock = false
+      return lines.map((line, i) => {
+        if (line.startsWith('```')) {
+          const isInlineBlock = line.length > 3 && line.endsWith('```') && !line.slice(3, -3).includes('```')
+          if (!isInlineBlock) inCodeBlock = !inCodeBlock
+          return line
+        }
+        if (inCodeBlock) return line
+        if (i === lines.length - 1) return line
+        if (line.trim() === '') return line
+        if (line.startsWith('    ') || line.startsWith('\t') || line.startsWith('> ') ||
+            line.startsWith('- ') || line.startsWith('* ') || line.startsWith('+ ') ||
+            /^\d+\. /.test(line) || line.startsWith('#') || line.includes('|')) {
+          return line
+        }
+        return line + '  '
+      }).join('\n')
+    }
+    text = fixLineBreaks(text)
+
+    // 解析表情
+    text = parseSmilies(text)
+
+    // HTML渲染处理
+    if (!htmlRenderEnabled) {
+      let smiliePlaceholders = []
+      let smilieIndex = 0
+      text = text.replace(/<img class="smilies-img"[^>]*\/>/g, (match) => {
+        smiliePlaceholders.push(match)
+        return `SMILIE_PH_${smilieIndex++}`
+      })
+      let dplayerPlaceholders = []
+      let dplayerIndex = 0
+      text = text.replace(/<dplayer-data[^>]*><\/dplayer-data>/g, (match) => {
+        dplayerPlaceholders.push(match)
+        return `DPLAYER_PH_${dplayerIndex++}`
+      })
+      let playerPlaceholders = []
+      let playerIndex = 0
+      text = text.replace(/<player-data[^>]*><\/player-data>/g, (match) => {
+        playerPlaceholders.push(match)
+        return `PLAYER_PH_${playerIndex++}`
+      })
+      text = text.replace(/<\/?[a-zA-Z][^>]*>/g, (tag) => {
+        return tag.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      })
+      text = text.replace(/SMILIE_PH_(\d+)/g, (_, i) => smiliePlaceholders[parseInt(i)])
+      text = text.replace(/DPLAYER_PH_(\d+)/g, (_, i) => dplayerPlaceholders[parseInt(i)])
+      text = text.replace(/PLAYER_PH_(\d+)/g, (_, i) => playerPlaceholders[parseInt(i)])
+    }
+
+    // 使用处理后的内容计算目录，并将标题替换为带ID的HTML标签（排除代码块）
+    const counters = [0, 0, 0, 0, 0, 0]
+    const tocItems = []
+    let headingIndex = 0
+
+    // 逐行处理，排除代码块内的内容
+    const lines = text.split('\n')
+    let inCodeBlock = false
+    const processedLines = lines.map((line) => {
+      // 检测代码块边界
+      if (line.startsWith('```')) {
+        const isInlineBlock = line.length > 3 && line.endsWith('```') && !line.slice(3, -3).includes('```')
+        if (!isInlineBlock) {
+          inCodeBlock = !inCodeBlock
+        }
+        return line
+      }
+      // 代码块内不处理
+      if (inCodeBlock) return line
+
+      // 匹配标题
+      const headingMatch = line.match(/^(#{1,6})\s+(.+)$/)
+      if (headingMatch) {
+        const hashes = headingMatch[1]
+        const headingText = headingMatch[2]
+        const level = hashes.length
+        const id = `heading-${headingIndex}`
+        headingIndex++
+
+        counters[level - 1]++
+        for (let i = level; i < 6; i++) counters[i] = 0
+        const number = counters.slice(0, level).filter(n => n > 0).join('.')
+
+        tocItems.push({ level, text: headingText, id, number })
+        return `<h${level} id="${id}">${headingText}</h${level}>`
+      }
+      return line
+    })
+
+    return { processed: processedLines.join('\n'), tocItems }
+  }, [content, htmlRenderEnabled])
+
+  const processedContent = preprocessContent.processed
+  const tocItems = preprocessContent.tocItems
+
+  // 目录数据变化时通知父组件
+  useEffect(() => {
+    if (onTocReady) {
+      onTocReady(tocItems)
+    }
+  }, [tocItems, onTocReady])
 
   // 自定义组件
   const components = {
@@ -93,31 +220,13 @@ function MarkdownRenderer({ content, className = '' }) {
     'player-data': ({ id, type, autoplay }) => (
       <PlayerComponent key={id} id={id} type={type} autoplay={autoplay} />
     ),
-    // 为标题添加ID
-    h1: ({ children, ...props }) => {
-      const id = `heading-${tocItems.findIndex(t => t.text === children[0])}`
-      return <h1 id={id} {...props}>{children}</h1>
-    },
-    h2: ({ children, ...props }) => {
-      const id = `heading-${tocItems.findIndex(t => t.text === children[0])}`
-      return <h2 id={id} {...props}>{children}</h2>
-    },
-    h3: ({ children, ...props }) => {
-      const id = `heading-${tocItems.findIndex(t => t.text === children[0])}`
-      return <h3 id={id} {...props}>{children}</h3>
-    },
-    h4: ({ children, ...props }) => {
-      const id = `heading-${tocItems.findIndex(t => t.text === children[0])}`
-      return <h4 id={id} {...props}>{children}</h4>
-    },
-    h5: ({ children, ...props }) => {
-      const id = `heading-${tocItems.findIndex(t => t.text === children[0])}`
-      return <h5 id={id} {...props}>{children}</h5>
-    },
-    h6: ({ children, ...props }) => {
-      const id = `heading-${tocItems.findIndex(t => t.text === children[0])}`
-      return <h6 id={id} {...props}>{children}</h6>
-    },
+    // 标题组件直接使用预处理添加的 ID（已在 HTML 标签中）
+    h1: ({ children, ...props }) => <h1 {...props}>{children}</h1>,
+    h2: ({ children, ...props }) => <h2 {...props}>{children}</h2>,
+    h3: ({ children, ...props }) => <h3 {...props}>{children}</h3>,
+    h4: ({ children, ...props }) => <h4 {...props}>{children}</h4>,
+    h5: ({ children, ...props }) => <h5 {...props}>{children}</h5>,
+    h6: ({ children, ...props }) => <h6 {...props}>{children}</h6>,
     // 外链在新窗口打开
     a: ({ href, children, ...props }) => {
       const isExternal = href && (href.startsWith('http://') || href.startsWith('https://'))
@@ -159,121 +268,6 @@ function MarkdownRenderer({ content, className = '' }) {
   }
 
   if (!content) return null
-
-  // 预处理：修复 # 后无空格的标题（兼容Typecho等宽松解析器）
-  const fixMarkdownHeaders = (text) => {
-    return text.replace(/^(#{1,6})([^\s#])/gm, '$1 $2')
-  }
-
-  // 预处理：解析 dplayer 短代码，转换为 HTML 占位符
-  const parseDPlayerShortcode = (text) => {
-    return text.replace(/\[dplayer\s+([^\]]*)\/\]/g, (match, attrs) => {
-      const urlMatch = attrs.match(/url="([^"]*)"/)
-      const picMatch = attrs.match(/pic="([^"]*)"/)
-      const danmuMatch = attrs.match(/danmu="([^"]*)"/)
-      const autoplayMatch = attrs.match(/autoplay="([^"]*)"/)
-      const additionMatch = attrs.match(/addition="([^"]*)"/)
-
-      const url = urlMatch ? urlMatch[1] : ''
-      const pic = picMatch ? picMatch[1] : ''
-      const danmu = danmuMatch ? danmuMatch[1] : 'true'
-      const autoplay = autoplayMatch ? autoplayMatch[1] : 'false'
-      const addition = additionMatch ? additionMatch[1] : ''
-
-      return `<dplayer-data url="${url}" pic="${pic}" danmu="${danmu}" autoplay="${autoplay}" addition="${addition}"></dplayer-data>`
-    })
-  }
-
-  // 预处理：解析 player 短代码，转换为 HTML 占位符
-  const parsePlayerShortcode = (text) => {
-    return text.replace(/\[player\s+([^\]]*)\/\]/g, (match, attrs) => {
-      const idMatch = attrs.match(/id="([^"]*)"/)
-      const typeMatch = attrs.match(/type="([^"]*)"/)
-      const autoplayMatch = attrs.match(/autoplay="([^"]*)"/)
-
-      const id = idMatch ? idMatch[1] : ''
-      const type = typeMatch ? typeMatch[1] : 'song'
-      const autoplay = autoplayMatch ? autoplayMatch[1] : 'false'
-
-      return `<player-data id="${id}" type="${type}" autoplay="${autoplay}"></player-data>`
-    })
-  }
-
-  // 预处理：将单个换行符转换为Markdown硬换行（两个空格+换行）
-  // 兼容Typecho等宽松解析器的换行行为
-  const fixLineBreaks = (text) => {
-    const lines = text.split('\n')
-    let inCodeBlock = false
-    return lines.map((line, i) => {
-      // 检测代码块开始/结束
-      if (line.startsWith('```')) {
-        // 单行代码块如 ```code``` 不切换状态
-        const isInlineBlock = line.length > 3 && line.endsWith('```') && !line.slice(3, -3).includes('```')
-        if (!isInlineBlock) {
-          inCodeBlock = !inCodeBlock
-        }
-        return line
-      }
-      // 代码块内部不处理
-      if (inCodeBlock) return line
-      // 最后一行不加
-      if (i === lines.length - 1) return line
-      // 空行不加（段落分隔）
-      if (line.trim() === '') return line
-      // 缩进代码块、引用、列表、标题、表格等特殊内容不加
-      if (line.startsWith('    ') ||
-          line.startsWith('\t') ||
-          line.startsWith('> ') ||
-          line.startsWith('- ') ||
-          line.startsWith('* ') ||
-          line.startsWith('+ ') ||
-          /^\d+\. /.test(line) ||
-          line.startsWith('#') ||
-          line.includes('|')) {
-        return line
-      }
-      // 普通文本行，添加两个空格实现硬换行
-      return line + '  '
-    }).join('\n')
-  }
-
-  // 先解析短代码，再修复标题格式，再修复换行，最后解析表情代码
-  let processedContent = parseSmilies(fixLineBreaks(fixMarkdownHeaders(parsePlayerShortcode(parseDPlayerShortcode(content)))))
-
-  // 如果HTML渲染关闭，保护表情标签和dplayer标签，转义其他HTML标签，再恢复表情标签
-  if (!htmlRenderEnabled) {
-    let smiliePlaceholders = []
-    let index = 0
-    // 用占位符替换表情img标签
-    processedContent = processedContent.replace(/<img class="smilies-img"[^>]*\/>/g, (match) => {
-      smiliePlaceholders.push(match)
-      return `SMILIE_PH_${index++}`
-    })
-    // 用占位符替换dplayer标签
-    let dplayerPlaceholders = []
-    let dplayerIndex = 0
-    processedContent = processedContent.replace(/<dplayer-data[^>]*><\/dplayer-data>/g, (match) => {
-      dplayerPlaceholders.push(match)
-      return `DPLAYER_PH_${dplayerIndex++}`
-    })
-    // 用占位符替换player标签
-    let playerPlaceholders = []
-    let playerIndex = 0
-    processedContent = processedContent.replace(/<player-data[^>]*><\/player-data>/g, (match) => {
-      playerPlaceholders.push(match)
-      return `PLAYER_PH_${playerIndex++}`
-    })
-    // 转义剩余HTML标签（仅匹配 <tag> 形式，不影响 Markdown 引用 >）
-    processedContent = processedContent.replace(/<\/?[a-zA-Z][^>]*>/g, (tag) => {
-      return tag.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    })
-    // 恢复表情标签
-    processedContent = processedContent.replace(/SMILIE_PH_(\d+)/g, (_, i) => smiliePlaceholders[parseInt(i)])
-    // 恢复dplayer标签
-    processedContent = processedContent.replace(/DPLAYER_PH_(\d+)/g, (_, i) => dplayerPlaceholders[parseInt(i)])
-    // 恢复player标签
-    processedContent = processedContent.replace(/PLAYER_PH_(\d+)/g, (_, i) => playerPlaceholders[parseInt(i)])
-  }
 
   return (
     <div ref={fancyboxRef} className={`markdown-body ${className}`}>

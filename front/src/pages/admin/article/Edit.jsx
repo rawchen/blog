@@ -410,7 +410,7 @@ function ArticleEdit() {
               </Form.Item>
             </div>
 
-            <Form.Item name="content" rules={[{ required: true, message: '请输入内容' }]} className="content-editor-item">
+            <Form.Item name="content" className="content-editor-item">
               <MarkdownEditor placeholder="请输入Markdown内容，支持粘贴图片自动上传" />
             </Form.Item>
           </Form>

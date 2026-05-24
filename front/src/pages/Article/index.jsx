@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -7,6 +7,7 @@ import { getArticleDetail, incrementViewCount } from '../../api/article'
 import CommentList from '../../components/Comment'
 import MarkdownRenderer from '../../components/MarkdownRenderer'
 import RelatedPosts from '../../components/RelatedPosts'
+import TOC from '../../components/TOC'
 import NotFoundPage from '../NotFound'
 import Headroom from 'headroom.js'
 import eyeIcon from '../../assets/images/eye.png'
@@ -30,9 +31,25 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
   const [loading, setLoading] = useState(true)
   const [showReward, setShowReward] = useState(false)
   const [rewardEnabled, setRewardEnabled] = useState(false)
+  const [tocItems, setTocItems] = useState([])
+  const [isNotTop, setIsNotTop] = useState(false)
   const bottomBarRef = useRef(null)
   const headroomRef = useRef(null)
   const { isAuthenticated } = useSelector(state => state.auth)
+
+  // 接收目录数据的回调
+  const handleTocReady = useCallback((items) => {
+    setTocItems(items)
+  }, [])
+
+  // 监听滚动，控制目录显示
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsNotTop(window.scrollY > 120)
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   useEffect(() => {
     const config = localStorage.getItem('site_config')
@@ -210,7 +227,7 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
 
             {/* Article Content */}
             <div className="article-content">
-              <MarkdownRenderer content={article.content} />
+              <MarkdownRenderer content={article.content} onTocReady={handleTocReady} />
             </div>
           </div>
 
@@ -295,6 +312,15 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
           </div>
         </div>
       </article>
+
+      {/* TOC Directory */}
+      {tocItems.length > 0 && (
+        <div className={`directory-content ${isNotTop ? 'headroom-not-top' : ''}`}>
+          <div id="directory">
+            <TOC items={tocItems} />
+          </div>
+        </div>
+      )}
 
       {/* Comments */}
       {article.allowComment !== false && (

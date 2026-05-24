@@ -98,6 +98,7 @@
   height: 4em;
   width: 4em;
   object-fit: cover;
+  margin: 0;
 }
 
 .c-player .controls .c-left .music-description .music-meta {
