@@ -12,6 +12,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import java.time.ZoneId;
@@ -36,6 +37,7 @@ public class QuartzConfig implements ApplicationRunner {
     @Autowired
     private TaskJobMapper taskJobMapper;
 
+    @Lazy
     @Autowired
     private Scheduler scheduler;
 
