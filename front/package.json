@@ -38,7 +38,9 @@
     "react-router-dom": "^6.20.0",
     "redux": "^5.0.0",
     "rehype-raw": "^7.0.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "simplebar": "^6.3.3",
+    "simplebar-react": "^3.3.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

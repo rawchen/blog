@@ -30,6 +30,8 @@ import { useSelector, useDispatch } from 'react-redux'
 import { clearAuth } from '../../store/modules/auth'
 import { logout } from '../../api/auth'
 import Md5 from 'md5'
+import SimpleBar from 'simplebar-react'
+import 'simplebar-react/dist/simplebar.min.css'
 import './index.css'
 
 const { Header, Sider, Content } = Layout
@@ -138,14 +140,16 @@ function AdminLayout() {
     <Layout className={`admin-layout ${collapsed ? 'sider-collapsed' : ''}`}>
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <div className="logo" onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>{collapsed ? 'BLOG' : '博客管理系统'}</div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          selectedKeys={[selectedKey]}
-          defaultOpenKeys={defaultOpenKeys}
-          items={menuItems}
-          onClick={handleMenuClick}
-        />
+        <SimpleBar className="admin-sider-scrollbar">
+          <Menu
+            theme="dark"
+            mode="inline"
+            selectedKeys={[selectedKey]}
+            defaultOpenKeys={defaultOpenKeys}
+            items={menuItems}
+            onClick={handleMenuClick}
+          />
+        </SimpleBar>
       </Sider>
       <Layout>
         <Header className="header">

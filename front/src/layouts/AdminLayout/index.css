@@ -20,39 +20,42 @@ body:has(.admin-layout) {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .admin-layout > .ant-layout-sider .logo {
   flex-shrink: 0;
 }
 
-.admin-layout > .ant-layout-sider .ant-menu {
+.admin-layout > .ant-layout-sider .admin-sider-scrollbar {
   flex: 1;
-  overflow-y: auto;
   overflow-x: hidden;
-  /* scrollbar-width: none; */
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.admin-layout > .ant-layout-sider .ant-menu::-webkit-scrollbar {
-  width: 0;
-  height: 0;
+.admin-layout > .ant-layout-sider .admin-sider-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-.admin-layout > .ant-layout-sider .ant-menu:hover::-webkit-scrollbar {
-  width: 6px;
-}
-
-.admin-layout > .ant-layout-sider .ant-menu:hover::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.admin-layout > .ant-layout-sider .ant-menu:hover::-webkit-scrollbar-thumb {
+/* SimpleBar 滚动条样式 */
+.admin-sider-scrollbar .simplebar-scrollbar::before {
   background: rgba(255, 255, 255, 0.3);
   border-radius: 3px;
 }
 
-.admin-layout > .ant-layout-sider .ant-menu:hover::-webkit-scrollbar-thumb:hover {
+.admin-sider-scrollbar .simplebar-scrollbar.simplebar-visible::before {
+  opacity: 1;
+}
+
+.admin-sider-scrollbar:hover .simplebar-scrollbar::before {
   background: rgba(255, 255, 255, 0.5);
+}
+
+/* 菜单组件不需要单独设置overflow */
+.admin-layout > .ant-layout-sider .ant-menu {
+  border-inline-end: none !important;
 }
 
 .admin-layout > .ant-layout {
