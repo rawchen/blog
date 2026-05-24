@@ -7,6 +7,8 @@ import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.config.DeepseekConfig;
 import com.rawchen.blog.dto.ArticleDTO;
+import com.rawchen.blog.dto.LatestArticleDTO;
+import com.rawchen.blog.dto.PageDTO;
 import com.rawchen.blog.entity.Article;
 import com.rawchen.blog.entity.ArticleVersion;
 import com.rawchen.blog.enums.OperationType;
@@ -144,7 +146,7 @@ public class ArticleController {
 
     @ApiOperation("最新文章")
     @PostMapping("/latest-article")
-    public R<List<ArticleVO>> getRecentArticles(@RequestBody Map<String, Object> params) {
+    public R<List<LatestArticleDTO>> getRecentArticles(@RequestBody Map<String, Object> params) {
         Integer limit = params.get("limit") != null ? Integer.valueOf(params.get("limit").toString()) : 5;
         return R.ok(articleService.getRecentArticles(limit));
     }
@@ -371,7 +373,7 @@ public class ArticleController {
 
     @ApiOperation("获取独立页面列表（前台导航）")
     @GetMapping("/pages")
-    public R<List<ArticleVO>> getPageList() {
+    public R<List<PageDTO>> getPageList() {
         return R.ok(articleService.getPageList());
     }
 

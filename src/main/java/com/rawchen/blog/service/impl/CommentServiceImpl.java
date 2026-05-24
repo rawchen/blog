@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.dto.CommentDTO;
+import com.rawchen.blog.dto.LatestCommentDTO;
 import com.rawchen.blog.entity.Article;
 import com.rawchen.blog.entity.Comment;
 import com.rawchen.blog.entity.User;
@@ -295,19 +296,27 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentVO> getRecentComments(Integer limit) {
+    public List<LatestCommentDTO> getRecentComments(Integer limit) {
         if (limit == null || limit <= 0) {
             limit = 10;
         }
 
         List<Comment> comments = commentMapper.selectList(new LambdaQueryWrapper<Comment>()
+                .select(Comment::getId, Comment::getArticleId, Comment::getContent,
+                        Comment::getCreateTime, Comment::getNickname)
                 .eq(Comment::getStatus, 1)
                 .orderByDesc(Comment::getCreateTime)
                 .last("LIMIT " + limit));
 
-        return comments.stream()
-                .map(this::convertToVO)
-                .collect(Collectors.toList());
+        return comments.stream().map(comment -> {
+            LatestCommentDTO dto = new LatestCommentDTO();
+            dto.setId(comment.getId());
+            dto.setArticleId(comment.getArticleId());
+            dto.setContent(comment.getContent());
+            dto.setCreateTime(comment.getCreateTime());
+            dto.setNickname(comment.getNickname());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @Override

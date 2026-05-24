@@ -3,6 +3,7 @@ package com.rawchen.blog.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.dto.CommentDTO;
+import com.rawchen.blog.dto.LatestCommentDTO;
 import com.rawchen.blog.entity.Comment;
 import com.rawchen.blog.vo.CommentVO;
 
@@ -51,9 +52,9 @@ public interface CommentService {
     void likeComment(Long id);
 
     /**
-     * 获取最近评论
+     * 获取最近评论（精简字段）
      */
-    List<CommentVO> getRecentComments(Integer limit);
+    List<LatestCommentDTO> getRecentComments(Integer limit);
 
     /**
      * 批量审核评论

@@ -9,11 +9,11 @@ import { dateWord } from '../../../utils/datetime'
 const { RangePicker } = DatePicker
 
 const statusOptions = [
-  { value: 0, label: '草稿' },
-  { value: 1, label: '已发布' },
-  { value: 2, label: '回收站' },
+  { value: 0, label: '待审' },
+  { value: 1, label: '发布' },
+  { value: 2, label: '加密' },
   { value: 3, label: '隐藏' },
-  { value: 4, label: '待审核' }
+  { value: 4, label: '私密' }
 ]
 
 function ArticleList() {

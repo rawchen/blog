@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.common.ResultCode;
 import com.rawchen.blog.dto.ArticleDTO;
+import com.rawchen.blog.dto.LatestArticleDTO;
+import com.rawchen.blog.dto.PageDTO;
 import com.rawchen.blog.entity.*;
 import com.rawchen.blog.exception.BusinessException;
 import com.rawchen.blog.mapper.*;
@@ -628,18 +630,25 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public List<ArticleVO> getRecentArticles(Integer limit) {
+    public List<LatestArticleDTO> getRecentArticles(Integer limit) {
         if (limit == null || limit <= 0) {
             limit = 5;
         }
 
         List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
+                .select(Article::getId, Article::getTitle, Article::getPublishTime)
                 .eq(Article::getStatus, 1)
-                .eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章
+                .eq(Article::getType, Article.ArticleType.POST)
                 .orderByDesc(Article::getPublishTime)
                 .last("LIMIT " + limit));
 
-        return batchConvertToVO(articles);
+        return articles.stream().map(article -> {
+            LatestArticleDTO dto = new LatestArticleDTO();
+            dto.setId(article.getId());
+            dto.setTitle(article.getTitle());
+            dto.setPublishTime(article.getPublishTime());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -1101,12 +1110,24 @@ public class ArticleServiceImpl implements ArticleService {
     // ========== 独立页面相关 ==========
 
     @Override
-    public List<ArticleVO> getPageList() {
+    public List<PageDTO> getPageList() {
         List<Article> pages = articleMapper.selectList(new LambdaQueryWrapper<Article>()
+                .select(Article::getId, Article::getTitle, Article::getSlug,
+                        Article::getStatus, Article::getTemplate, Article::getSortOrder)
                 .eq(Article::getType, Article.ArticleType.PAGE)
                 .orderByAsc(Article::getSortOrder)
                 .orderByDesc(Article::getCreateTime));
-        return batchConvertToVO(pages);
+
+        return pages.stream().map(page -> {
+            PageDTO dto = new PageDTO();
+            dto.setId(page.getId());
+            dto.setTitle(page.getTitle());
+            dto.setSlug(page.getSlug());
+            dto.setStatus(page.getStatus());
+            dto.setTemplate(page.getTemplate());
+            dto.setSortOrder(page.getSortOrder());
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     @Override

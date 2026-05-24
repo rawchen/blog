@@ -4,6 +4,7 @@ import com.rawchen.blog.annotation.OperationLogAnnotation;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.dto.CommentDTO;
+import com.rawchen.blog.dto.LatestCommentDTO;
 import com.rawchen.blog.enums.OperationType;
 import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.service.CommentService;
@@ -62,7 +63,7 @@ public class CommentController {
 
     @ApiOperation("获取最近评论")
     @PostMapping("/latest-comment")
-    public R<List<CommentVO>> getRecentComments(@RequestBody Map<String, Object> params) {
+    public R<List<LatestCommentDTO>> getRecentComments(@RequestBody Map<String, Object> params) {
         Integer limit = params.get("limit") != null ? Integer.valueOf(params.get("limit").toString()) : 10;
         return R.ok(commentService.getRecentComments(limit));
     }

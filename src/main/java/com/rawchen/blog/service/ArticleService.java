@@ -3,6 +3,8 @@ package com.rawchen.blog.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.dto.ArticleDTO;
+import com.rawchen.blog.dto.LatestArticleDTO;
+import com.rawchen.blog.dto.PageDTO;
 import com.rawchen.blog.entity.Article;
 import com.rawchen.blog.entity.ArticleVersion;
 import com.rawchen.blog.vo.ArticleDetailVO;
@@ -105,9 +107,9 @@ public interface ArticleService {
     List<ArticleVO> getRelatedArticles(Long articleId, Integer limit);
 
     /**
-     * 最新文章
+     * 最新文章（精简字段）
      */
-    List<ArticleVO> getRecentArticles(Integer limit);
+    List<LatestArticleDTO> getRecentArticles(Integer limit);
 
     /**
      * 保存草稿
@@ -152,9 +154,9 @@ public interface ArticleService {
     // ========== 独立页面相关 ==========
 
     /**
-     * 获取独立页面列表（前台导航使用）
+     * 获取独立页面列表（前台导航，精简字段）
      */
-    List<ArticleVO> getPageList();
+    List<PageDTO> getPageList();
 
     /**
      * 根据别名获取独立页面详情
