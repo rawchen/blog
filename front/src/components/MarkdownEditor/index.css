@@ -685,6 +685,32 @@
   white-space: nowrap;
 }
 
+.music-result-play-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -8px;
+  margin-right: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.music-result-play-btn:hover {
+  background: #1890ff;
+  color: #fff;
+}
+
+.music-result-play-btn.playing {
+  background: #52c41a;
+  color: #fff;
+}
+
 .music-result-type-tag {
   font-size: 12px;
   color: #1890ff;

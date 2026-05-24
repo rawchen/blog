@@ -86,6 +86,9 @@ function MarkdownEditor({
   const [musicSearchKeyword, setMusicSearchKeyword] = useState('')
   const [musicSearchResults, setMusicSearchResults] = useState([])
   const [musicSearching, setMusicSearching] = useState(false)
+  const [musicPreviewId, setMusicPreviewId] = useState(null) // 正在预览的歌曲ID
+  const [musicPreviewLoading, setMusicPreviewLoading] = useState(false) // 预览加载中
+  const musicPreviewRef = useRef(null) // 预览音频元素
   const [showSmilies, setShowSmilies] = useState(false)
   const [uploadList, setUploadList] = useState([]) // 上传列表 {file, status, url, altText}
   const [previewValue, setPreviewValue] = useState(value) // 防抖后的预览内容
@@ -471,12 +474,19 @@ function MarkdownEditor({
     }
     setMusicSearching(true)
     setMusicSearchResults([])
+    // 停止之前的预览
+    if (musicPreviewRef.current) {
+      musicPreviewRef.current.pause()
+      musicPreviewRef.current = null
+    }
+    setMusicPreviewId(null)
     try {
       // 使用公开的网易云音乐API
-      const response = await fetch(`https://api.injahow.cn/meting/?type=name&id=${encodeURIComponent(keyword)}`)
+      const response = await fetch(`/api/music/search?keyword=${encodeURIComponent(keyword)}&limit=20`)
       const data = await response.json()
-      if (data && Array.isArray(data)) {
-        setMusicSearchResults(data.slice(0, 20)) // 限制显示20条
+      // 后端返回 R 格式: { code: 200, data: [...] }
+      if (data && data.code === 200 && Array.isArray(data.data)) {
+        setMusicSearchResults(data.data.slice(0, 20)) // 限制显示20条
       } else {
         message.info('未找到相关音乐')
       }
@@ -487,6 +497,71 @@ function MarkdownEditor({
       setMusicSearching(false)
     }
   }, [])
+
+  // 预览播放音乐
+  const handlePreviewMusic = useCallback(async (item, e) => {
+    e.stopPropagation() // 阻止事件冒泡，避免触发选择
+
+    // 如果正在播放同一首，则暂停
+    if (musicPreviewId === item.id) {
+      if (musicPreviewRef.current) {
+        musicPreviewRef.current.pause()
+        musicPreviewRef.current = null
+      }
+      setMusicPreviewId(null)
+      return
+    }
+
+    // 停止之前的播放
+    if (musicPreviewRef.current) {
+      musicPreviewRef.current.pause()
+    }
+
+    setMusicPreviewLoading(true)
+    setMusicPreviewId(item.id)
+
+    try {
+      // 如果没有URL，需要获取
+      let playUrl = item.url
+      if (!playUrl) {
+        const response = await fetch(`/api/music/url/${item.id}?br=128`)
+        const data = await response.json()
+        if (data && data.code === 200 && data.data && data.data.url) {
+          playUrl = data.data.url
+          // 更新结果列表中的URL
+          setMusicSearchResults(prev => prev.map(r =>
+            r.id === item.id ? { ...r, url: playUrl } : r
+          ))
+        }
+      }
+
+      if (playUrl) {
+        const audio = new Audio(playUrl)
+        musicPreviewRef.current = audio
+        audio.volume = 0.5
+        audio.play()
+        // 播放结束或出错时清除状态
+        audio.onended = () => {
+          setMusicPreviewId(null)
+          musicPreviewRef.current = null
+        }
+        audio.onerror = () => {
+          message.warning('播放失败，可能需要VIP')
+          setMusicPreviewId(null)
+          musicPreviewRef.current = null
+        }
+      } else {
+        message.warning('无法获取播放链接')
+        setMusicPreviewId(null)
+      }
+    } catch (err) {
+      console.error('预览播放失败:', err)
+      message.error('播放失败')
+      setMusicPreviewId(null)
+    } finally {
+      setMusicPreviewLoading(false)
+    }
+  }, [musicPreviewId])
 
   // 上传文件到OSS
   const uploadToOSS = async (file, ossStyle) => {
@@ -1184,7 +1259,15 @@ function MarkdownEditor({
       <Modal
         title="插入音乐"
         open={musicModalVisible}
-        onCancel={() => setMusicModalVisible(false)}
+        onCancel={() => {
+          // 停止预览播放
+          if (musicPreviewRef.current) {
+            musicPreviewRef.current.pause()
+            musicPreviewRef.current = null
+          }
+          setMusicPreviewId(null)
+          setMusicModalVisible(false)
+        }}
         onOk={() => {
           if (!musicParams.id) {
             message.warning('请输入音乐ID或从搜索结果中选择')
@@ -1197,6 +1280,12 @@ function MarkdownEditor({
             shortcode = `[player id="${musicParams.id}" autoplay="${musicParams.autoplay}" /]`
           }
           insertMultilineText(shortcode)
+          // 停止预览播放
+          if (musicPreviewRef.current) {
+            musicPreviewRef.current.pause()
+            musicPreviewRef.current = null
+          }
+          setMusicPreviewId(null)
           setMusicModalVisible(false)
         }}
         okText="插入"
@@ -1242,6 +1331,23 @@ function MarkdownEditor({
                           }}
                         >
                           <img src={item.pic} alt="" className="music-result-cover" />
+                          <div
+                            className={`music-result-play-btn ${musicPreviewId === item.id ? 'playing' : ''}`}
+                            onClick={(e) => handlePreviewMusic(item, e)}
+                            title={musicPreviewId === item.id ? '暂停预览' : '预览播放'}
+                          >
+                            {musicPreviewLoading && musicPreviewId === item.id ? (
+                              <Spin size="small" />
+                            ) : musicPreviewId === item.id ? (
+                              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                              </svg>
+                            ) : (
+                              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M8 5v14l11-7z"/>
+                              </svg>
+                            )}
+                          </div>
                           <div className="music-result-info">
                             <div className="music-result-title">{item.name}</div>
                             <div className="music-result-artist">{item.artist}</div>

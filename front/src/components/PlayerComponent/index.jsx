@@ -87,8 +87,8 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
         setError(null)
 
         const apiUrl = type === 'collect'
-          ? `https://api.injahow.cn/meting/?type=playlist&id=${id}`
-          : `https://api.injahow.cn/meting/?type=song&id=${id}`
+          ? `/api/music/meting?type=playlist&id=${id}`
+          : `/api/music/meting?type=song&id=${id}`
 
         const response = await fetch(apiUrl)
         const data = await response.json()
@@ -155,11 +155,33 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
 
     const currentSong = songs[currentIndex]
     if (currentSong) {
-      audioRef.current.src = currentSong.url
-      audioRef.current.volume = isMuted ? 0 : volume
-      if (isPlaying) {
-        audioRef.current.play().catch(() => {})
+      const playSong = async () => {
+        let songUrl = currentSong.url
+        // 如果没有URL，动态获取
+        if (!songUrl && currentSong.id) {
+          try {
+            const response = await fetch(`/api/music/url/${currentSong.id}?br=320`)
+            const data = await response.json()
+            if (data && data.data && data.data.url) {
+              songUrl = data.data.url
+              // 更新歌曲URL缓存
+              setSongs(prev => prev.map((s, i) =>
+                i === currentIndex ? { ...s, url: songUrl } : s
+              ))
+            }
+          } catch (err) {
+            console.error('获取播放链接失败:', err)
+          }
+        }
+        if (songUrl) {
+          audioRef.current.src = songUrl
+          audioRef.current.volume = isMuted ? 0 : volume
+          if (isPlaying) {
+            audioRef.current.play().catch(() => {})
+          }
+        }
       }
+      playSong()
     }
   }, [currentIndex, songs])
 
