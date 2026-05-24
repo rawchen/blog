@@ -54,6 +54,8 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   const [showLyric, setShowLyric] = useState(false)
   const [showList, setShowList] = useState(true)
   const [lyricsCache, setLyricsCache] = useState({})
+  const [isDragging, setIsDragging] = useState(false)
+  const [dragTime, setDragTime] = useState(0)
 
   const audioRef = useRef(null)
   const lyricBodyRef = useRef(null)
@@ -251,11 +253,64 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   const handleProgressClick = useCallback((e) => {
     if (!audioRef.current) return
     const rect = e.currentTarget.getBoundingClientRect()
-    const percent = (e.clientX - rect.left) / rect.width
+    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
     const newTime = percent * duration
     audioRef.current.currentTime = newTime
     setCurrentTime(newTime)
   }, [duration])
+
+  // 进度条拖动
+  const progressBarRef = useRef(null)
+
+  const getTimeFromX = useCallback((clientX) => {
+    if (!progressBarRef.current) return 0
+    const rect = progressBarRef.current.getBoundingClientRect()
+    const percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+    return percent * duration
+  }, [duration])
+
+  const handleDragStart = useCallback((e) => {
+    e.preventDefault()
+    setIsDragging(true)
+    const clientX = e.clientX || (e.touches && e.touches[0]?.clientX)
+    if (clientX) {
+      const newTime = getTimeFromX(clientX)
+      setDragTime(newTime)
+    }
+  }, [getTimeFromX])
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    const handleDragMove = (e) => {
+      const clientX = e.clientX || (e.touches && e.touches[0]?.clientX)
+      if (clientX) {
+        const newTime = getTimeFromX(clientX)
+        setDragTime(newTime)
+      }
+    }
+
+    const handleDragEnd = (e) => {
+      const clientX = e.clientX || (e.changedTouches && e.changedTouches[0]?.clientX)
+      if (audioRef.current && clientX) {
+        const newTime = getTimeFromX(clientX)
+        audioRef.current.currentTime = newTime
+        setCurrentTime(newTime)
+      }
+      setIsDragging(false)
+    }
+
+    document.addEventListener('mousemove', handleDragMove)
+    document.addEventListener('mouseup', handleDragEnd)
+    document.addEventListener('touchmove', handleDragMove)
+    document.addEventListener('touchend', handleDragEnd)
+    return () => {
+      document.removeEventListener('mousemove', handleDragMove)
+      document.removeEventListener('mouseup', handleDragEnd)
+      document.removeEventListener('touchmove', handleDragMove)
+      document.removeEventListener('touchend', handleDragEnd)
+    }
+  }, [isDragging, getTimeFromX])
 
   // 音量调整
   const handleVolumeChange = useCallback((e) => {
@@ -339,7 +394,8 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   const lrcUrl = currentSong?.lrc
   const lyricText = lrcUrl ? (lyricsCache[lrcUrl] || '') : ''
   const lyrics = parseLyric(lyricText)
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0
+  const displayTime = isDragging ? dragTime : currentTime
+  const progress = duration > 0 ? (displayTime / duration) * 100 : 0
 
   const getCurrentLyricIndex = () => {
     for (let i = lyrics.length - 1; i >= 0; i--) {
@@ -396,13 +452,13 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
 
         <div className="c-center">
           <div className="time">
-            <div className="time-body" onClick={handleProgressClick}>
-              <div className="time-line" style={{ width: `${progress}%` }}>
-                <div className="time-point"></div>
+            <div className="time-body" ref={progressBarRef} onClick={handleProgressClick}>
+              <div className={`time-line ${isDragging ? 'dragging' : ''}`} style={{ width: `${progress}%` }}>
+                <div className="time-point" onMouseDown={handleDragStart} onTouchStart={handleDragStart}></div>
               </div>
             </div>
             <span className="time-text">
-              {formatTime(currentTime)} / {formatTime(duration)}
+              {formatTime(displayTime)} / {formatTime(duration)}
             </span>
           </div>
         </div>

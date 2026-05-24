@@ -6,12 +6,14 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.rawchen.blog.service.ConfigService;
 import com.rawchen.blog.service.MusicService;
 import com.rawchen.blog.util.NetEaseCryptoUtil;
 import com.rawchen.blog.vo.MusicLyricVO;
 import com.rawchen.blog.vo.MusicUrlVO;
 import com.rawchen.blog.vo.MusicVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,6 +31,9 @@ import java.util.stream.Collectors;
 @Service
 public class MusicServiceImpl implements MusicService {
 
+    @Autowired
+    private ConfigService configService;
+
     private static final String BASE_URL = "https://music.163.com";
     private static final String EAPI_BASE_URL = "https://music.163.com/eapi";
 
@@ -40,10 +45,11 @@ public class MusicServiceImpl implements MusicService {
         String deviceId = NetEaseCryptoUtil.generateDeviceId();
         String timestamp = String.valueOf(System.currentTimeMillis());
         String requestId = timestamp + String.format("%04d", (int) (Math.random() * 1000));
+        String musicU = configService.getConfigByKey("music_u", "");
 
         headers.put("User-Agent", "Mozilla/5.0 (Linux; Android 11; M2007J3SC Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045714 Mobile Safari/537.36 NeteaseMusic/8.7.01");
         headers.put("Referer", "music.163.com");
-        headers.put("Cookie", String.format("osver=android; appver=8.7.01; os=android; deviceId=%s; channel=netease; requestId=%s; __remember_me=true", deviceId, requestId));
+        headers.put("Cookie", String.format("osver=android; appver=8.7.01; os=android; deviceId=%s; channel=netease; requestId=%s; __remember_me=true; MUSIC_U=%s", deviceId, requestId, musicU));
         headers.put("Content-Type", "application/x-www-form-urlencoded");
         headers.put("Accept", "*/*");
         headers.put("Accept-Language", "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7");

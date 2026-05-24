@@ -81,6 +81,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/article/like/**",
                         "/api/article/search",
                         "/api/article/timeline",
+                        "/api/article/archive",
                         "/api/article/random",
                         "/api/article/recommend",
                         "/api/article/*/related",

@@ -30,6 +30,7 @@ const camelToSnake = {
   ossEnabled: 'oss_enabled',
   ossStyle: 'oss_style',
   gravatarDomain: 'gravatar_domain',
+  musicU: 'music_u',
   commentEnabled: 'comment_enabled',
   mailEnabled: 'mail_enabled',
   totalPv: 'total_pv',
@@ -228,6 +229,9 @@ function Setting() {
               </Form.Item>
               <Form.Item label="Gravatar头像域名" name="gravatar_domain">
                 <Input placeholder="如：weavatar.com，为空则默认使用weavatar.com" />
+              </Form.Item>
+              <Form.Item label={<span><Tooltip title="用户身份验证令牌，关联网易云音乐账号信息，用于解除VIP歌曲30秒限制。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 网易云身份令牌</span>} name="music_u">
+                <Input placeholder="可登录music.163.com后在Cookie中找到MUSIC_U复制填入" />
               </Form.Item>
               <Form.Item label="开启评论审核" name="comment_enabled" valuePropName="checked">
                 <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setCommentEnabled(checked)} />

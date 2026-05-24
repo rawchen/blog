@@ -202,6 +202,10 @@
   border-radius: 0.5em;
 }
 
+.c-player .controls .c-center .time .time-line.dragging {
+  transition: none;
+}
+
 .c-player .controls .c-center .time .time-point {
   width: 1em;
   height: 1em;
@@ -210,6 +214,19 @@
   border-radius: 100%;
   position: absolute;
   right: 0;
+  cursor: grab;
+  touch-action: none;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.c-player .controls .c-center .time .time-point:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 6px rgba(107, 196, 222, 0.6);
+}
+
+.c-player .controls .c-center .time .time-point:active {
+  cursor: grabbing;
+  transform: scale(1.3);
 }
 
 .c-player .controls .c-center .time .time-text {
