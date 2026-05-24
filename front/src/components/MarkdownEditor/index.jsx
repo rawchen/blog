@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
-import { Tooltip, message, Dropdown, Modal } from 'antd'
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { Tooltip, message, Dropdown, Modal, Input, Switch, Radio, Tabs, Spin } from 'antd'
 import {
   EditOutlined,
   EyeOutlined,
@@ -22,7 +22,8 @@ import {
   FullscreenExitOutlined,
   BorderVerticleOutlined,
   JavaScriptOutlined,
-  UpOutlined
+  UpOutlined,
+  VideoCameraOutlined, FontSizeOutlined, SmileOutlined, CustomerServiceOutlined
 } from '@ant-design/icons'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -40,6 +41,8 @@ import 'prismjs/components/prism-css'
 import 'prismjs/components/prism-markup'
 import { getStsToken } from '../../api/oss'
 import { uploadImageLocal } from '../../api/config'
+import DPlayerComponent from '../DPlayerComponent'
+import { SMILIES_LIST, SMILIES_MAP, parseSmilies } from '../../utils/smilies'
 import './index.css'
 
 // 动态导入 ali-oss
@@ -66,7 +69,48 @@ function MarkdownEditor({
   const [mode, setMode] = useState('split') // 'edit' | 'preview' | 'split'
   const [uploading, setUploading] = useState(false)
   const [imageModalVisible, setImageModalVisible] = useState(false)
+  const [videoModalVisible, setVideoModalVisible] = useState(false)
+  const [videoParams, setVideoParams] = useState({
+    url: '',
+    pic: '',
+    addition: '',
+    danmu: true,
+    autoplay: false
+  })
+  const [musicModalVisible, setMusicModalVisible] = useState(false)
+  const [musicParams, setMusicParams] = useState({
+    id: '',
+    type: 'song',
+    autoplay: false
+  })
+  const [musicSearchKeyword, setMusicSearchKeyword] = useState('')
+  const [musicSearchResults, setMusicSearchResults] = useState([])
+  const [musicSearching, setMusicSearching] = useState(false)
+  const [showSmilies, setShowSmilies] = useState(false)
   const [uploadList, setUploadList] = useState([]) // 上传列表 {file, status, url, altText}
+  const [previewValue, setPreviewValue] = useState(value) // 防抖后的预览内容
+  const previewTimerRef = useRef(null)
+
+  // 防抖更新预览内容（300ms 延迟）
+  useEffect(() => {
+    if (previewTimerRef.current) {
+      clearTimeout(previewTimerRef.current)
+    }
+    previewTimerRef.current = setTimeout(() => {
+      setPreviewValue(value)
+    }, 300)
+    return () => {
+      if (previewTimerRef.current) {
+        clearTimeout(previewTimerRef.current)
+      }
+    }
+  }, [value])
+
+  // 插入表情
+  const insertSmilie = (code) => {
+    insertText(`${code}`, '', '')
+    setShowSmilies(false)
+  }
   const [dragActive, setDragActive] = useState(false)
   const [fullscreen, setFullscreen] = useState(false)
   const [showBackTop, setShowBackTop] = useState(false)
@@ -74,72 +118,107 @@ function MarkdownEditor({
   const fileInputRef = useRef(null)
   const previewRef = useRef(null)
 
-  // 在光标处插入文本
+  // 在光标处插入文本（支持 undo）
   const insertText = useCallback((before, after = '', placeholder = '') => {
     const textarea = textareaRef.current
     if (!textarea || disabled) return
+
+    textarea.focus()
 
     const start = textarea.selectionStart
     const end = textarea.selectionEnd
     const selectedText = value.substring(start, end)
     const textToInsert = selectedText || placeholder
+    const fullText = before + textToInsert + after
 
-    const newValue =
-      value.substring(0, start) +
-      before + textToInsert + after +
-      value.substring(end)
+    // 使用 execCommand 插入文本，支持 undo
+    const success = document.execCommand('insertText', false, fullText)
 
-    onChange?.(newValue)
+    if (!success) {
+      // 降级方案：直接修改 value（不支持 undo）
+      const newValue = value.substring(0, start) + fullText + value.substring(end)
+      onChange?.(newValue)
+    }
 
     // 设置光标位置并滚动到可见区域
-    setTimeout(() => {
-      textarea.focus()
+    requestAnimationFrame(() => {
       let newStart, newEnd
       if (selectedText) {
-        // 如果有选中文本，光标放在插入内容之后
-        newStart = newEnd = start + before.length + textToInsert.length + after.length
+        newStart = newEnd = start + fullText.length
       } else {
-        // 如果没有选中文本，光标放在占位符位置（选中占位符便于替换）
         newStart = start + before.length
         newEnd = start + before.length + placeholder.length
       }
       textarea.selectionStart = newStart
       textarea.selectionEnd = newEnd
 
-      // 滚动到光标位置，确保光标可见
-      // 计算光标所在行的大致位置
       const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 20
-      const linesBeforeCursor = newValue.substring(0, newStart).split('\n').length
+      const linesBeforeCursor = (value.substring(0, newStart) + fullText).split('\n').length
       const scrollTarget = Math.max(0, (linesBeforeCursor - 1) * lineHeight - textarea.clientHeight / 2)
       textarea.scrollTop = scrollTarget
-    }, 0)
-  }, [value, onChange, disabled])
+    })
+  }, [value, disabled])
 
-  // 插入多行文本（如代码块、列表等）
+  // 插入多行文本（如代码块、列表等，支持 undo）
   const insertMultilineText = useCallback((text) => {
     const textarea = textareaRef.current
     if (!textarea || disabled) return
 
-    const start = textarea.selectionStart
-    const newValue =
-      value.substring(0, start) +
-      text +
-      value.substring(textarea.selectionEnd)
+    textarea.focus()
 
-    onChange?.(newValue)
+    // 使用 execCommand 插入文本，支持 undo
+    const success = document.execCommand('insertText', false, text)
 
-    setTimeout(() => {
-      textarea.focus()
-      const newCursorPos = start + text.length
+    if (!success) {
+      const start = textarea.selectionStart
+      const newValue = value.substring(0, start) + text + value.substring(textarea.selectionEnd)
+      onChange?.(newValue)
+    }
+
+    requestAnimationFrame(() => {
+      const newCursorPos = textarea.selectionStart
       textarea.selectionStart = textarea.selectionEnd = newCursorPos
 
-      // 滚动到光标位置
       const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 20
-      const linesBeforeCursor = newValue.substring(0, newCursorPos).split('\n').length
+      const linesBeforeCursor = textarea.value.substring(0, newCursorPos).split('\n').length
       const scrollTarget = Math.max(0, (linesBeforeCursor - 1) * lineHeight - textarea.clientHeight / 2)
       textarea.scrollTop = scrollTarget
-    }, 0)
-  }, [value, onChange, disabled])
+    })
+  }, [value, disabled])
+
+  // 解析 dplayer 短代码
+  const parseDPlayerShortcode = (text) => {
+    return text.replace(/\[dplayer\s+([^\]]*)\/\]/g, (match, attrs) => {
+      const urlMatch = attrs.match(/url="([^"]*)"/)
+      const picMatch = attrs.match(/pic="([^"]*)"/)
+      const danmuMatch = attrs.match(/danmu="([^"]*)"/)
+      const autoplayMatch = attrs.match(/autoplay="([^"]*)"/)
+      const additionMatch = attrs.match(/addition="([^"]*)"/)
+
+      const url = urlMatch ? urlMatch[1] : ''
+      const pic = picMatch ? picMatch[1] : ''
+      const danmu = danmuMatch ? danmuMatch[1] : 'true'
+      const autoplay = autoplayMatch ? autoplayMatch[1] : 'false'
+      const addition = additionMatch ? additionMatch[1] : ''
+
+      return `<dplayer-data url="${url}" pic="${pic}" danmu="${danmu}" autoplay="${autoplay}" addition="${addition}"></dplayer-data>`
+    })
+  }
+
+  // 解析 player 短代码
+  const parsePlayerShortcode = (text) => {
+    return text.replace(/\[player\s+([^\]]*)\/\]/g, (match, attrs) => {
+      const idMatch = attrs.match(/id="([^"]*)"/)
+      const typeMatch = attrs.match(/type="([^"]*)"/)
+      const autoplayMatch = attrs.match(/autoplay="([^"]*)"/)
+
+      const id = idMatch ? idMatch[1] : ''
+      const type = typeMatch ? typeMatch[1] : 'song'
+      const autoplay = autoplayMatch ? autoplayMatch[1] : 'false'
+
+      return `<player-data id="${id}" type="${type}" autoplay="${autoplay}"></player-data>`
+    })
+  }
 
   // 工具栏按钮配置
   const toolbarButtons = [
@@ -168,7 +247,7 @@ function MarkdownEditor({
     { type: 'divider' },
     {
       key: 'heading',
-      icon: <FileMarkdownOutlined />,
+      icon: <FontSizeOutlined />,
       tooltip: '标题',
       dropdown: true
     },
@@ -249,7 +328,6 @@ function MarkdownEditor({
       shiftKey: true,
       action: () => insertText('- [ ] ', '', '待办项')
     },
-    { type: 'divider' },
     {
       key: 'divider',
       icon: <BorderVerticleOutlined />,
@@ -257,6 +335,34 @@ function MarkdownEditor({
       shortcut: '-',
       shiftKey: true,
       action: () => insertMultilineText('\n\n---\n\n')
+    },
+    { type: 'divider' },
+    {
+      key: 'music',
+      icon: <CustomerServiceOutlined />,
+      tooltip: '插入音乐',
+      action: () => {
+        setMusicParams({ id: '', type: 'song', autoplay: false })
+        setMusicSearchKeyword('')
+        setMusicSearchResults([])
+        setMusicModalVisible(true)
+      }
+    },
+    {
+      key: 'video',
+      icon: <VideoCameraOutlined />,
+      tooltip: '插入视频',
+      action: () => {
+        setVideoParams({ url: '', pic: '', addition: '', danmu: true, autoplay: false })
+        setVideoModalVisible(true)
+      }
+    },
+    {
+      key: 'smilies',
+      icon: <SmileOutlined />,
+      tooltip: '插入表情',
+      dropdown: true,
+      smilies: true
     }
   ]
 
@@ -357,6 +463,31 @@ function MarkdownEditor({
     }
   }
 
+  // 搜索网易云音乐
+  const searchNetEaseMusic = useCallback(async (keyword) => {
+    if (!keyword || !keyword.trim()) {
+      message.warning('请输入搜索关键词')
+      return
+    }
+    setMusicSearching(true)
+    setMusicSearchResults([])
+    try {
+      // 使用公开的网易云音乐API
+      const response = await fetch(`https://api.injahow.cn/meting/?type=name&id=${encodeURIComponent(keyword)}`)
+      const data = await response.json()
+      if (data && Array.isArray(data)) {
+        setMusicSearchResults(data.slice(0, 20)) // 限制显示20条
+      } else {
+        message.info('未找到相关音乐')
+      }
+    } catch (error) {
+      console.error('搜索失败:', error)
+      message.error('搜索失败，请稍后重试')
+    } finally {
+      setMusicSearching(false)
+    }
+  }, [])
+
   // 上传文件到OSS
   const uploadToOSS = async (file, ossStyle) => {
     try {
@@ -438,24 +569,29 @@ function MarkdownEditor({
     const textarea = textareaRef.current
     if (!textarea) return
 
+    textarea.focus()
+
     const imageMarkdown = `![${altText}](${imageUrl})`
-    const start = textarea.selectionStart
-    const end = textarea.selectionEnd
-    const newValue = value.substring(0, start) + imageMarkdown + value.substring(end)
 
-    onChange?.(newValue)
+    // 使用 execCommand 插入文本，支持 undo
+    const success = document.execCommand('insertText', false, imageMarkdown)
 
-    setTimeout(() => {
-      textarea.focus()
-      const newCursorPos = start + imageMarkdown.length
+    if (!success) {
+      const start = textarea.selectionStart
+      const end = textarea.selectionEnd
+      const newValue = value.substring(0, start) + imageMarkdown + value.substring(end)
+      onChange?.(newValue)
+    }
+
+    requestAnimationFrame(() => {
+      const newCursorPos = textarea.selectionStart
       textarea.selectionStart = textarea.selectionEnd = newCursorPos
 
-      // 滚动到光标位置
       const lineHeight = parseInt(getComputedStyle(textarea).lineHeight) || 20
-      const linesBeforeCursor = newValue.substring(0, newCursorPos).split('\n').length
+      const linesBeforeCursor = textarea.value.substring(0, newCursorPos).split('\n').length
       const scrollTarget = Math.max(0, (linesBeforeCursor - 1) * lineHeight - textarea.clientHeight / 2)
       textarea.scrollTop = scrollTarget
-    }, 0)
+    })
   }
 
   // 处理图片上传
@@ -734,6 +870,46 @@ function MarkdownEditor({
               )
             }
 
+            // 表情按钮
+            if (btn.key === 'smilies') {
+              return (
+                <Dropdown
+                  key={btn.key}
+                  dropdownRender={() => (
+                    <div className="smilies-dropdown">
+                      {SMILIES_LIST.map(code => (
+                        <span
+                          key={code}
+                          className="smilie-item"
+                          title={code}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            insertSmilie(code)
+                          }}
+                        >
+                          <img
+                            src={`/smilies/bilibili/${SMILIES_MAP[code]}`}
+                            alt={code}
+                            className="smilie-img"
+                          />
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  trigger={['click']}
+                  open={showSmilies}
+                  onOpenChange={setShowSmilies}
+                >
+                  <Tooltip title={btn.tooltip}>
+                    <div className="toolbar-btn">
+                      {btn.icon}
+                    </div>
+                  </Tooltip>
+                </Dropdown>
+              )
+            }
+
             // 普通按钮
             return (
               <Tooltip key={btn.key} title={btn.tooltip}>
@@ -810,6 +986,52 @@ function MarkdownEditor({
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeRaw]}
                 components={{
+                  'dplayer-data': ({ url, pic }) => (
+                    <div className="dplayer-placeholder" style={{
+                      margin: '16px 0',
+                      borderRadius: 6,
+                      overflow: 'hidden',
+                      background: '#000',
+                      position: 'relative',
+                      paddingBottom: '56.25%',
+                    }}>
+                      {pic ? (
+                        <img src={pic} alt="视频封面" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />
+                      ) : null}
+                      <div style={{
+                        position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                        width: 48, height: 48, background: 'rgba(255,255,255,0.8)', borderRadius: '50%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                        <VideoCameraOutlined style={{ fontSize: 24, color: '#333', marginLeft: 3 }} />
+                      </div>
+                    </div>
+                  ),
+                  'player-data': ({ id, type }) => (
+                    <div className="player-placeholder" style={{
+                      margin: '16px 0',
+                      borderRadius: 8,
+                      overflow: 'hidden',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      padding: '16px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                    }}>
+                      <div style={{
+                        width: 48, height: 48, background: 'rgba(255,255,255,0.2)', borderRadius: '50%',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                      }}>
+                        <CustomerServiceOutlined style={{ fontSize: 24, color: '#fff' }} />
+                      </div>
+                      <div>
+                        <div style={{ color: '#fff', fontSize: 14, fontWeight: 500 }}>
+                          {type === 'collect' ? '歌单' : '单曲'}播放器
+                        </div>
+                        <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12 }}>ID: {id}</div>
+                      </div>
+                    </div>
+                  ),
                   pre: ({ children }) => children,
                   code: ({ className, children, ...props }) => {
                     const match = /language-(\w+)/.exec(className || '')
@@ -829,7 +1051,7 @@ function MarkdownEditor({
                   }
                 }}
               >
-                {value}
+                {parseSmilies(parsePlayerShortcode(parseDPlayerShortcode(value)))}
               </ReactMarkdown>
             ) : (
               <div className="md-editor-preview-empty">预览区域</div>
@@ -893,6 +1115,198 @@ function MarkdownEditor({
             ))}
           </div>
         )}
+      </Modal>
+
+      {/* 视频插入弹窗 */}
+      <Modal
+        title="插入视频"
+        open={videoModalVisible}
+        onCancel={() => setVideoModalVisible(false)}
+        onOk={() => {
+          if (!videoParams.url) {
+            message.warning('请输入视频链接')
+            return
+          }
+          const shortcode = `[dplayer url="${videoParams.url}" pic="${videoParams.pic}" autoplay="${videoParams.autoplay}" danmu="${videoParams.danmu}" addition="${videoParams.addition}" /]`
+          insertMultilineText(shortcode)
+          setVideoModalVisible(false)
+        }}
+        okText="确定"
+        cancelText="取消"
+        width={480}
+      >
+        {/*<p style={{ color: '#8c8c8c', marginBottom: 16 }}>在下方输入参数</p>*/}
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>视频链接</label>
+          <Input
+            placeholder="https://example.com/video.mp4"
+            value={videoParams.url}
+            onChange={(e) => setVideoParams(prev => ({ ...prev, url: e.target.value }))}
+          />
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>封面图</label>
+          <Input
+            placeholder="https://example.com/cover.jpg"
+            value={videoParams.pic}
+            onChange={(e) => setVideoParams(prev => ({ ...prev, pic: e.target.value }))}
+          />
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>额外弹幕源</label>
+          <Input
+            placeholder="https://example.com/danmu.json"
+            value={videoParams.addition}
+            onChange={(e) => setVideoParams(prev => ({ ...prev, addition: e.target.value }))}
+          />
+        </div>
+        <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <label style={{ fontWeight: 500 }}>开启弹幕</label>
+              <Switch
+                checked={videoParams.danmu}
+                onChange={(checked) => setVideoParams(prev => ({ ...prev, danmu: checked }))}
+              />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <label style={{ fontWeight: 500 }}>自动播放</label>
+              <Switch
+                checked={videoParams.autoplay}
+                onChange={(checked) => setVideoParams(prev => ({ ...prev, autoplay: checked }))}
+              />
+            </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* 音乐插入弹窗 */}
+      <Modal
+        title="插入音乐"
+        open={musicModalVisible}
+        onCancel={() => setMusicModalVisible(false)}
+        onOk={() => {
+          if (!musicParams.id) {
+            message.warning('请输入音乐ID或从搜索结果中选择')
+            return
+          }
+          let shortcode
+          if (musicParams.type === 'collect') {
+            shortcode = `[player id="${musicParams.id}" type="collect" autoplay="${musicParams.autoplay}" /]`
+          } else {
+            shortcode = `[player id="${musicParams.id}" autoplay="${musicParams.autoplay}" /]`
+          }
+          insertMultilineText(shortcode)
+          setMusicModalVisible(false)
+        }}
+        okText="插入"
+        cancelText="取消"
+        width={560}
+      >
+        <Tabs
+          defaultActiveKey="search"
+          items={[
+            {
+              key: 'search',
+              label: '搜索音乐',
+              children: (
+                <div>
+                  <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
+                    <Input
+                      placeholder="输入歌曲名称、歌手或歌单名称..."
+                      value={musicSearchKeyword}
+                      onChange={(e) => setMusicSearchKeyword(e.target.value)}
+                      onPressEnter={() => searchNetEaseMusic(musicSearchKeyword)}
+                      style={{ flex: 1 }}
+                    />
+                    <button
+                      className="music-search-btn"
+                      onClick={() => searchNetEaseMusic(musicSearchKeyword)}
+                      disabled={musicSearching}
+                    >
+                      {musicSearching ? <Spin size="small" /> : '搜索'}
+                    </button>
+                  </div>
+                  {musicSearchResults.length > 0 && (
+                    <div className="music-search-results">
+                      {musicSearchResults.map((item, index) => (
+                        <div
+                          key={index}
+                          className={`music-result-item ${musicParams.id === item.id ? 'selected' : ''}`}
+                          onClick={() => {
+                            setMusicParams(prev => ({
+                              ...prev,
+                              id: item.id,
+                              type: item.type === 'playlist' ? 'collect' : 'song'
+                            }))
+                          }}
+                        >
+                          <img src={item.pic} alt="" className="music-result-cover" />
+                          <div className="music-result-info">
+                            <div className="music-result-title">{item.name}</div>
+                            <div className="music-result-artist">{item.artist}</div>
+                          </div>
+                          <div className="music-result-type-tag">
+                            {item.type === 'playlist' ? '歌单' : '歌曲'}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {musicSearching && musicSearchResults.length === 0 && (
+                    <div className="music-search-loading">
+                      <Spin />
+                      <span>正在搜索...</span>
+                    </div>
+                  )}
+                  {!musicSearching && musicSearchResults.length === 0 && (
+                    <div className="music-search-empty">
+                      输入关键词搜索网易云音乐
+                    </div>
+                  )}
+                </div>
+              )
+            },
+            {
+              key: 'manual',
+              label: '手动输入ID',
+              children: (
+                <div>
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>类型</label>
+                    <Radio.Group
+                      value={musicParams.type}
+                      onChange={(e) => setMusicParams(prev => ({ ...prev, type: e.target.value }))}
+                    >
+                      <Radio value="song">单曲</Radio>
+                      <Radio value="collect">歌单</Radio>
+                    </Radio.Group>
+                  </div>
+                  <div style={{ marginBottom: 16 }}>
+                    <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>
+                      网易云音乐ID
+                    </label>
+                    <Input
+                      placeholder={musicParams.type === 'collect' ? '输入歌单ID，如：471071972' : '输入歌曲ID，如：38592976'}
+                      value={musicParams.id}
+                      onChange={(e) => setMusicParams(prev => ({ ...prev, id: e.target.value }))}
+                    />
+                    <p style={{ color: '#8c8c8c', fontSize: 12, marginTop: 8 }}>
+                      从网易云音乐网页版获取ID，例如歌曲链接 https://music.163.com/#/song?id=38592976 中的 38592976
+                    </p>
+                  </div>
+                </div>
+              )
+            }
+          ]}
+        />
+        <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <label style={{ fontWeight: 500 }}>自动播放</label>
+          <Switch
+            checked={musicParams.autoplay}
+            onChange={(checked) => setMusicParams(prev => ({ ...prev, autoplay: checked }))}
+          />
+        </div>
       </Modal>
     </div>
   )

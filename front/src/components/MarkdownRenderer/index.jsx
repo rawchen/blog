@@ -15,6 +15,8 @@ import 'prismjs/components/prism-css'
 import 'prismjs/components/prism-markup'
 import useFancybox from '../../hooks/useFancybox'
 import { parseSmilies } from '../../utils/smilies'
+import DPlayerComponent from '../DPlayerComponent'
+import PlayerComponent from '../PlayerComponent'
 import './index.css'
 
 // 代码块组件
@@ -83,6 +85,14 @@ function MarkdownRenderer({ content, className = '' }) {
 
   // 自定义组件
   const components = {
+    // dplayer 短代码组件
+    'dplayer-data': ({ url, pic, danmu, autoplay, addition }) => (
+      <DPlayerComponent key={url} url={url} pic={pic} danmu={danmu} autoplay={autoplay} addition={addition} />
+    ),
+    // player 短代码组件
+    'player-data': ({ id, type, autoplay }) => (
+      <PlayerComponent key={id} id={id} type={type} autoplay={autoplay} />
+    ),
     // 为标题添加ID
     h1: ({ children, ...props }) => {
       const id = `heading-${tocItems.findIndex(t => t.text === children[0])}`
@@ -155,6 +165,40 @@ function MarkdownRenderer({ content, className = '' }) {
     return text.replace(/^(#{1,6})([^\s#])/gm, '$1 $2')
   }
 
+  // 预处理：解析 dplayer 短代码，转换为 HTML 占位符
+  const parseDPlayerShortcode = (text) => {
+    return text.replace(/\[dplayer\s+([^\]]*)\/\]/g, (match, attrs) => {
+      const urlMatch = attrs.match(/url="([^"]*)"/)
+      const picMatch = attrs.match(/pic="([^"]*)"/)
+      const danmuMatch = attrs.match(/danmu="([^"]*)"/)
+      const autoplayMatch = attrs.match(/autoplay="([^"]*)"/)
+      const additionMatch = attrs.match(/addition="([^"]*)"/)
+
+      const url = urlMatch ? urlMatch[1] : ''
+      const pic = picMatch ? picMatch[1] : ''
+      const danmu = danmuMatch ? danmuMatch[1] : 'true'
+      const autoplay = autoplayMatch ? autoplayMatch[1] : 'false'
+      const addition = additionMatch ? additionMatch[1] : ''
+
+      return `<dplayer-data url="${url}" pic="${pic}" danmu="${danmu}" autoplay="${autoplay}" addition="${addition}"></dplayer-data>`
+    })
+  }
+
+  // 预处理：解析 player 短代码，转换为 HTML 占位符
+  const parsePlayerShortcode = (text) => {
+    return text.replace(/\[player\s+([^\]]*)\/\]/g, (match, attrs) => {
+      const idMatch = attrs.match(/id="([^"]*)"/)
+      const typeMatch = attrs.match(/type="([^"]*)"/)
+      const autoplayMatch = attrs.match(/autoplay="([^"]*)"/)
+
+      const id = idMatch ? idMatch[1] : ''
+      const type = typeMatch ? typeMatch[1] : 'song'
+      const autoplay = autoplayMatch ? autoplayMatch[1] : 'false'
+
+      return `<player-data id="${id}" type="${type}" autoplay="${autoplay}"></player-data>`
+    })
+  }
+
   // 预处理：将单个换行符转换为Markdown硬换行（两个空格+换行）
   // 兼容Typecho等宽松解析器的换行行为
   const fixLineBreaks = (text) => {
@@ -193,10 +237,10 @@ function MarkdownRenderer({ content, className = '' }) {
     }).join('\n')
   }
 
-  // 先修复标题格式，再修复换行，最后解析表情代码
-  let processedContent = parseSmilies(fixLineBreaks(fixMarkdownHeaders(content)))
+  // 先解析短代码，再修复标题格式，再修复换行，最后解析表情代码
+  let processedContent = parseSmilies(fixLineBreaks(fixMarkdownHeaders(parsePlayerShortcode(parseDPlayerShortcode(content)))))
 
-  // 如果HTML渲染关闭，保护表情标签，转义其他HTML标签，再恢复表情标签
+  // 如果HTML渲染关闭，保护表情标签和dplayer标签，转义其他HTML标签，再恢复表情标签
   if (!htmlRenderEnabled) {
     let smiliePlaceholders = []
     let index = 0
@@ -205,12 +249,30 @@ function MarkdownRenderer({ content, className = '' }) {
       smiliePlaceholders.push(match)
       return `SMILIE_PH_${index++}`
     })
+    // 用占位符替换dplayer标签
+    let dplayerPlaceholders = []
+    let dplayerIndex = 0
+    processedContent = processedContent.replace(/<dplayer-data[^>]*><\/dplayer-data>/g, (match) => {
+      dplayerPlaceholders.push(match)
+      return `DPLAYER_PH_${dplayerIndex++}`
+    })
+    // 用占位符替换player标签
+    let playerPlaceholders = []
+    let playerIndex = 0
+    processedContent = processedContent.replace(/<player-data[^>]*><\/player-data>/g, (match) => {
+      playerPlaceholders.push(match)
+      return `PLAYER_PH_${playerIndex++}`
+    })
     // 转义剩余HTML标签（仅匹配 <tag> 形式，不影响 Markdown 引用 >）
     processedContent = processedContent.replace(/<\/?[a-zA-Z][^>]*>/g, (tag) => {
       return tag.replace(/</g, '&lt;').replace(/>/g, '&gt;')
     })
     // 恢复表情标签
     processedContent = processedContent.replace(/SMILIE_PH_(\d+)/g, (_, i) => smiliePlaceholders[parseInt(i)])
+    // 恢复dplayer标签
+    processedContent = processedContent.replace(/DPLAYER_PH_(\d+)/g, (_, i) => dplayerPlaceholders[parseInt(i)])
+    // 恢复player标签
+    processedContent = processedContent.replace(/PLAYER_PH_(\d+)/g, (_, i) => playerPlaceholders[parseInt(i)])
   }
 
   return (

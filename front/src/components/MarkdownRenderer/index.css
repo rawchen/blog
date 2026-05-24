@@ -400,3 +400,17 @@
   width: 20px;
   height: 20px;
 }
+
+/* DPlayer 视频播放器 */
+.markdown-body .dplayer-wrapper {
+  margin: 20px 0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Player 音乐播放器 - 在markdown-body中的额外样式 */
+.markdown-body .c-player {
+  margin: 20px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}

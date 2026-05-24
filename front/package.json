@@ -40,7 +40,8 @@
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
     "simplebar": "^6.3.3",
-    "simplebar-react": "^3.3.2"
+    "simplebar-react": "^3.3.2",
+    "react-dplayer": "^0.4.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

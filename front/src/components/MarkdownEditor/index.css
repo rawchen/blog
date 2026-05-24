@@ -572,3 +572,142 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
 }
+
+/* 表情下拉菜单 */
+.smilies-dropdown {
+  width: 318px;
+  padding: 8px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08);
+}
+
+.smilies-dropdown .smilie-item {
+  cursor: pointer;
+  display: inline-block;
+  padding: 2px;
+  margin: 1px;
+  border-radius: 4px;
+  transition: transform 0.2s ease;
+}
+
+.smilies-dropdown .smilie-item:hover {
+  transform: scale(1.1);
+}
+
+.smilies-dropdown .smilie-img {
+  max-width: 28px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* 音乐搜索样式 */
+.music-search-btn {
+  padding: 4px 16px;
+  background: #1890ff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+  min-width: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.music-search-btn:hover {
+  background: #40a9ff;
+}
+
+.music-search-btn:disabled {
+  background: #d9d9d9;
+  cursor: not-allowed;
+}
+
+.music-search-results {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+}
+
+.music-result-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.music-result-item:last-child {
+  border-bottom: none;
+}
+
+.music-result-item:hover {
+  background: #f5f5f5;
+}
+
+.music-result-item.selected {
+  background: #e6f7ff;
+}
+
+.music-result-cover {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  object-fit: cover;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.music-result-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.music-result-title {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.music-result-artist {
+  font-size: 12px;
+  color: #8c8c8c;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.music-result-type-tag {
+  font-size: 12px;
+  color: #1890ff;
+  background: #e6f7ff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.music-search-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #8c8c8c;
+  gap: 12px;
+}
+
+.music-search-empty {
+  text-align: center;
+  padding: 40px;
+  color: #bfbfbf;
+}
+

@@ -485,6 +485,7 @@
 .smilies-img {
   max-width: 30px !important;
   display: inline-block !important;
+  box-shadow: none !important;
   vertical-align: middle;
   margin: -5px 0px 0px 0px;
 }
