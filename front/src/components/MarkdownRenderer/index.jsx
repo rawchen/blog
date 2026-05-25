@@ -52,7 +52,7 @@ function CodeBlock({ className, children }) {
   )
 }
 
-function MarkdownRenderer({ content, className = '', onTocReady }) {
+const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, className = '', onTocReady }) {
   const [fancyboxRef] = useFancybox({
     Thumbs: {
       type: 'classic',
@@ -210,8 +210,8 @@ function MarkdownRenderer({ content, className = '', onTocReady }) {
     }
   }, [tocItems, onTocReady])
 
-  // 自定义组件
-  const components = {
+  // 自定义组件 - 使用 useMemo 避免每次渲染重新创建
+  const components = useMemo(() => ({
     // dplayer 短代码组件
     'dplayer-data': ({ url, pic, danmu, autoplay, addition }) => (
       <DPlayerComponent key={url} url={url} pic={pic} danmu={danmu} autoplay={autoplay} addition={addition} />
@@ -265,7 +265,7 @@ function MarkdownRenderer({ content, className = '', onTocReady }) {
       // 代码块
       return <CodeBlock className={className}>{children}</CodeBlock>
     }
-  }
+  }), [])
 
   if (!content) return null
 
@@ -280,6 +280,6 @@ function MarkdownRenderer({ content, className = '', onTocReady }) {
       </ReactMarkdown>
     </div>
   )
-}
+})
 
 export default MarkdownRenderer

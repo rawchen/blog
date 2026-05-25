@@ -26,29 +26,27 @@ function TOC({ items }) {
   useEffect(() => {
     if (!items || items.length === 0) return
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id)
-          }
-        })
-      },
-      {
-        rootMargin: '-80px 0px -70% 0px',
-        threshold: 0
-      }
-    )
+    const offset = 100
 
-    items.forEach((item) => {
-      const element = document.getElementById(item.id)
-      if (element) {
-        observer.observe(element)
+    const handleScroll = () => {
+      let currentId = null
+      for (const item of items) {
+        const element = document.getElementById(item.id)
+        if (element) {
+          const rect = element.getBoundingClientRect()
+          if (rect.top <= offset) {
+            currentId = item.id
+          }
+        }
       }
-    })
+      setActiveId(currentId)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
 
     return () => {
-      observer.disconnect()
+      window.removeEventListener('scroll', handleScroll)
     }
   }, [items])
 

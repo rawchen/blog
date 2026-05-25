@@ -119,6 +119,11 @@
   color: #eb5055
 }
 
+#directory a.active {
+  color: #eb5055 !important;
+  font-weight: 600
+}
+
 /* Post Header with Thumbnail */
 .post-header-thumb {
   position: relative;

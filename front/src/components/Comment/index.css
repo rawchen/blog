@@ -167,12 +167,18 @@
 }
 
 .comment-author-at a {
-  color: #eb5055 !important;
-  border-bottom: none !important;
+  /*color: #eb5055 !important;*/
+  /*border-bottom: none !important;*/
+}
+
+.comment-author-at a:hover {
+  border-bottom: 1px solid #b8b8b8;
+  /*color: #eb5055 !important;*/
+  /*border-bottom: none !important;*/
 }
 
 .comment-author-at a::after {
-  display: none;
+  width: 100%;
 }
 
 .comment-meta {
