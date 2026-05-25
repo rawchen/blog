@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Form, Input, InputNumber, Button, message, Spin, Card, Switch, Row, Col, Tooltip, DatePicker } from 'antd'
 import { QuestionCircleOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
-import { getSiteConfig, updateConfigs } from '../../../api/config'
+import { getAllConfig, updateConfigs } from '../../../api/config'
 
 // 字段映射：驼峰 -> 下划线
 const camelToSnake = {
@@ -66,12 +66,18 @@ function Setting() {
   const loadConfig = async () => {
     setLoading(true)
     try {
-      const res = await getSiteConfig()
-      if (res.data) {
+      const res = await getAllConfig()
+      if (res.data && Array.isArray(res.data)) {
+        // 将配置列表转换为对象 { configKey: configValue }
+        const configMap = {}
+        res.data.forEach(item => {
+          configMap[item.configKey] = item.configValue
+        })
+
         // 驼峰转下划线填充表单
         const formValues = {}
         Object.entries(camelToSnake).forEach(([camelKey, snakeKey]) => {
-          let value = res.data[camelKey]
+          let value = configMap[snakeKey]
           // 布尔值字段特殊处理
           if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled' || camelKey === 'mailEnabled' || camelKey === 'typewriterEnabled' || camelKey === 'htmlRenderEnabled' || camelKey === 'rewardEnabled' || camelKey === 'relatedPostsEnabled') {
             value = value === true || value === 'true'
