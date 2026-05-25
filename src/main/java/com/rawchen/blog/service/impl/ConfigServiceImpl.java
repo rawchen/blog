@@ -57,6 +57,9 @@ public class ConfigServiceImpl implements ConfigService {
     private static final String KEY_TYPEWRITER_ENABLED = "typewriter_enabled";
     private static final String KEY_HTML_RENDER_ENABLED = "html_render_enabled";
     private static final String KEY_REWARD_ENABLED = "reward_enabled";
+    private static final String KEY_RELATED_POSTS_ENABLED = "related_posts_enabled";
+    private static final String KEY_ARTICLE_PAGE_SIZE = "article_page_size";
+    private static final String KEY_MUSIC_U = "music_u";
 
     @Override
     public SiteConfigVO getSiteConfig() {
@@ -92,6 +95,8 @@ public class ConfigServiceImpl implements ConfigService {
         vo.setTypewriterEnabled(Boolean.parseBoolean(getConfigByKey(KEY_TYPEWRITER_ENABLED, "true")));
         vo.setHtmlRenderEnabled(Boolean.parseBoolean(getConfigByKey(KEY_HTML_RENDER_ENABLED, "false")));
         vo.setRewardEnabled(Boolean.parseBoolean(getConfigByKey(KEY_REWARD_ENABLED, "true")));
+        vo.setRelatedPostsEnabled(Boolean.parseBoolean(getConfigByKey(KEY_RELATED_POSTS_ENABLED, "true")));
+        vo.setArticlePageSize(Integer.parseInt(getConfigByKey(KEY_ARTICLE_PAGE_SIZE, "5")));
 
         return vo;
     }

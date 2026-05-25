@@ -150,6 +150,16 @@ public class SiteConfigVO implements Serializable {
     private Boolean rewardEnabled;
 
     /**
+     * 是否开启相关文章
+     */
+    private Boolean relatedPostsEnabled;
+
+    /**
+     * 文章分页大小
+     */
+    private Integer articlePageSize;
+
+    /**
      * 历史累积PV
      */
     private String totalPv;
