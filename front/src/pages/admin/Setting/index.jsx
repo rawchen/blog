@@ -31,6 +31,8 @@ const camelToSnake = {
   ossStyle: 'oss_style',
   gravatarDomain: 'gravatar_domain',
   musicU: 'music_u',
+  articlePageSize: 'article_page_size',
+  relatedPostsEnabled: 'related_posts_enabled',
   commentEnabled: 'comment_enabled',
   mailEnabled: 'mail_enabled',
   totalPv: 'total_pv',
@@ -54,6 +56,7 @@ function Setting() {
   const [typewriterEnabled, setTypewriterEnabled] = useState(true)
   const [htmlRenderEnabled, setHtmlRenderEnabled] = useState(false)
   const [rewardEnabled, setRewardEnabled] = useState(false)
+  const [relatedPostsEnabled, setRelatedPostsEnabled] = useState(true)
   const [form] = Form.useForm()
 
   useEffect(() => {
@@ -70,7 +73,7 @@ function Setting() {
         Object.entries(camelToSnake).forEach(([camelKey, snakeKey]) => {
           let value = res.data[camelKey]
           // 布尔值字段特殊处理
-          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled' || camelKey === 'mailEnabled' || camelKey === 'typewriterEnabled' || camelKey === 'htmlRenderEnabled' || camelKey === 'rewardEnabled') {
+          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled' || camelKey === 'mailEnabled' || camelKey === 'typewriterEnabled' || camelKey === 'htmlRenderEnabled' || camelKey === 'rewardEnabled' || camelKey === 'relatedPostsEnabled') {
             value = value === true || value === 'true'
           }
           // 日期字段转为dayjs对象
@@ -86,6 +89,7 @@ function Setting() {
         setTypewriterEnabled(formValues['typewriter_enabled'])
         setHtmlRenderEnabled(formValues['html_render_enabled'])
         setRewardEnabled(formValues['reward_enabled'])
+        setRelatedPostsEnabled(formValues['related_posts_enabled'] ?? true)
       }
     } catch (e) {
       console.error('加载配置失败', e)
@@ -117,6 +121,9 @@ function Setting() {
       if (values.reward_enabled !== undefined) {
         values.reward_enabled = String(values.reward_enabled)
       }
+      if (values.related_posts_enabled !== undefined) {
+        values.related_posts_enabled = String(values.related_posts_enabled)
+      }
       // 处理数字字段转字符串
       if (values.total_pv !== undefined && values.total_pv !== null) {
         values.total_pv = String(values.total_pv)
@@ -140,7 +147,7 @@ function Setting() {
         const camelKey = snakeToCamel[key]
         if (camelKey) {
           // 布尔值字段保持布尔值
-          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled' || camelKey === 'mailEnabled' || camelKey === 'typewriterEnabled' || camelKey === 'htmlRenderEnabled' || camelKey === 'rewardEnabled') {
+          if (camelKey === 'ossEnabled' || camelKey === 'commentEnabled' || camelKey === 'mailEnabled' || camelKey === 'typewriterEnabled' || camelKey === 'htmlRenderEnabled' || camelKey === 'rewardEnabled' || camelKey === 'relatedPostsEnabled') {
             cacheData[camelKey] = value === 'true'
           } else {
             cacheData[camelKey] = value
@@ -158,8 +165,8 @@ function Setting() {
   return (
     <Form
       form={form}
-      labelCol={{ span: 6 }}
-      wrapperCol={{ span: 18 }}
+      labelCol={{ span: 8 }}
+      wrapperCol={{ span: 16 }}
       onFinish={handleSave}
     >
       <Spin spinning={loading}>
@@ -216,54 +223,93 @@ function Setting() {
           <Col span={12}>
             <Card title="系统设置">
               <Form.Item label="统计链接" name="stats_url">
-                <Input placeholder="统计查看链接，如 https://umami.example.com" />
+                <Input placeholder="统计查看链接，如 https://umami.example.com"/>
               </Form.Item>
               <Form.Item label="跟踪代码" name="tracking_code">
-                <Input.TextArea rows={2} placeholder='跟踪脚本代码，如：<script async defer src="https://umami.example.com/umami.js"></script>' />
+                <Input.TextArea rows={2}
+                                placeholder='跟踪脚本代码，如：<script async defer src="https://umami.example.com/umami.js"></script>'/>
               </Form.Item>
-              <Form.Item label="开启OSS上传" name="oss_enabled" valuePropName="checked">
-                <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setOssEnabled(checked)} />
+              <Form.Item label={<span><Tooltip title="开启OSS云存储上传图片，后面参数为OSS图片处理样式不填则不拼接"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> OSS上传</span>}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Form.Item name="oss_enabled" valuePropName="checked" noStyle>
+                    <Switch checkedChildren="开" unCheckedChildren="关" onChange={(checked) => setOssEnabled(checked)}/>
+                  </Form.Item>
+                  {ossEnabled && (
+                    <Form.Item name="oss_style" noStyle style={{ flex: 1 }}>
+                      <Input placeholder="如：?x-oss-process=style/small"/>
+                    </Form.Item>
+                  )}
+                </div>
               </Form.Item>
-              <Form.Item label="OSS图片处理样式" name="oss_style" style={{ display: ossEnabled ? 'block' : 'none' }}>
-                <Input placeholder="如：?x-oss-process=style/small" />
+              <Form.Item label="Gravatar域名" name="gravatar_domain">
+                <Input placeholder="如：weavatar.com，为空则默认使用weavatar.com"/>
               </Form.Item>
-              <Form.Item label="Gravatar头像域名" name="gravatar_domain">
-                <Input placeholder="如：weavatar.com，为空则默认使用weavatar.com" />
+              <Form.Item label={<span><Tooltip title="用户身份验证令牌，关联网易云音乐账号信息，用于解除VIP歌曲30秒限制。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 网易云令牌</span>} name="music_u">
+                <Input placeholder="登录music.163.com后Cookie中MUSIC_U"/>
               </Form.Item>
-              <Form.Item label={<span><Tooltip title="用户身份验证令牌，关联网易云音乐账号信息，用于解除VIP歌曲30秒限制。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 网易云身份令牌</span>} name="music_u">
-                <Input placeholder="可登录music.163.com后在Cookie中找到MUSIC_U复制填入" />
-              </Form.Item>
-              <Form.Item label="开启评论审核" name="comment_enabled" valuePropName="checked">
-                <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setCommentEnabled(checked)} />
-              </Form.Item>
-              <Form.Item label="开启邮件通知" name="mail_enabled" valuePropName="checked">
-                <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setMailEnabled(checked)} />
-              </Form.Item>
-              <Form.Item label={<span><Tooltip title="开启后文章底部显示打赏按钮，点击弹出二维码。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 开启文章打赏</span>} name="reward_enabled" valuePropName="checked">
-                <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setRewardEnabled(checked)} />
-              </Form.Item>
-              <Form.Item label={<span><Tooltip title="开启后文章中的HTML标签将被渲染为真实元素，关闭则HTML标签以纯文本显示。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 渲染HTML</span>} name="html_render_enabled" valuePropName="checked">
-                <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setHtmlRenderEnabled(checked)} />
-              </Form.Item>
-              <Form.Item label="开启打字机" name="typewriter_enabled" valuePropName="checked">
-                <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => setTypewriterEnabled(checked)} />
-              </Form.Item>
-              <Form.Item label={<span><Tooltip title="打字机效果循环显示的技能，逗号分隔。如：写博客,极简化,户外运动"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 技能列表</span>} name="skill_list" style={{ display: typewriterEnabled ? 'block' : 'none' }}>
-                <Input placeholder="逗号分隔，如：写博客,极简化,户外运动" />
+              <Form.Item label={<span><Tooltip title="打字机效果循环显示的技能，逗号分隔"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 打字机</span>}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Form.Item name="typewriter_enabled" valuePropName="checked" noStyle>
+                    <Switch checkedChildren="开" unCheckedChildren="关" onChange={(checked) => setTypewriterEnabled(checked)}/>
+                  </Form.Item>
+                  {typewriterEnabled && (
+                    <Form.Item name="skill_list" noStyle style={{ flex: 1 }}>
+                      <Input placeholder="写博客,极简化,户外运动"/>
+                    </Form.Item>
+                  )}
+                </div>
               </Form.Item>
               <Form.Item label={<span><Tooltip title="系统自动累积，清理日志前会自动保存。可手动设置初始值。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 历史累积PV</span>} name="total_pv">
-                <InputNumber min={0} style={{ width: '100%' }} placeholder="历史累积总访问量" />
+                <InputNumber min={0} style={{width: '100%'}} placeholder="历史累积总访问量"/>
               </Form.Item>
               <Form.Item label={<span><Tooltip title="系统自动累积，清理日志前会自动保存。可手动设置初始值。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 历史累积UV</span>} name="total_uv">
-                <InputNumber min={0} style={{ width: '100%' }} placeholder="历史累积独立访客数" />
+                <InputNumber min={0} style={{width: '100%'}} placeholder="历史累积独立访客数"/>
               </Form.Item>
               <Form.Item label={<span><Tooltip title="用于在页脚计算网站已运行时间。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 建站日期</span>} name="site_create_date">
-                <DatePicker style={{ width: '100%' }} placeholder="选择建站日期" />
+                <DatePicker style={{width: '100%'}} placeholder="选择建站日期"/>
               </Form.Item>
+              <Form.Item label={<span><Tooltip title="首页文章列表每页显示的文章数量。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 文章分页大小</span>} name="article_page_size">
+                <InputNumber min={1} max={50} style={{width: '100%'}} placeholder="默认10"/>
+              </Form.Item>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 24px', marginBottom: 24 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Tooltip title="开启后文章底部显示相关文章推荐。"><QuestionCircleOutlined style={{ color: '#999' }} /></Tooltip>
+                    <span>相关文章</span>
+                    <Form.Item name="related_posts_enabled" valuePropName="checked" noStyle>
+                      <Switch checkedChildren="开" unCheckedChildren="关" onChange={(checked) => setRelatedPostsEnabled(checked)}/>
+                    </Form.Item>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span>评论审核</span>
+                    <Form.Item name="comment_enabled" valuePropName="checked" noStyle>
+                      <Switch checkedChildren="开" unCheckedChildren="关" onChange={(checked) => setCommentEnabled(checked)}/>
+                    </Form.Item>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <span>邮件通知</span>
+                    <Form.Item name="mail_enabled" valuePropName="checked" noStyle>
+                      <Switch checkedChildren="开" unCheckedChildren="关" onChange={(checked) => setMailEnabled(checked)}/>
+                    </Form.Item>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Tooltip title="开启后文章底部显示打赏按钮，点击弹出二维码。"><QuestionCircleOutlined style={{ color: '#999' }} /></Tooltip>
+                    <span>打赏</span>
+                    <Form.Item name="reward_enabled" valuePropName="checked" noStyle>
+                      <Switch checkedChildren="开" unCheckedChildren="关" onChange={(checked) => setRewardEnabled(checked)}/>
+                    </Form.Item>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <Tooltip title="开启后文章中的HTML标签将被渲染为真实元素，关闭则HTML标签以纯文本显示。"><QuestionCircleOutlined style={{ color: '#999' }} /></Tooltip>
+                    <span>渲染HTML</span>
+                    <Form.Item name="html_render_enabled" valuePropName="checked" noStyle>
+                      <Switch checkedChildren="开" unCheckedChildren="关" onChange={(checked) => setHtmlRenderEnabled(checked)}/>
+                    </Form.Item>
+                  </div>
+                </div>
             </Card>
           </Col>
         </Row>
-        <div style={{ marginTop: 24, textAlign: 'center' }}>
+        <div style={{marginTop: 24, textAlign: 'center'}}>
           <Button type="primary" htmlType="submit" loading={saving}>
             保存设置
           </Button>

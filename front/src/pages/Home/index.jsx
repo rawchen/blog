@@ -26,7 +26,7 @@ function Home() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
   const [current, setCurrent] = useState(parseInt(page) || 1)
-  const [size] = useState(10)
+  const [size, setSize] = useState(10) // 从后端返回获取
   const [total, setTotal] = useState(0)
   const siteConfig = useSelector(state => state.siteConfig.data) || {}
   const typingRef = useRef(null)
@@ -75,9 +75,10 @@ function Home() {
   const fetchArticles = async () => {
     setLoading(true)
     try {
-      const res = await getArticleList({ current, size })
+      const res = await getArticleList({ current })
       setArticles(res.data.records || [])
       setTotal(res.data.total || 0)
+      if (res.data.size) setSize(res.data.size)
     } finally {
       setLoading(false)
     }

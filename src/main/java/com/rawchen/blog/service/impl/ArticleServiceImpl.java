@@ -11,6 +11,7 @@ import com.rawchen.blog.entity.*;
 import com.rawchen.blog.exception.BusinessException;
 import com.rawchen.blog.mapper.*;
 import com.rawchen.blog.service.ArticleService;
+import com.rawchen.blog.service.ConfigService;
 import com.rawchen.blog.vo.ArticleDetailVO;
 import com.rawchen.blog.vo.ArticleEditVO;
 import com.rawchen.blog.vo.ArticleVO;
@@ -62,9 +63,23 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private ArticleVersionMapper articleVersionMapper;
 
+    @Autowired
+    private ConfigService configService;
+
     @Override
     public PageResult<ArticleVO> getArticleList(Long current, Long size, Long categoryId, Long tagId, String keyword) {
-        Page<Article> page = new Page<>(current, size);
+        // 从系统配置获取分页大小，默认10
+        Long pageSize = size;
+        if (pageSize == null || pageSize <= 0) {
+            String configSize = configService.getConfigByKey("article_page_size", "10");
+            try {
+                pageSize = Long.parseLong(configSize);
+            } catch (NumberFormatException e) {
+                pageSize = 10L;
+            }
+        }
+
+        Page<Article> page = new Page<>(current, pageSize);
 
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Article::getStatus, 1) // 已发布

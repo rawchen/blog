@@ -14,7 +14,7 @@
   border-radius: 8px;
   overflow: hidden;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
 }
 
 .c-player * {
@@ -80,9 +80,11 @@
 
 /* 控制区域 */
 .c-player .controls {
+  z-index: 1;
   background: white;
   height: 4em;
   display: flex;
+  box-shadow: rgb(0 0 0 / 1%) 0px 2px 8px;
 }
 
 .c-player .controls .c-left {
@@ -99,6 +101,7 @@
   width: 4em;
   object-fit: cover;
   margin: 0;
+  box-shadow: none;
 }
 
 .c-player .controls .c-left .music-description .music-meta {

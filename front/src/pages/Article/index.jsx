@@ -31,6 +31,7 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
   const [loading, setLoading] = useState(true)
   const [showReward, setShowReward] = useState(false)
   const [rewardEnabled, setRewardEnabled] = useState(false)
+  const [relatedPostsEnabled, setRelatedPostsEnabled] = useState(true)
   const [tocItems, setTocItems] = useState([])
   const [isNotTop, setIsNotTop] = useState(false)
   const bottomBarRef = useRef(null)
@@ -57,6 +58,7 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
       try {
         const parsed = JSON.parse(config)
         setRewardEnabled(parsed.rewardEnabled === true)
+        setRelatedPostsEnabled(parsed.relatedPostsEnabled !== false)
       } catch (e) {}
     }
   }, [])
@@ -260,7 +262,7 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
         </div>
 
         {/* Related Posts */}
-        <RelatedPosts articleId={id} limit={5}/>
+        {relatedPostsEnabled && <RelatedPosts articleId={id} limit={5}/>}
 
         {/* Next/Prev Navigation */}
         <div className="post-next-prev">

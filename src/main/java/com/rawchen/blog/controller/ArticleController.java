@@ -59,11 +59,11 @@ public class ArticleController {
     @AccessLogAnnotation("HOME")
     public R<PageResult<ArticleVO>> getArticleList(@RequestBody Map<String, Object> params) {
         Long current = params.get("current") != null ? Long.valueOf(params.get("current").toString()) : 1L;
-        Long size = params.get("size") != null ? Long.valueOf(params.get("size").toString()) : 10L;
+        // size 不再使用前端传入值，由后端配置决定
         Long categoryId = params.get("categoryId") != null ? Long.valueOf(params.get("categoryId").toString()) : null;
         Long tagId = params.get("tagId") != null ? Long.valueOf(params.get("tagId").toString()) : null;
         String keyword = params.get("keyword") != null ? params.get("keyword").toString() : null;
-        return R.ok(articleService.getArticleList(current, size, categoryId, tagId, keyword));
+        return R.ok(articleService.getArticleList(current, null, categoryId, tagId, keyword));
     }
 
     @ApiOperation("获取文章详情（前台）")
