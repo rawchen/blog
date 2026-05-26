@@ -32,7 +32,7 @@ public class CategoryController {
 
     @ApiOperation("获取分类列表")
     @GetMapping("/category-list")
-    @AccessLogAnnotation("CATEGORY")
+//    @AccessLogAnnotation("CATEGORY")
     public R<List<CategoryVO>> getCategoryList() {
         return R.ok(categoryService.getCategoryList());
     }
