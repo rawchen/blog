@@ -120,7 +120,13 @@ function Home() {
               丨
               <a href="https://ai.rawchen.com" target="_blank" rel="noopener noreferrer" style={{border: 'none'}}>AI</a>
               丨
-              <span id="moment-span" href="https://rawchen.com/moment"><img src={momentIcon} id="moment" /> </span>
+              <Link
+                  id="moment-span"
+                  to={`/moment`}
+              >
+                <img src={momentIcon} id="moment" />
+              </Link>
+              {/*<a id="moment-span" href="/moment"> </a>*/}
               丨
               <a href="https://pan.rawchen.com" target="_blank" rel="noopener noreferrer"
                  style={{border: 'none'}}>PAN</a>

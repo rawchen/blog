@@ -177,16 +177,20 @@ function MomentsPage({ pageContent }) {
                       <div className="moment-title">
                         {moment.title}
                       </div>
-                      <div className="moment-content">
-                        <p>{moment.description}</p>
+                      <div className="moment-body">
+                        <div className="moment-content">
+                          <p>{moment.description || '没有文字内容哦~'}</p>
+                        </div>
+                        {moment.img && (
+                          <div className="moment-image-wrapper">
+                            <img
+                              className="moment-image"
+                              src={moment.img}
+                              alt={moment.title}
+                            />
+                          </div>
+                        )}
                       </div>
-                      {moment.img && (
-                        <img
-                          className="moment-image"
-                          src={moment.img}
-                          alt={moment.title}
-                        />
-                      )}
                       <div className="moment-footer">
                         <span className="moment-author">
                           {moment.icon && (

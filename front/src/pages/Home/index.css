@@ -306,12 +306,15 @@
 }
 
 #moment-span {
+  background-size: 0;
   cursor: pointer;
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 #moment-span #moment {
   position: relative;
-  left: 2px;
+  left: 0px;
   top: 11px;
 }
 
