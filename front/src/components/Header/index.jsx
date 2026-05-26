@@ -105,6 +105,12 @@ function Header() {
                   </div>
               )}
             </Link>
+            <Link
+                to="/tag"
+                className={location.pathname === `/tag` ? 'current' : ''}
+            >
+              标签
+            </Link>
 
             {/* 动态页面导航 */}
             {publicPages.map(page => (

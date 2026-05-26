@@ -105,7 +105,7 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
     text = text.replace(/^(#{1,6})([^\s#])/gm, '$1 $2')
 
     // 修复自动链接：将裸露的 URL 转换为显式链接，避免中文标点被误包含
-    text = text.replace(/(?<![<\[(])(https?:\/\/[^\s<>\[\]()（）]+?)(?=[\s<>\[\]()（）,\u3000，。！？；："'`]|$)/gi, '<$1>')
+    text = text.replace(/(?<![<\[('"（])(https?:\/\/[^\s<>\[\]()（）'"`]+?)(?=[\s<>\[\]()（）,\u3000，。！？；："'`]|$)/gi, '<$1>')
 
     // 修复换行
     const fixLineBreaks = (txt) => {
@@ -195,7 +195,7 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
         const number = counters.slice(0, level).filter(n => n > 0).join('.')
 
         tocItems.push({ level, text: headingText, id, number })
-        return `<h${level} id="${id}">${headingText}</h${level}>`
+        return `\n<h${level} id="${id}">${headingText}</h${level}>\n`
       }
       return line
     })
