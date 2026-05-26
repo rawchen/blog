@@ -1,6 +1,7 @@
 package com.rawchen.blog.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.entity.Tag;
 import com.rawchen.blog.vo.TagVO;
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @author RawChen
  */
-public interface TagService {
+public interface TagService extends IService<Tag> {
 
     /**
      * 获取所有标签列表

@@ -2,6 +2,7 @@ package com.rawchen.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.dto.ConfigDTO;
 import com.rawchen.blog.entity.AccessLog;
@@ -24,7 +25,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class AccessLogServiceImpl implements AccessLogService {
+public class AccessLogServiceImpl extends ServiceImpl<AccessLogMapper, AccessLog> implements AccessLogService {
 
     @Autowired
     private AccessLogMapper accessLogMapper;

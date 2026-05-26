@@ -2,6 +2,7 @@ package com.rawchen.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.dto.MomentDTO;
 import com.rawchen.blog.entity.Moment;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class MomentServiceImpl implements MomentService {
+public class MomentServiceImpl extends ServiceImpl<MomentMapper, Moment> implements MomentService {
 
     @Autowired
     private MomentMapper momentMapper;
@@ -82,18 +83,6 @@ public class MomentServiceImpl implements MomentService {
     public void deleteMoment(Long id) {
         momentMapper.deleteById(id);
         log.info("删除动态成功: {}", id);
-    }
-
-    @Override
-    public void saveBatch(List<Moment> moments) {
-        if (moments == null || moments.isEmpty()) {
-            return;
-        }
-        // rewriteBatchedStatements=true 会让MySQL驱动自动优化批量插入
-        for (Moment moment : moments) {
-            momentMapper.insert(moment);
-        }
-        log.info("批量插入完成，共{}条", moments.size());
     }
 
     private MomentVO convertToVO(Moment moment) {

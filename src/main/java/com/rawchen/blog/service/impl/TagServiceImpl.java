@@ -2,6 +2,7 @@ package com.rawchen.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.entity.Tag;
 import com.rawchen.blog.mapper.ArticleTagMapper;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class TagServiceImpl implements TagService {
+public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
 
     @Autowired
     private TagMapper tagMapper;

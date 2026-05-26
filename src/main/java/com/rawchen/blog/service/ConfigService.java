@@ -1,5 +1,6 @@
 package com.rawchen.blog.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.rawchen.blog.dto.ConfigDTO;
 import com.rawchen.blog.entity.Config;
 import com.rawchen.blog.vo.SiteConfigVO;
@@ -12,7 +13,7 @@ import java.util.Map;
  *
  * @author RawChen
  */
-public interface ConfigService {
+public interface ConfigService extends IService<Config> {
 
     /**
      * 获取站点配置（公开）

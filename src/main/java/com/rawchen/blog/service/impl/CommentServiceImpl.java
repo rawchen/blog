@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.dto.CommentDTO;
 import com.rawchen.blog.dto.LatestCommentDTO;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class CommentServiceImpl implements CommentService {
+public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements CommentService {
 
     @Autowired
     private CommentMapper commentMapper;

@@ -1,5 +1,6 @@
 package com.rawchen.blog.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.rawchen.blog.entity.TaskExecutionLog;
 
 /**
@@ -7,7 +8,7 @@ import com.rawchen.blog.entity.TaskExecutionLog;
  *
  * @author RawChen
  */
-public interface TaskExecutionLogService {
+public interface TaskExecutionLogService extends IService<TaskExecutionLog> {
 
     /**
      * 保存执行日志

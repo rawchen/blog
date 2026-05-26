@@ -1,5 +1,6 @@
 package com.rawchen.blog.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.entity.OperationLog;
 
@@ -8,7 +9,7 @@ import com.rawchen.blog.entity.OperationLog;
  *
  * @author RawChen
  */
-public interface OperationLogService {
+public interface OperationLogService extends IService<OperationLog> {
 
     /**
      * 分页查询操作日志

@@ -1,6 +1,7 @@
 package com.rawchen.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.rawchen.blog.dto.ConfigDTO;
 import com.rawchen.blog.entity.Config;
 import com.rawchen.blog.mapper.ConfigMapper;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class ConfigServiceImpl implements ConfigService {
+public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> implements ConfigService {
 
     @Autowired
     private ConfigMapper configMapper;

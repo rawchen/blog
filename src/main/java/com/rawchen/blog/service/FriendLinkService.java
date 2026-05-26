@@ -1,6 +1,7 @@
 package com.rawchen.blog.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.rawchen.blog.dto.FriendLinkDTO;
 import com.rawchen.blog.entity.FriendLink;
 import com.rawchen.blog.vo.FriendLinkVO;
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @author RawChen
  */
-public interface FriendLinkService {
+public interface FriendLinkService extends IService<FriendLink> {
 
     /**
      * 获取友链列表（前台）

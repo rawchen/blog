@@ -1,5 +1,6 @@
 package com.rawchen.blog.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.entity.Category;
 import com.rawchen.blog.vo.CategoryVO;
@@ -11,7 +12,7 @@ import java.util.List;
  *
  * @author RawChen
  */
-public interface CategoryService {
+public interface CategoryService extends IService<Category> {
 
     /**
      * 获取所有分类列表

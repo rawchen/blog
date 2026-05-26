@@ -1,6 +1,7 @@
 package com.rawchen.blog.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.dto.ArticleDTO;
 import com.rawchen.blog.dto.LatestArticleDTO;
@@ -19,7 +20,7 @@ import java.util.List;
  *
  * @author RawChen
  */
-public interface ArticleService {
+public interface ArticleService extends IService<Article> {
 
     /**
      * 分页查询文章列表（前台）

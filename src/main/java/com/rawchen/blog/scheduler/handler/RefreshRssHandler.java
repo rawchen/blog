@@ -1,6 +1,7 @@
 package com.rawchen.blog.scheduler.handler;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rawchen.blog.entity.Moment;
@@ -135,7 +136,6 @@ public class RefreshRssHandler implements JobHandler {
                     moments.add(moment);
                 }
             }
-
             // 批量插入
             momentService.saveBatch(moments);
 

@@ -2,6 +2,7 @@ package com.rawchen.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.rawchen.blog.dto.TaskJobDTO;
 import com.rawchen.blog.entity.TaskExecutionLog;
 import com.rawchen.blog.entity.TaskJob;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class TaskJobServiceImpl implements TaskJobService {
+public class TaskJobServiceImpl extends ServiceImpl<TaskJobMapper, TaskJob> implements TaskJobService {
 
     @Autowired
     private TaskJobMapper taskJobMapper;

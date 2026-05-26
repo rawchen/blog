@@ -2,6 +2,7 @@ package com.rawchen.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.rawchen.blog.dto.FriendLinkDTO;
 import com.rawchen.blog.entity.FriendLink;
 import com.rawchen.blog.exception.BusinessException;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class FriendLinkServiceImpl implements FriendLinkService {
+public class FriendLinkServiceImpl extends ServiceImpl<FriendLinkMapper, FriendLink> implements FriendLinkService {
 
     @Autowired
     private FriendLinkMapper friendLinkMapper;

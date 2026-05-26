@@ -1,5 +1,6 @@
 package com.rawchen.blog.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.entity.AccessLog;
 
@@ -8,7 +9,7 @@ import com.rawchen.blog.entity.AccessLog;
  *
  * @author RawChen
  */
-public interface AccessLogService {
+public interface AccessLogService extends IService<AccessLog> {
 
     /**
      * 分页查询访问日志

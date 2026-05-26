@@ -1,7 +1,9 @@
 package com.rawchen.blog.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.rawchen.blog.dto.TaskJobDTO;
+import com.rawchen.blog.entity.TaskJob;
 import com.rawchen.blog.vo.TaskExecutionLogVO;
 import com.rawchen.blog.vo.TaskJobVO;
 
@@ -10,7 +12,7 @@ import com.rawchen.blog.vo.TaskJobVO;
  *
  * @author RawChen
  */
-public interface TaskJobService {
+public interface TaskJobService extends IService<TaskJob> {
 
     /**
      * 分页查询任务列表

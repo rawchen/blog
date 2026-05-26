@@ -1,5 +1,6 @@
 package com.rawchen.blog.controller;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.rawchen.blog.annotation.AccessLogAnnotation;
 import com.rawchen.blog.annotation.OperationLogAnnotation;
 import com.rawchen.blog.common.PageResult;

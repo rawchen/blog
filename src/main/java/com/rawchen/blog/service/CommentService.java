@@ -1,6 +1,7 @@
 package com.rawchen.blog.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.dto.CommentDTO;
 import com.rawchen.blog.dto.LatestCommentDTO;
@@ -14,7 +15,7 @@ import java.util.List;
  *
  * @author RawChen
  */
-public interface CommentService {
+public interface CommentService extends IService<Comment> {
 
     /**
      * 分页查询评论列表（前台）

@@ -1,5 +1,7 @@
 package com.rawchen.blog.service;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.rawchen.blog.common.PageResult;
 import com.rawchen.blog.dto.MomentDTO;
 import com.rawchen.blog.entity.Moment;
@@ -12,7 +14,7 @@ import java.util.List;
  *
  * @author RawChen
  */
-public interface MomentService {
+public interface MomentService extends IService<Moment> {
 
     /**
      * 获取朋友圈列表（前台）
@@ -42,5 +44,5 @@ public interface MomentService {
     /**
      * 批量保存动态
      */
-    void saveBatch(List<Moment> moments);
+//    void saveBatch(List<Moment> moments);
 }

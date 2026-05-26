@@ -1,6 +1,7 @@
 package com.rawchen.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.rawchen.blog.entity.TaskExecutionLog;
 import com.rawchen.blog.mapper.TaskExecutionLogMapper;
 import com.rawchen.blog.service.TaskExecutionLogService;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
  * @author RawChen
  */
 @Service
-public class TaskExecutionLogServiceImpl implements TaskExecutionLogService {
+public class TaskExecutionLogServiceImpl extends ServiceImpl<TaskExecutionLogMapper, TaskExecutionLog> implements TaskExecutionLogService {
 
     @Autowired
     private TaskExecutionLogMapper executionLogMapper;
