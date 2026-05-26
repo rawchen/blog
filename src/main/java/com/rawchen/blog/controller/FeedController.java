@@ -6,6 +6,7 @@ import com.rawchen.blog.entity.Article;
 import com.rawchen.blog.entity.Config;
 import com.rawchen.blog.mapper.ArticleMapper;
 import com.rawchen.blog.mapper.ConfigMapper;
+import com.rawchen.blog.util.MarkdownUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +57,7 @@ public class FeedController {
         // 构建RSS XML
         StringBuilder rss = new StringBuilder();
         rss.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        rss.append("<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
+        rss.append("<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\">\n");
         rss.append("  <channel>\n");
         rss.append("    <title>").append(escapeXml(siteName)).append("</title>\n");
         rss.append("    <link>").append(escapeXml(siteUrl)).append("</link>\n");
@@ -73,6 +74,14 @@ public class FeedController {
             rss.append("      <pubDate>").append(formatRfc822Date(article.getPublishTime())).append("</pubDate>\n");
             rss.append("      <description>").append(escapeXml(article.getSummary() != null ? article.getSummary() : ""))
                     .append("</description>\n");
+            // 添加正文内容（后端渲染Markdown为HTML）
+            String content = article.getContent();
+            if (content != null && !content.isEmpty()) {
+                String contentHtml = MarkdownUtil.render(content);
+                rss.append("      <content:encoded xml:lang=\"zh-CN\"><![CDATA[\n");
+                rss.append(contentHtml);
+                rss.append("\n]]></content:encoded>\n");
+            }
             rss.append("    </item>\n");
         }
 

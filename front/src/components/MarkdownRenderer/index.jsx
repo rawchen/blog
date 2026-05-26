@@ -104,6 +104,9 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
     // 修复标题格式
     text = text.replace(/^(#{1,6})([^\s#])/gm, '$1 $2')
 
+    // 修复自动链接：将裸露的 URL 转换为显式链接，避免中文标点被误包含
+    text = text.replace(/(?<![<\[(])(https?:\/\/[^\s<>\[\]()（）]+?)(?=[\s<>\[\]()（）,\u3000，。！？；："'`]|$)/gi, '<$1>')
+
     // 修复换行
     const fixLineBreaks = (txt) => {
       const lines = txt.split('\n')

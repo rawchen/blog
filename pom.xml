@@ -122,6 +122,23 @@
             <version>${ip2region.version}</version>
         </dependency>
 
+        <!-- CommonMark Markdown 渲染 -->
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark</artifactId>
+            <version>0.21.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark-ext-gfm-tables</artifactId>
+            <version>0.21.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark-ext-heading-anchor</artifactId>
+            <version>0.21.0</version>
+        </dependency>
+
         <!-- Spring Boot Quartz -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
