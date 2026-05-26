@@ -84,6 +84,18 @@ public class MomentServiceImpl implements MomentService {
         log.info("删除动态成功: {}", id);
     }
 
+    @Override
+    public void saveBatch(List<Moment> moments) {
+        if (moments == null || moments.isEmpty()) {
+            return;
+        }
+        // rewriteBatchedStatements=true 会让MySQL驱动自动优化批量插入
+        for (Moment moment : moments) {
+            momentMapper.insert(moment);
+        }
+        log.info("批量插入完成，共{}条", moments.size());
+    }
+
     private MomentVO convertToVO(Moment moment) {
         MomentVO vo = new MomentVO();
         BeanUtils.copyProperties(moment, vo);

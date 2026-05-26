@@ -9,6 +9,7 @@ import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 任务处理器工厂
@@ -59,5 +60,56 @@ public class JobHandlerFactory {
             result.put(entry.getKey(), entry.getValue().getDescription());
         }
         return result;
+    }
+
+    /**
+     * 获取处理器详情（包含参数定义）
+     */
+    public HandlerDetail getHandlerDetail(String handlerName) {
+        JobHandler handler = handlerMap.get(handlerName);
+        if (handler == null) {
+            return null;
+        }
+        return new HandlerDetail(
+                handler.getName(),
+                handler.getDescription(),
+                handler.getParams()
+        );
+    }
+
+    /**
+     * 获取所有处理器详情列表
+     */
+    public List<HandlerDetail> getAllHandlerDetails() {
+        return handlerMap.values().stream()
+                .map(h -> new HandlerDetail(h.getName(), h.getDescription(), h.getParams()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 处理器详情
+     */
+    public static class HandlerDetail {
+        private final String name;
+        private final String description;
+        private final List<HandlerParam> params;
+
+        public HandlerDetail(String name, String description, List<HandlerParam> params) {
+            this.name = name;
+            this.description = description;
+            this.params = params;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public List<HandlerParam> getParams() {
+            return params;
+        }
     }
 }

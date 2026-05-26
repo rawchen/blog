@@ -49,3 +49,13 @@ export function getTaskLogPage(params) {
 export function getHandlers() {
   return request({ url: '/admin/task/handlers', method: 'get' })
 }
+
+// 获取处理器详情（包含参数定义）
+export function getHandlerDetail(handlerName) {
+  return request({ url: `/admin/task/handlers/${handlerName}`, method: 'get' })
+}
+
+// 获取所有处理器详情列表
+export function getAllHandlerDetails() {
+  return request({ url: '/admin/task/handlers/details', method: 'get' })
+}

@@ -2,6 +2,9 @@ package com.rawchen.blog.scheduler;
 
 import org.quartz.JobDataMap;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * 任务处理器接口
  *
@@ -27,5 +30,12 @@ public interface JobHandler {
      */
     default String getDescription() {
         return "";
+    }
+
+    /**
+     * 获取处理器参数定义
+     */
+    default List<HandlerParam> getParams() {
+        return Collections.emptyList();
     }
 }

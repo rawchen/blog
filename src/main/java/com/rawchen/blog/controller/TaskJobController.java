@@ -7,6 +7,7 @@ import com.rawchen.blog.dto.TaskJobDTO;
 import com.rawchen.blog.enums.OperationType;
 import com.rawchen.blog.enums.TargetType;
 import com.rawchen.blog.scheduler.JobHandlerFactory;
+import com.rawchen.blog.scheduler.JobHandlerFactory.HandlerDetail;
 import com.rawchen.blog.service.TaskJobService;
 import com.rawchen.blog.vo.TaskExecutionLogVO;
 import com.rawchen.blog.vo.TaskJobVO;
@@ -17,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -120,5 +122,21 @@ public class TaskJobController {
     @GetMapping("/handlers")
     public R<Map<String, String>> getHandlers() {
         return R.ok(jobHandlerFactory.getAllHandlers());
+    }
+
+    @ApiOperation("获取处理器详情")
+    @GetMapping("/handlers/{handlerName}")
+    public R<HandlerDetail> getHandlerDetail(@PathVariable String handlerName) {
+        HandlerDetail detail = jobHandlerFactory.getHandlerDetail(handlerName);
+        if (detail == null) {
+            return R.fail("处理器不存在");
+        }
+        return R.ok(detail);
+    }
+
+    @ApiOperation("获取所有处理器详情列表")
+    @GetMapping("/handlers/details")
+    public R<List<HandlerDetail>> getAllHandlerDetails() {
+        return R.ok(jobHandlerFactory.getAllHandlerDetails());
     }
 }

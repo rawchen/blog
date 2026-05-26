@@ -8,22 +8,21 @@ import {
   EyeOutlined, PauseOutlined, SettingOutlined
 } from '@ant-design/icons'
 import dayjs from 'dayjs'
-import { getJobPage, createJob, updateJob, deleteJob, triggerJob, updateJobStatus, getJobLogs, getHandlers } from '../../../api/schedule'
+import { getJobPage, createJob, updateJob, deleteJob, triggerJob, updateJobStatus, getJobLogs, getHandlers, getHandlerDetail } from '../../../api/schedule'
 import CronDialog from '../../../components/CronDialog'
 
 // 处理器名称映射
 const handlerLabels = {
-  'checkFriendLink': '检测友链状态',
-  'publishArticle': '定时发布文章',
-  'generateSitemap': '生成sitemap',
-  'refreshCache': '刷新首页缓存',
-  'cleanTempFiles': '清理临时文件',
-  'statistics': '统计文章浏览量',
-  'backupDatabase': '备份数据库',
-  'sendNotification': '发送通知邮件',
-  'checkSpamComment': '检查垃圾评论',
-  'syncSearchIndex': '同步搜索索引',
-  'generateStaticPage': '生成静态页面',
+  // 'publishArticle': '定时发布文章',
+  // 'generateSitemap': '生成sitemap',
+  // 'refreshCache': '刷新首页缓存',
+  // 'cleanTempFiles': '清理临时文件',
+  // 'statistics': '统计文章浏览量',
+  // 'backupDatabase': '备份数据库',
+  // 'sendNotification': '发送通知邮件',
+  // 'checkSpamComment': '检查垃圾评论',
+  // 'syncSearchIndex': '同步搜索索引',
+  // 'generateStaticPage': '生成静态页面',
 }
 
 const statusColors = { 1: 'success', 0: 'error' }
@@ -45,6 +44,7 @@ function ScheduleJob() {
   const [logsLoading, setLogsLoading] = useState(false)
   const [executingJobIds, setExecutingJobIds] = useState(new Set())
   const [handlers, setHandlers] = useState({})
+  const [handlerParams, setHandlerParams] = useState([])
 
   // 筛选条件
   const [filterJobName, setFilterJobName] = useState('')
@@ -64,6 +64,24 @@ function ScheduleJob() {
       }
     } catch (error) {
       // 使用默认映射
+    }
+  }
+
+  // 获取处理器参数定义
+  const fetchHandlerParams = async (handlerName) => {
+    if (!handlerName) {
+      setHandlerParams([])
+      return
+    }
+    try {
+      const res = await getHandlerDetail(handlerName)
+      if (res.data && res.data.params) {
+        setHandlerParams(res.data.params)
+      } else {
+        setHandlerParams([])
+      }
+    } catch (error) {
+      setHandlerParams([])
     }
   }
 
@@ -95,6 +113,7 @@ function ScheduleJob() {
   const handleAdd = () => {
     setEditingId(null)
     setSelectedJobType('CRON')
+    setHandlerParams([])
     form.resetFields()
     form.setFieldsValue({ jobType: 'CRON', retryCount: 0, timeoutSeconds: 300, enabled: 1 })
     setModalVisible(true)
@@ -103,6 +122,17 @@ function ScheduleJob() {
   const handleEdit = (record) => {
     setEditingId(record.id)
     setSelectedJobType(record.jobType)
+    // 解析已有参数
+    if (record.handlerParams) {
+      try {
+        const params = JSON.parse(record.handlerParams)
+        // 设置参数值到表单
+        Object.keys(params).forEach(key => {
+          form.setFieldsValue({ [`param_${key}`]: params[key] })
+        })
+      } catch (e) {}
+    }
+    fetchHandlerParams(record.handlerName)
     form.setFieldsValue({
       ...record,
       executeTime: record.executeTime ? dayjs(record.executeTime) : null
@@ -205,6 +235,21 @@ function ScheduleJob() {
       const values = await form.validateFields()
       if (values.executeTime) {
         values.executeTime = values.executeTime.format('YYYY-MM-DD HH:mm:ss')
+      }
+      // 构建处理器参数JSON
+      if (handlerParams.length > 0) {
+        const paramsObj = {}
+        handlerParams.forEach(param => {
+          const key = `param_${param.name}`
+          if (values[key] !== undefined && values[key] !== null && values[key] !== '') {
+            paramsObj[param.name] = values[key]
+          }
+        })
+        values.handlerParams = Object.keys(paramsObj).length > 0 ? JSON.stringify(paramsObj) : null
+        // 清理临时字段
+        handlerParams.forEach(param => {
+          delete values[`param_${param.name}`]
+        })
       }
       if (editingId) {
         await updateJob({ ...values, id: editingId })
@@ -368,15 +413,52 @@ function ScheduleJob() {
             </Form.Item>
           )}
           <Form.Item label="处理器名称" name="handlerName" rules={[{ required: true }]}>
-            <Select placeholder="请选择处理器">
+            <Select placeholder="请选择处理器" onChange={(val) => {
+              setHandlerParams([])
+              fetchHandlerParams(val)
+            }}>
               {Object.keys({ ...handlers, ...handlerLabels }).map(key => (
                 <Select.Option key={key} value={key}>{handlers[key] || handlerLabels[key] || key}</Select.Option>
               ))}
             </Select>
           </Form.Item>
-          <Form.Item label="处理器参数" name="handlerParams">
-            <Input placeholder="JSON格式参数（可选）" />
-          </Form.Item>
+          {/* 动态渲染处理器参数 */}
+          {handlerParams.length > 0 && handlerParams.map(param => (
+            <Form.Item
+              key={param.name}
+              label={param.label}
+              name={`param_${param.name}`}
+              rules={[{ required: param.required, message: `请输入${param.label}` }]}
+              tooltip={param.tooltip}
+            >
+              {param.type === 'password' ? (
+                <Input.Password placeholder={param.placeholder} />
+              ) : param.type === 'number' ? (
+                <InputNumber min={param.min} max={param.max} style={{ width: '100%' }} placeholder={param.placeholder} />
+              ) : param.type === 'textarea' ? (
+                <Input.TextArea rows={3} placeholder={param.placeholder} />
+              ) : param.type === 'select' ? (
+                <Select placeholder={param.placeholder}>
+                  {param.options && param.options.split(',').map(opt => {
+                    const [value, label] = opt.split(':')
+                    return <Select.Option key={value} value={value}>{label || value}</Select.Option>
+                  })}
+                </Select>
+              ) : param.type === 'switch' ? (
+                <Select placeholder={param.placeholder}>
+                  <Select.Option value={true}>开启</Select.Option>
+                  <Select.Option value={false}>关闭</Select.Option>
+                </Select>
+              ) : (
+                <Input placeholder={param.placeholder} />
+              )}
+            </Form.Item>
+          ))}
+          {handlerParams.length === 0 && (
+            <Form.Item label="处理器参数" name="handlerParams">
+              <Input placeholder="JSON格式参数（可选）" />
+            </Form.Item>
+          )}
           <Form.Item label="重试次数" name="retryCount">
             <InputNumber min={0} max={10} style={{ width: '100%' }} />
           </Form.Item>

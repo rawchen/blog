@@ -5,6 +5,8 @@ import com.rawchen.blog.dto.MomentDTO;
 import com.rawchen.blog.entity.Moment;
 import com.rawchen.blog.vo.MomentVO;
 
+import java.util.List;
+
 /**
  * 朋友圈服务接口
  *
@@ -36,4 +38,9 @@ public interface MomentService {
      * 删除动态
      */
     void deleteMoment(Long id);
+
+    /**
+     * 批量保存动态
+     */
+    void saveBatch(List<Moment> moments);
 }
