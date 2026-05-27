@@ -28,7 +28,8 @@ const camelToSnake = {
   statsUrl: 'stats_url',
   trackingCode: 'tracking_code',
   ossEnabled: 'oss_enabled',
-  ossStyle: 'oss_style',
+  ossStyleArticle: 'oss_style_article',
+  ossStyleCover: 'oss_style_cover',
   gravatarDomain: 'gravatar_domain',
   musicU: 'music_u',
   articlePageSize: 'article_page_size',
@@ -171,8 +172,8 @@ function Setting() {
   return (
     <Form
       form={form}
-      labelCol={{ span: 8 }}
-      wrapperCol={{ span: 16 }}
+      labelCol={{ span: 4 }}
+      wrapperCol={{ span: 20 }}
       onFinish={handleSave}
     >
       <Spin spinning={loading}>
@@ -235,15 +236,20 @@ function Setting() {
                 <Input.TextArea rows={2}
                                 placeholder='跟踪脚本代码，如：<script async defer src="https://umami.example.com/umami.js"></script>'/>
               </Form.Item>
-              <Form.Item label={<span><Tooltip title="开启OSS云存储上传图片，后面参数为OSS图片处理样式不填则不拼接"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> OSS上传</span>}>
+              <Form.Item label={<span><Tooltip title="开启OSS云存储上传图片：文章图片处理样式/封面图片处理样式"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> OSS上传</span>}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Form.Item name="oss_enabled" valuePropName="checked" noStyle>
                     <Switch checkedChildren="开" unCheckedChildren="关" onChange={(checked) => setOssEnabled(checked)}/>
                   </Form.Item>
                   {ossEnabled && (
-                    <Form.Item name="oss_style" noStyle style={{ flex: 1 }}>
-                      <Input placeholder="如：?x-oss-process=style/small"/>
-                    </Form.Item>
+                    <>
+                      <Form.Item name="oss_style_article" noStyle>
+                        <Input placeholder="?x-oss-process=style/article"/>
+                      </Form.Item>
+                      <Form.Item name="oss_style_cover" noStyle>
+                        <Input placeholder="?x-oss-process=style/cover"/>
+                      </Form.Item>
+                    </>
                   )}
                 </div>
               </Form.Item>

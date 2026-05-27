@@ -219,7 +219,7 @@ function ArticleEdit() {
     } catch (e) {
       console.error('获取站点配置失败', e)
     }
-    return { ossEnabled: true, ossStyle: '' }
+    return { ossEnabled: true, ossStyleCover: '' }
   }
 
   // 上传封面图片到OSS
@@ -258,8 +258,8 @@ function ArticleEdit() {
       }
       // 拼接OSS样式
       const siteConfig = getSiteConfigCache()
-      if (siteConfig.ossStyle) {
-        url = url + siteConfig.ossStyle
+      if (siteConfig.ossStyleCover) {
+        url = url + siteConfig.ossStyleCover
       }
       return url
     } catch (error) {

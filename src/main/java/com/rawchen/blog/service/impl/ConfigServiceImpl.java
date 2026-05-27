@@ -49,7 +49,8 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
     private static final String KEY_STATS_URL = "stats_url";
     private static final String KEY_TRACKING_CODE = "tracking_code";
     private static final String KEY_OSS_ENABLED = "oss_enabled";
-    private static final String KEY_OSS_STYLE = "oss_style";
+    private static final String KEY_OSS_STYLE_ARTICLE = "oss_style_article";
+    private static final String KEY_OSS_STYLE_COVER = "oss_style_cover";
     private static final String KEY_GRAVATAR_DOMAIN = "gravatar_domain";
     private static final String KEY_COMMENT_ENABLED = "comment_enabled";
     private static final String KEY_MAIL_ENABLED = "mail_enabled";
@@ -85,7 +86,8 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
         vo.setStatsUrl(getConfigByKey(KEY_STATS_URL));
         vo.setTrackingCode(getConfigByKey(KEY_TRACKING_CODE));
         vo.setOssEnabled(Boolean.parseBoolean(getConfigByKey(KEY_OSS_ENABLED, "true")));
-        vo.setOssStyle(getConfigByKey(KEY_OSS_STYLE));
+        vo.setOssStyleArticle(getConfigByKey(KEY_OSS_STYLE_ARTICLE));
+        vo.setOssStyleCover(getConfigByKey(KEY_OSS_STYLE_COVER));
         vo.setGravatarDomain(getConfigByKey(KEY_GRAVATAR_DOMAIN));
         vo.setCommentEnabled(Boolean.parseBoolean(getConfigByKey(KEY_COMMENT_ENABLED, "false")));
         vo.setMailEnabled(Boolean.parseBoolean(getConfigByKey(KEY_MAIL_ENABLED, "false")));

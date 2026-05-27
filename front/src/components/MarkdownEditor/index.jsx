@@ -636,7 +636,7 @@ function MarkdownEditor({
     } catch (e) {
       console.error('获取站点配置失败', e)
     }
-    return { ossEnabled: true, ossStyle: '' }
+    return { ossEnabled: true, ossStyleArticle: '' }
   }
 
   // 插入Markdown图片语法
@@ -703,7 +703,7 @@ function MarkdownEditor({
       try {
         let result
         if (siteConfig.ossEnabled === true || siteConfig.ossEnabled === 'true') {
-          result = await uploadToOSS(file, siteConfig.ossStyle || '')
+          result = await uploadToOSS(file, siteConfig.ossStyleArticle || '')
         } else {
           result = await uploadToLocal(file)
         }

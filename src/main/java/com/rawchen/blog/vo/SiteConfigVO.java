@@ -120,9 +120,14 @@ public class SiteConfigVO implements Serializable {
     private Boolean ossEnabled;
 
     /**
-     * OSS图片处理样式
+     * OSS文章图片处理样式
      */
-    private String ossStyle;
+    private String ossStyleArticle;
+
+    /**
+     * OSS封面图片处理样式
+     */
+    private String ossStyleCover;
 
     /**
      * Gravatar头像域名
