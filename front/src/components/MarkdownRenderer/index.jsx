@@ -104,8 +104,8 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
     // 修复标题格式
     text = text.replace(/^(#{1,6})([^\s#])/gm, '$1 $2')
 
-    // 修复自动链接：将裸露的 URL 转换为显式链接，避免中文标点被误包含
-    text = text.replace(/(?<![<\[('"（])(https?:\/\/[^\s<>\[\]()（）'"`]+?)(?=[\s<>\[\]()（）,\u3000，。！？；："'`]|$)/gi, '<$1>')
+    // 修复自动链接：将裸露的 URL 转换为显式链接，避免中文标点和Markdown语法被误包含
+    text = text.replace(/(?<![<\[('"（])(https?:\/\/[^\s<>\[\]()（）'"`*]+?)(?=[\s<>\[\]()（）,\u3000，。！？；："'`]|$)/gi, '<$1>')
 
     // 修复换行
     const fixLineBreaks = (txt) => {
@@ -161,10 +161,19 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
       text = text.replace(/PLAYER_PH_(\d+)/g, (_, i) => playerPlaceholders[parseInt(i)])
     }
 
-    // 使用处理后的内容计算目录，并将标题替换为带ID的HTML标签（排除代码块）
+    // 计算目录并转换标题为带ID的HTML标签
     const counters = [0, 0, 0, 0, 0, 0]
     const tocItems = []
     let headingIndex = 0
+
+    // 将标题文本中的Markdown格式转换为HTML
+    const convertMarkdownToHtml = (text) => {
+      return text
+        .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+    }
 
     // 逐行处理，排除代码块内的内容
     const lines = text.split('\n')
@@ -181,7 +190,7 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
       // 代码块内不处理
       if (inCodeBlock) return line
 
-      // 匹配标题
+      // 匹配标题，转换为带ID的HTML标签
       const headingMatch = line.match(/^(#{1,6})\s+(.+)$/)
       if (headingMatch) {
         const hashes = headingMatch[1]
@@ -194,8 +203,17 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
         for (let i = level; i < 6; i++) counters[i] = 0
         const number = counters.slice(0, level).filter(n => n > 0).join('.')
 
-        tocItems.push({ level, text: headingText, id, number })
-        return `\n<h${level} id="${id}">${headingText}</h${level}>\n`
+        // 提取纯文本用于目录（移除Markdown格式）
+        const plainText = headingText.replace(/\*\*([^*]+)\*\*/g, '$1')
+                                     .replace(/\*([^*]+)\*/g, '$1')
+                                     .replace(/`([^`]+)`/g, '$1')
+                                     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+
+        tocItems.push({ level, text: plainText, id, number })
+
+        // 转换为带ID的HTML标签，同时转换内部Markdown格式
+        const htmlContent = convertMarkdownToHtml(headingText)
+        return `\n<h${level} id="${id}">${htmlContent}</h${level}>\n`
       }
       return line
     })
@@ -213,8 +231,8 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
     }
   }, [tocItems, onTocReady])
 
-  // 自定义组件 - 使用 useMemo 避免每次渲染重新创建
-  const components = useMemo(() => ({
+  // 自定义组件
+  const components = {
     // dplayer 短代码组件
     'dplayer-data': ({ url, pic, danmu, autoplay, addition }) => (
       <DPlayerComponent key={url} url={url} pic={pic} danmu={danmu} autoplay={autoplay} addition={addition} />
@@ -223,7 +241,7 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
     'player-data': ({ id, type, autoplay }) => (
       <PlayerComponent key={id} id={id} type={type} autoplay={autoplay} />
     ),
-    // 标题组件直接使用预处理添加的 ID（已在 HTML 标签中）
+    // 标题组件 - 直接使用预处理生成的HTML标签（已有ID）
     h1: ({ children, ...props }) => <h1 {...props}>{children}</h1>,
     h2: ({ children, ...props }) => <h2 {...props}>{children}</h2>,
     h3: ({ children, ...props }) => <h3 {...props}>{children}</h3>,
@@ -268,7 +286,7 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
       // 代码块
       return <CodeBlock className={className}>{children}</CodeBlock>
     }
-  }), [])
+  }
 
   if (!content) return null
 
