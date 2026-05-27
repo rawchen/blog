@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Row, Col, Button, Modal, Form, Input, InputNumber, Select, message, Progress, Spin, Statistic } from 'antd'
-import { ToolOutlined, ReloadOutlined, CloudSyncOutlined } from '@ant-design/icons'
+import { Card, Row, Col, Button, Modal, Form, Input, InputNumber, Select, message, Progress, Spin, Statistic, Switch, Tabs } from 'antd'
+import { CloudSyncOutlined, GlobalOutlined, EyeOutlined, SaveOutlined } from '@ant-design/icons'
 import { getDatabases, testConnection, getMigrationStats, startMigration, getMigrationProgress } from '../../../api/migration'
+import { getScraperArticleCount, fetchArticle, saveScraperArticle } from '../../../api/scraper'
 
 function Tool() {
+  // Typecho迁移相关状态
   const [stats, setStats] = useState({ articleCount: 0, commentCount: 0, tagCount: 0, categoryCount: 0 })
   const [modalVisible, setModalVisible] = useState(false)
   const [mysqlLoading, setMysqlLoading] = useState(false)
@@ -14,8 +16,19 @@ function Tool() {
   const [progress, setProgress] = useState({ currentStep: '', progress: 0, processed: 0, total: 0 })
   const [form] = Form.useForm()
 
+  // 网页采集相关状态
+  const [scraperCount, setScraperCount] = useState(0)
+  const [scraperModalVisible, setScraperModalVisible] = useState(false)
+  const [scraperLoading, setScraperLoading] = useState(false)
+  const [scraperResult, setScraperResult] = useState(null)
+  const [scraperForm] = Form.useForm()
+  const [createTags, setCreateTags] = useState(true)
+  const [previewVisible, setPreviewVisible] = useState(false)
+  const [savingArticle, setSavingArticle] = useState(false)
+
   useEffect(() => {
     loadStats()
+    loadScraperCount()
   }, [])
 
   const loadStats = async () => {
@@ -29,6 +42,18 @@ function Tool() {
     }
   }
 
+  const loadScraperCount = async () => {
+    try {
+      const res = await getScraperArticleCount()
+      if (res.data !== undefined) {
+        setScraperCount(res.data)
+      }
+    } catch (e) {
+      console.error('加载采集数量失败', e)
+    }
+  }
+
+  // Typecho迁移相关函数
   const handleConnect = async () => {
     try {
       const values = await form.validateFields(['mysqlHost', 'mysqlPort', 'mysqlUsername', 'mysqlPassword'])
@@ -58,7 +83,6 @@ function Tool() {
     setConnected(false)
     setPendingStats(null)
 
-    // 选择数据库后自动测试连接并获取待迁移数据
     try {
       const values = await form.validateFields(['mysqlHost', 'mysqlPort', 'mysqlUsername', 'mysqlPassword', 'databaseName'])
       setMysqlLoading(true)
@@ -104,7 +128,6 @@ function Tool() {
         database: values.databaseName
       })
 
-      // 开始轮询进度
       pollProgress()
     } catch (e) {
       message.error('启动迁移失败')
@@ -145,6 +168,70 @@ function Tool() {
     setModalVisible(true)
   }
 
+  // 网页采集相关函数
+  const openScraperModal = () => {
+    scraperForm.resetFields()
+    setScraperResult(null)
+    setCreateTags(true)
+    setScraperModalVisible(true)
+  }
+
+  const handleFetchArticle = async () => {
+    try {
+      const values = await scraperForm.validateFields(['url'])
+      setScraperLoading(true)
+      setScraperResult(null)
+
+      const res = await fetchArticle(values.url)
+      if (res.code === 200 && res.data) {
+        setScraperResult(res.data)
+        message.success('采集成功')
+      } else {
+        message.error(res.message || '采集失败')
+      }
+    } catch (e) {
+      message.error(e.response?.data?.message || '采集失败')
+    } finally {
+      setScraperLoading(false)
+    }
+  }
+
+  const handleSaveArticle = async () => {
+    if (!scraperResult) {
+      message.error('请先采集文章')
+      return
+    }
+
+    setSavingArticle(true)
+    try {
+      // 随机选择封面图
+      const randomThumb = Math.floor(Math.random() * 9) + 1
+      const articleData = {
+        title: scraperResult.title,
+        content: scraperResult.content,
+        summary: scraperResult.summary,
+        coverImage: `/thumbs/${randomThumb}.jpg`,
+        status: 1, // 发布状态
+        source: 2, // 来源：抓取
+        createTags: createTags,
+        newTags: createTags ? scraperResult.tags : []
+      }
+
+      const res = await saveScraperArticle(articleData)
+      if (res.code === 200) {
+        message.success('文章保存成功')
+        setScraperModalVisible(false)
+        loadScraperCount()
+      } else {
+        message.error(res.message || '保存失败')
+      }
+    } catch (e) {
+      message.error(e.response?.data?.message || '保存失败')
+    } finally {
+      setSavingArticle(false)
+    }
+  }
+
   return (
     <div>
       <Row gutter={[16, 16]}>
@@ -177,8 +264,30 @@ function Tool() {
             </Row>
           </Card>
         </Col>
+
+        <Col span={12}>
+          <Card
+            title={
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <GlobalOutlined style={{ marginRight: 8 }} />
+                AI 网页文章采集
+              </div>
+            }
+            extra={<Button type="primary" onClick={openScraperModal}>开始采集</Button>}
+          >
+            <p style={{ marginBottom: 16, color: '#666' }}>
+              输入网页链接，AI自动提取文章内容并转换为Markdown格式，AI智能生成标签
+            </p>
+            <Row gutter={16}>
+              <Col span={24}>
+                <Statistic title="采集数量" value={scraperCount} suffix="篇" />
+              </Col>
+            </Row>
+          </Card>
+        </Col>
       </Row>
 
+      {/* Typecho迁移弹窗 */}
       <Modal
         title="Typecho数据迁移"
         open={modalVisible}
@@ -190,7 +299,6 @@ function Tool() {
         maskClosable={false}
       >
         <Form form={form} labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
-          {/* MySQL连接器配置 */}
           <Form.Item label="MySQL连接器配置">
             <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
               <Input.Group compact style={{ width: 260 }}>
@@ -209,7 +317,7 @@ function Tool() {
               </Form.Item>
               <Button
                 type="primary"
-                icon={<ReloadOutlined spin={mysqlLoading} />}
+                icon={<CloudSyncOutlined spin={mysqlLoading} />}
                 onClick={handleConnect}
                 loading={mysqlLoading}
               >
@@ -233,7 +341,6 @@ function Tool() {
           </Form.Item>
         </Form>
 
-        {/* 连接成功后显示待迁移数据 */}
         {connected && pendingStats && (
           <div style={{ marginTop: 16, padding: 16, background: '#f5f5f5', borderRadius: 4 }}>
             <h4 style={{ marginBottom: 12 }}>待迁移数据统计</h4>
@@ -254,7 +361,6 @@ function Tool() {
           </div>
         )}
 
-        {/* 迁移进度 */}
         {migrating && (
           <div style={{ marginTop: 16 }}>
             <h4 style={{ marginBottom: 12 }}>迁移进度</h4>
@@ -266,7 +372,6 @@ function Tool() {
           </div>
         )}
 
-        {/* 操作按钮 */}
         <div style={{ marginTop: 24, textAlign: 'right' }}>
           <Button onClick={() => setModalVisible(false)} disabled={migrating}>
             取消
@@ -280,6 +385,104 @@ function Tool() {
           >
             开始迁移
           </Button>
+        </div>
+      </Modal>
+
+      {/* 网页文章采集弹窗 */}
+      <Modal
+        title="网页文章采集"
+        open={scraperModalVisible}
+        onCancel={() => {
+          if (!scraperLoading && !savingArticle) setScraperModalVisible(false)
+        }}
+        footer={null}
+        width={800}
+        maskClosable={false}
+      >
+        <Form form={scraperForm} labelCol={{ span: 4 }} wrapperCol={{ span: 20 }}>
+          <Form.Item
+            name="url"
+            label="网页链接"
+            rules={[
+              { required: true, message: '请输入网页链接' },
+              { type: 'url', message: '请输入有效的URL' }
+            ]}
+          >
+            <Input.Search
+              placeholder="请输入要采集的网页链接"
+              enterButton="采集"
+              loading={scraperLoading}
+              onSearch={handleFetchArticle}
+            />
+          </Form.Item>
+        </Form>
+
+        {/* 采集结果 */}
+        {scraperResult && (
+          <div style={{ marginTop: 16 }}>
+            <div style={{ marginBottom: 16, padding: 16, background: '#f5f5f5', borderRadius: 4 }}>
+              <h4 style={{ marginBottom: 12 }}>采集结果</h4>
+              <p><strong>标题：</strong>{scraperResult.title}</p>
+              <p><strong>来源：</strong>
+                <a href={scraperResult.sourceUrl} target="_blank" rel="noopener noreferrer">
+                  {scraperResult.sourceUrl}
+                </a>
+              </p>
+              {scraperResult.tags && scraperResult.tags.length > 0 && (
+                <p><strong>标签：</strong>{scraperResult.tags.join(', ')}</p>
+              )}
+              {scraperResult.summary && (
+                <p><strong>摘要：</strong>{scraperResult.summary}</p>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <Button icon={<EyeOutlined />} onClick={() => setPreviewVisible(true)} style={{ marginRight: 8 }}>
+                预览内容
+              </Button>
+              <span style={{ marginLeft: 16 }}>
+                生成标签：
+                <Switch
+                  checked={createTags}
+                  onChange={setCreateTags}
+                  checkedChildren="是"
+                  unCheckedChildren="否"
+                  style={{ marginLeft: 8 }}
+                />
+              </span>
+            </div>
+          </div>
+        )}
+
+        <div style={{ marginTop: 24, textAlign: 'right' }}>
+          <Button onClick={() => setScraperModalVisible(false)} disabled={scraperLoading || savingArticle}>
+            取消
+          </Button>
+          <Button
+            type="primary"
+            icon={<SaveOutlined />}
+            onClick={handleSaveArticle}
+            disabled={!scraperResult}
+            loading={savingArticle}
+            style={{ marginLeft: 8 }}
+          >
+            保存文章
+          </Button>
+        </div>
+      </Modal>
+
+      {/* 内容预览弹窗 */}
+      <Modal
+        title="文章内容预览"
+        open={previewVisible}
+        onCancel={() => setPreviewVisible(false)}
+        footer={null}
+        width={800}
+      >
+        <div style={{ maxHeight: '60vh', overflow: 'auto' }}>
+          <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: 13 }}>
+            {scraperResult?.content}
+          </pre>
         </div>
       </Modal>
     </div>

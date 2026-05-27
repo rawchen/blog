@@ -317,6 +317,29 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         article.setLikeCount(0);
         article.setCommentCount(0);
 
+        // 设置来源（默认为系统创建）
+        if (articleDTO.getSource() != null) {
+            article.setSource(articleDTO.getSource());
+        } else {
+            article.setSource(0);
+        }
+
+        // 设置默认封面图（如果为空则随机选择）
+        if (!StringUtils.hasText(article.getCoverImage())) {
+            article.setCoverImage(getRandomThumb());
+        }
+
+        // 设置默认分类（如果为空则获取第一个分类）
+        if (article.getCategoryId() == null) {
+            Category firstCategory = categoryMapper.selectOne(new LambdaQueryWrapper<Category>()
+                    .eq(Category::getStatus, 1)
+                    .orderByAsc(Category::getSortOrder)
+                    .last("LIMIT 1"));
+            if (firstCategory != null) {
+                article.setCategoryId(firstCategory.getId());
+            }
+        }
+
         articleMapper.insert(article);
         log.info("创建文章成功: {}", article.getTitle());
 
@@ -385,7 +408,21 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             saveArticleVersion(article, user.getId());
         }
 
+        // 保留系统字段（不应被前端覆盖）
+        Integer originalSource = article.getSource();
+        Integer originalViewCount = article.getViewCount();
+        Integer originalLikeCount = article.getLikeCount();
+        Integer originalCommentCount = article.getCommentCount();
+        LocalDateTime originalCreateTime = article.getCreateTime();
+
         BeanUtils.copyProperties(articleDTO, article);
+
+        // 恢复系统字段
+        article.setSource(originalSource);
+        article.setViewCount(originalViewCount);
+        article.setLikeCount(originalLikeCount);
+        article.setCommentCount(originalCommentCount);
+        article.setCreateTime(originalCreateTime);
 
         // Boolean 转 Integer
         article.setIsTop(articleDTO.getIsTop() != null && articleDTO.getIsTop() ? 1 : 0);
@@ -1294,5 +1331,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         article.setAllowComment(allowComment);
         articleMapper.updateById(article);
         log.info("更新独立页面允许评论: id={}, allowComment={}", id, allowComment);
+    }
+
+    /**
+     * 获取随机封面图路径
+     */
+    private String getRandomThumb() {
+        int random = (int) (Math.random() * 9) + 1;
+        return "/thumbs/" + random + ".jpg";
     }
 }

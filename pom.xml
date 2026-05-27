@@ -122,6 +122,13 @@
             <version>${ip2region.version}</version>
         </dependency>
 
+        <!-- Jsoup HTML解析器 -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.17.2</version>
+        </dependency>
+
         <!-- CommonMark Markdown 渲染 -->
         <dependency>
             <groupId>org.commonmark</groupId>

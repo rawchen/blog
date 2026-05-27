@@ -112,4 +112,9 @@ public class ArticleDTO implements Serializable {
      * 排序顺序（独立页面专用）
      */
     private Integer sortOrder = 0;
+
+    /**
+     * 来源: 0-系统, 1-迁移, 2-抓取
+     */
+    private Integer source = 0;
 }
