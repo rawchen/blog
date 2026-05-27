@@ -143,8 +143,8 @@ function ArticleList() {
       dataIndex: 'status',
       width: 50,
       render: (status) => {
-        const statusMap = { 0: '草稿', 1: '已发布', 2: '回收站', 3: '隐藏', 4: '待审核' }
-        const colorMap = { 0: 'default', 1: 'success', 2: 'error', 3: 'warning', 4: 'processing' }
+        const statusMap = { 0: '待审', 1: '发布', 2: '加密', 3: '隐藏', 4: '私密' }
+        const colorMap = { 0: 'warning', 1: 'success', 2: 'error', 3: 'default', 4: 'processing' }
         return <Tag color={colorMap[status]}>{statusMap[status]}</Tag>
       }
     },

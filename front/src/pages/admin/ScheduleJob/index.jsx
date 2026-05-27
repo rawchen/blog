@@ -319,7 +319,7 @@ function ScheduleJob() {
   ]
 
   const logColumns = [
-    { title: '执行ID', dataIndex: 'executionId', width: 120 },
+    { title: '执行ID', dataIndex: 'executionId', width: 130 },
     {
       title: '状态', dataIndex: 'status', width: 80,
       render: (status) => <Tag color={logStatusColors[status]}>{status}</Tag>
