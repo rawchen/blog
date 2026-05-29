@@ -226,7 +226,7 @@ function Footer() {
                     </a>
                   )}
                   {siteConfig.qqNumber && (
-                    <a href={`tencent://ntqq-open?subCmd=profile&action=openMiniBuddyProfile&actionParams={%22uin%22:%${siteConfig.qqNumber}%22,%22sourceType%22:%22QrCodeShareBuddyLink%22}`} title="QQ" target="_blank" rel="noopener noreferrer">
+                    <a href={`tencent://ntqq-open?subCmd=profile&action=openMiniBuddyProfile&actionParams={%22uin%22:%22${siteConfig.qqNumber}%22,%22sourceType%22:%22QrCodeShareBuddyLink%22}`} title="QQ" target="_blank" rel="noopener noreferrer">
                       <FontAwesomeIcon icon={faComment} className="footer-icon" />
                     </a>
                   )}
