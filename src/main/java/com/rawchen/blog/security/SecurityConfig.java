@@ -105,6 +105,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/friend-link/**",
                         "/api/stat/**",
                         "/api/music/**",
+                        "/api/moment/list",
                         // 迁移工具接口（需要登录）
                         "/api/migration/admin/**",
                         "/feed",
