@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faGithubAlt, faTelegram, faWeibo, faTwitter} from '@fortawesome/free-brands-svg-icons'
+import {faGithubAlt, faTelegram, faWeibo, faTwitter, faQq} from '@fortawesome/free-brands-svg-icons'
 import {faEnvelope, faComments, faRss, faComment, faGlobe, faEarthAsia} from '@fortawesome/free-solid-svg-icons'
 import { getRecentArticles } from '../../api/article'
 import { getRecentComments } from '../../api/comment'
@@ -227,7 +227,7 @@ function Footer() {
                   )}
                   {siteConfig.qqNumber && (
                     <a href={`tencent://ntqq-open?subCmd=profile&action=openMiniBuddyProfile&actionParams={%22uin%22:%22${siteConfig.qqNumber}%22,%22sourceType%22:%22QrCodeShareBuddyLink%22}`} title="QQ" target="_blank" rel="noopener noreferrer">
-                      <FontAwesomeIcon icon={faComment} className="footer-icon" />
+                      <FontAwesomeIcon icon={faQq} className="footer-icon" />
                     </a>
                   )}
                   {siteConfig.telegramUrl && (

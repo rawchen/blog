@@ -106,6 +106,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/api/stat/**",
                         "/api/music/**",
                         "/api/moment/list",
+                        "/api/image/proxy",
                         // 迁移工具接口（需要登录）
                         "/api/migration/admin/**",
                         "/feed",

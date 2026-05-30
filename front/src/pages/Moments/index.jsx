@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { getMomentList } from '../../api/moment'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner, faImage } from '@fortawesome/free-solid-svg-icons'
 import './index.css'
 
 // Format relative time
@@ -26,6 +28,7 @@ function MomentsPage({ pageContent }) {
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+  const [imageLoading, setImageLoading] = useState({})
   const pageSize = 20
 
   useEffect(() => {
@@ -67,6 +70,14 @@ function MomentsPage({ pageContent }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleImageLoad = (id) => {
+    setImageLoading(prev => ({ ...prev, [id]: false }))
+  }
+
+  const handleImageError = (id) => {
+    setImageLoading(prev => ({ ...prev, [id]: 'error' }))
   }
 
   const renderPagination = () => {
@@ -183,10 +194,22 @@ function MomentsPage({ pageContent }) {
                         </div>
                         {moment.img && (
                           <div className="moment-image-wrapper">
+                            {imageLoading[`${moment.id}-img`] === 'error' ? (
+                              <div className="image-loading-placeholder image-error">
+                                <FontAwesomeIcon icon={faImage} />
+                              </div>
+                            ) : imageLoading[`${moment.id}-img`] !== false && (
+                              <div className="image-loading-placeholder">
+                                <FontAwesomeIcon icon={faSpinner} spin />
+                              </div>
+                            )}
                             <img
                               className="moment-image"
-                              src={moment.img}
+                              src={`/api/image/proxy?url=${encodeURIComponent(moment.img)}`}
                               alt={moment.title}
+                              style={{ display: imageLoading[`${moment.id}-img`] === false ? 'block' : 'none' }}
+                              onLoad={() => handleImageLoad(`${moment.id}-img`)}
+                              onError={() => handleImageError(`${moment.id}-img`)}
                             />
                           </div>
                         )}
@@ -196,8 +219,9 @@ function MomentsPage({ pageContent }) {
                           {moment.icon && (
                             <img
                               className="site-icon"
-                              src={moment.icon}
+                              src={`/api/image/proxy?url=${encodeURIComponent(moment.icon)}`}
                               alt={moment.siteName || moment.author}
+                              onError={(e) => e.target.style.display = 'none'}
                             />
                           )}
                           <span className="author-name">
