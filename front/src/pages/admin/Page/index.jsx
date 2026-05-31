@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Table, Button, Modal, Form, Input, message, Popconfirm, Space, Select, InputNumber, Switch, Tag, Tooltip } from 'antd'
 import { EditOutlined, DeleteOutlined, PlusOutlined, ExportOutlined } from '@ant-design/icons'
 import { getPageListAdmin, createPage, updatePage, deletePage, updatePageStatus, updatePageAllowComment } from '../../../api/article'
+import MarkdownEditor from '../../../components/MarkdownEditor'
 
 // 模板选项
 const templateOptions = [
@@ -202,7 +203,7 @@ function PageList() {
         open={modalVisible}
         onOk={handleSubmit}
         onCancel={() => setModalVisible(false)}
-        width={800}
+        width={1200}
         okText="保存"
         cancelText="取消"
       >
@@ -231,7 +232,7 @@ function PageList() {
             <InputNumber min={0} placeholder="数字越小越靠前" style={{ width: '100%' }} />
           </Form.Item>
           <Form.Item label="内容" name="content">
-            <Input.TextArea rows={6} placeholder="Markdown内容（使用默认模板时显示）" />
+            <MarkdownEditor placeholder="Markdown内容（使用默认模板时显示）" />
           </Form.Item>
           <Form.Item label="允许评论" name="allowComment" valuePropName="checked">
             <Switch checkedChildren="是" unCheckedChildren="否" />
