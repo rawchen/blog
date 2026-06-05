@@ -78,6 +78,7 @@
 }
 
 .btn-home:hover {
+  color: #fff;
   background: #e03a40;
   border-color: #e03a40;
   transform: translateY(-2px);

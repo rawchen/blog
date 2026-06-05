@@ -16,6 +16,7 @@ import com.rawchen.blog.mapper.CommentMapper;
 import com.rawchen.blog.mapper.UserMapper;
 import com.rawchen.blog.service.CommentService;
 import com.rawchen.blog.service.ConfigService;
+import com.rawchen.blog.service.ArticleService;
 import com.rawchen.blog.service.MailService;
 import com.rawchen.blog.vo.CommentVO;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +53,9 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Autowired
     private ArticleMapper articleMapper;
+
+    @Autowired
+    private ArticleService articleService;
 
     @Autowired
     private MailService mailService;
@@ -198,6 +202,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         commentMapper.insert(comment);
         log.info("提交评论成功: {}", comment.getId());
 
+        // 如果不需要审核，直接递增文章评论数
+        if (!needAudit) {
+            articleService.incrementCommentCount(comment.getArticleId());
+        }
+
         // 发送新评论通知邮件给文章作者
         try {
             String mailEnabled = configService.getConfigByKey("mail_enabled", "false");
@@ -222,13 +231,26 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         if (comment == null) {
             throw new RuntimeException("评论不存在");
         }
+        Integer oldStatus = comment.getStatus();
         comment.setStatus(status);
         commentMapper.updateById(comment);
         log.info("审核评论成功: {}, status: {}", id, status);
+
+        // 审核通过时递增评论数，审核拒绝时递减（仅当之前是待审状态时）
+        if (status == 1 && oldStatus != 1) {
+            articleService.incrementCommentCount(comment.getArticleId());
+        } else if (status != 1 && oldStatus == 1) {
+            articleService.decrementCommentCount(comment.getArticleId());
+        }
     }
 
     @Override
     public void deleteComment(Long id) {
+        Comment comment = commentMapper.selectById(id);
+        if (comment != null && comment.getStatus() == 1) {
+            // 如果删除的是已审核的评论，递减文章评论数
+            articleService.decrementCommentCount(comment.getArticleId());
+        }
         commentMapper.deleteById(id);
         log.info("删除评论成功: {}", id);
     }
@@ -268,6 +290,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         commentMapper.insert(comment);
         log.info("回复评论成功: {}", comment.getId());
 
+        // 如果不需要审核，直接递增文章评论数
+        if (!needAudit) {
+            articleService.incrementCommentCount(comment.getArticleId());
+        }
+
         // 发送回复通知邮件给被回复者
         try {
             String mailEnabled = configService.getConfigByKey("mail_enabled", "false");
@@ -306,6 +333,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 .select(Comment::getId, Comment::getArticleId, Comment::getContent,
                         Comment::getCreateTime, Comment::getNickname)
                 .eq(Comment::getStatus, 1)
+                .isNull(Comment::getUserId)
                 .orderByDesc(Comment::getCreateTime)
                 .last("LIMIT " + limit));
 
@@ -328,8 +356,15 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         for (Long id : ids) {
             Comment comment = commentMapper.selectById(id);
             if (comment != null) {
+                Integer oldStatus = comment.getStatus();
                 comment.setStatus(status);
                 commentMapper.updateById(comment);
+                // 审核通过时递增评论数，审核拒绝时递减
+                if (status == 1 && oldStatus != 1) {
+                    articleService.incrementCommentCount(comment.getArticleId());
+                } else if (status != 1 && oldStatus == 1) {
+                    articleService.decrementCommentCount(comment.getArticleId());
+                }
             }
         }
         log.info("批量审核评论成功: {}, status: {}", ids, status);
@@ -339,6 +374,13 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     public void batchDeleteComments(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return;
+        }
+        // 先查询所有要删除的评论，对已审核的评论递减文章评论数
+        for (Long id : ids) {
+            Comment comment = commentMapper.selectById(id);
+            if (comment != null && comment.getStatus() == 1) {
+                articleService.decrementCommentCount(comment.getArticleId());
+            }
         }
         commentMapper.deleteBatchIds(ids);
         log.info("批量删除评论成功: {}", ids);

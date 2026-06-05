@@ -43,6 +43,7 @@ public class MusicController {
         if (vo == null) {
             return R.fail("未找到歌曲");
         }
+        convertUrlToHttps(vo);
         return R.ok(vo);
     }
 
@@ -52,6 +53,9 @@ public class MusicController {
             @PathVariable String id,
             @RequestParam(defaultValue = "320") Integer br) {
         MusicUrlVO vo = musicService.url(id, br);
+        if (vo != null && vo.getUrl() != null && vo.getUrl().startsWith("http://")) {
+            vo.setUrl(vo.getUrl().replace("http://", "https://"));
+        }
         return R.ok(vo);
     }
 
@@ -97,6 +101,15 @@ public class MusicController {
     }
 
     /**
+     * 将 MusicVO 中的 url 字段从 http 替换为 https
+     */
+    private void convertUrlToHttps(MusicVO vo) {
+        if (vo != null && vo.getUrl() != null && vo.getUrl().startsWith("http://")) {
+            vo.setUrl(vo.getUrl().replace("http://", "https://"));
+        }
+    }
+
+    /**
      * 兼容 Meting API 格式
      * 返回格式与 api.injahow.cn/meting 保持一致，便于前端平滑切换
      */
@@ -111,21 +124,30 @@ public class MusicController {
                 if (song == null) {
                     return Collections.emptyList();
                 }
+                convertUrlToHttps(song);
                 return song;
             case "playlist":
                 List<MusicVO> playlist = musicService.playlist(id);
+                playlist.forEach(this::convertUrlToHttps);
                 return playlist;
             case "album":
                 List<MusicVO> album = musicService.album(id);
+                album.forEach(this::convertUrlToHttps);
                 return album;
             case "artist":
                 List<MusicVO> artist = musicService.artist(id, 50);
+                artist.forEach(this::convertUrlToHttps);
                 return artist;
             case "name":
                 // name 类型用于搜索
-                return musicService.search(id, 30);
+                List<MusicVO> search = musicService.search(id, 30);
+                search.forEach(this::convertUrlToHttps);
+                return search;
             case "url":
                 MusicUrlVO url = musicService.url(id, 320);
+                if (url != null && url.getUrl() != null && url.getUrl().startsWith("http://")) {
+                    url.setUrl(url.getUrl().replace("http://", "https://"));
+                }
                 return url;
             case "lrc":
             case "lyric":

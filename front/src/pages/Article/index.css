@@ -727,7 +727,7 @@
 }
 
 .post-next-prev .padd .next-prev {
-  width: 47%;
+  width: 47.8%;
   float: left;
   box-sizing: border-box;
   margin: 10px;
@@ -986,6 +986,12 @@
 @media (max-width: 1350px) {
   .directory-content {
     display: none;
+  }
+}
+
+@media (max-width: 970px) {
+  .post-next-prev .padd .next-prev {
+    width: 46.8%;
   }
 }
 

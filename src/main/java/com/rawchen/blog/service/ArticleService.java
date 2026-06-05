@@ -185,4 +185,14 @@ public interface ArticleService extends IService<Article> {
     void updatePageStatus(Long id, Integer status);
 
     void updatePageAllowComment(Long id, Integer allowComment);
+
+    /**
+     * 增加评论数
+     */
+    void incrementCommentCount(Long id);
+
+    /**
+     * 减少评论数
+     */
+    void decrementCommentCount(Long id);
 }

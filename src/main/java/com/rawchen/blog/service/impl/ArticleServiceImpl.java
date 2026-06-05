@@ -522,6 +522,24 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
+    public void incrementCommentCount(Long id) {
+        Article article = articleMapper.selectById(id);
+        if (article != null && article.getCommentCount() != null) {
+            article.setCommentCount(article.getCommentCount() + 1);
+            articleMapper.updateById(article);
+        }
+    }
+
+    @Override
+    public void decrementCommentCount(Long id) {
+        Article article = articleMapper.selectById(id);
+        if (article != null && article.getCommentCount() != null && article.getCommentCount() > 0) {
+            article.setCommentCount(article.getCommentCount() - 1);
+            articleMapper.updateById(article);
+        }
+    }
+
+    @Override
     public ArticleDetailVO getArticleBySlug(String slug) {
         Article article = articleMapper.selectOne(new LambdaQueryWrapper<Article>()
                 .eq(Article::getSlug, slug)

@@ -1,5 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faHome, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import './index.css'
 
 function NotFoundPage() {
@@ -13,13 +15,13 @@ function NotFoundPage() {
         </p>
         <div className="not-found-actions">
           <Link to="/" className="btn-home">
-            <i className="fa fa-home"></i> 返回首页
+            <FontAwesomeIcon icon={faHome} /> 返回首页
           </Link>
           <button
             className="btn-back"
             onClick={() => window.history.back()}
           >
-            <i className="fa fa-arrow-left"></i> 返回上页
+            <FontAwesomeIcon icon={faArrowLeft} /> 返回上页
           </button>
         </div>
       </div>
