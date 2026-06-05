@@ -1067,3 +1067,81 @@
     height: 183px;
   }
 }
+
+/* Password Protected Content */
+.password-protected-content {
+  padding: 110px 20px;
+  text-align: center;
+}
+
+.password-form-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.password-icon {
+  color: #ff6b6b;
+  margin-bottom: 20px;
+}
+
+.password-form-container h3 {
+  margin: 0 0 10px;
+  color: #333;
+  font-size: 20px;
+}
+
+.password-form-container p {
+  margin: 0 0 25px;
+  color: #666;
+  font-size: 14px;
+}
+
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.password-input {
+  padding: 12px 15px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.password-input:focus {
+  border-color: #eb5055;
+}
+
+.password-error {
+  color: #ff6b6b;
+  font-size: 13px;
+  margin-top: -5px;
+}
+
+.password-submit {
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  background: linear-gradient(to right, #eb5055, #ff6b6b);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.password-submit:hover {
+  opacity: 0.9;
+}
+
+.password-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

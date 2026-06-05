@@ -48,9 +48,9 @@ public class FeedController {
         String siteDescription = getConfigValue("site_description", "大道至简 大简至极");
         String siteUrl = getConfigValue("site_url", "https://example.com");
 
-        // 获取最新文章
+        // 获取最新文章（发布和加密）
         List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
-                .eq(Article::getStatus, 1)
+                .in(Article::getStatus, 1, 2)
                 .orderByDesc(Article::getPublishTime)
                 .last("LIMIT 20"));
 
@@ -72,15 +72,25 @@ public class FeedController {
             rss.append("      <link>").append(escapeXml(siteUrl)).append("/").append(article.getId()).append("</link>\n");
             rss.append("      <guid>").append(escapeXml(siteUrl)).append("/").append(article.getId()).append("</guid>\n");
             rss.append("      <pubDate>").append(formatRfc822Date(article.getPublishTime())).append("</pubDate>\n");
-            rss.append("      <description>").append(escapeXml(article.getSummary() != null ? article.getSummary() : ""))
-                    .append("</description>\n");
-            // 添加正文内容（后端渲染Markdown为HTML）
-            String content = article.getContent();
-            if (content != null && !content.isEmpty()) {
-                String contentHtml = MarkdownUtil.render(content);
+
+            // 加密文章显示提示信息
+            if (article.getStatus() == 2) {
+                String encryptedSummary = "🔐 该文章需要密码访问，请前往网站查看。";
+                rss.append("      <description>").append(escapeXml(encryptedSummary)).append("</description>\n");
                 rss.append("      <content:encoded xml:lang=\"zh-CN\"><![CDATA[\n");
-                rss.append(contentHtml);
+                rss.append("<p>🔐 该文章需要密码访问，请前往网站查看。</p>");
                 rss.append("\n]]></content:encoded>\n");
+            } else {
+                rss.append("      <description>").append(escapeXml(article.getSummary() != null ? article.getSummary() : ""))
+                        .append("</description>\n");
+                // 添加正文内容（后端渲染Markdown为HTML）
+                String content = article.getContent();
+                if (content != null && !content.isEmpty()) {
+                    String contentHtml = MarkdownUtil.render(content);
+                    rss.append("      <content:encoded xml:lang=\"zh-CN\"><![CDATA[\n");
+                    rss.append(contentHtml);
+                    rss.append("\n]]></content:encoded>\n");
+                }
             }
             rss.append("    </item>\n");
         }

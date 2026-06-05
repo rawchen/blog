@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faClock, faTags, faComment, faEye, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons'
+import { faClock, faTags, faComment, faEye, faAngleLeft, faAngleRight, faLock } from '@fortawesome/free-solid-svg-icons'
 import { getArticleDetail, incrementViewCount } from '../../api/article'
 import CommentList from '../../components/Comment'
 import MarkdownRenderer from '../../components/MarkdownRenderer'
@@ -25,6 +25,33 @@ function formatDate(datetime) {
   return datetime ? datetime.substring(0, 10) : ''
 }
 
+// 获取缓存的密码（有效期1天）
+function getCachedPassword(articleId) {
+  const key = `article_pwd_${articleId}`
+  const cached = localStorage.getItem(key)
+  if (cached) {
+    try {
+      const data = JSON.parse(cached)
+      const expireTime = data.expireTime
+      if (expireTime && new Date(expireTime) > new Date()) {
+        return data.password
+      } else {
+        localStorage.removeItem(key)
+      }
+    } catch (e) {
+      localStorage.removeItem(key)
+    }
+  }
+  return null
+}
+
+// 缓存密码（有效期1天）
+function cachePassword(articleId, password) {
+  const key = `article_pwd_${articleId}`
+  const expireTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+  localStorage.setItem(key, JSON.stringify({ password, expireTime }))
+}
+
 function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
   const { slug: id } = useParams()
   const [article, setArticle] = useState(null)
@@ -34,6 +61,10 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
   const [relatedPostsEnabled, setRelatedPostsEnabled] = useState(true)
   const [tocItems, setTocItems] = useState([])
   const [isNotTop, setIsNotTop] = useState(false)
+  const [needPassword, setNeedPassword] = useState(false)
+  const [password, setPassword] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
   const bottomBarRef = useRef(null)
   const headroomRef = useRef(null)
   const { isAuthenticated } = useSelector(state => state.auth)
@@ -114,23 +145,103 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
     }
   }, [article])
 
-  const fetchArticle = async () => {
+  const fetchArticle = async (pwd = null) => {
     // 非数字ID不请求
     if (!id || !/^\d+$/.test(id)) {
       setLoading(false)
       return
     }
     try {
-      const res = await getArticleDetail(id)
-      setArticle(res.data)
-      incrementViewCount(id)
-    } finally {
+      // 先检查缓存的密码
+      const cachedPwd = pwd || getCachedPassword(id)
+      const res = await getArticleDetail(id, cachedPwd || undefined)
+      if (res.data.needPassword) {
+        setNeedPassword(true)
+        setArticle(res.data)
+        setLoading(false)
+      } else {
+        setNeedPassword(false)
+        setArticle(res.data)
+        incrementViewCount(id)
+        setLoading(false)
+      }
+    } catch (e) {
       setLoading(false)
+    }
+  }
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault()
+    if (!password.trim()) {
+      setPasswordError('请输入密码')
+      return
+    }
+    setSubmitting(true)
+    setPasswordError('')
+    try {
+      const res = await getArticleDetail(id, password)
+      if (res.data.needPassword) {
+        setPasswordError('密码错误，请重试')
+      } else {
+        cachePassword(id, password)
+        setNeedPassword(false)
+        setArticle(res.data)
+        incrementViewCount(id)
+      }
+    } catch (e) {
+      setPasswordError('验证失败，请重试')
+    } finally {
+      setSubmitting(false)
     }
   }
 
   if (loading) return <div className="loading">加载中...</div>
   if (!article) return <NotFoundPage />
+
+  // 密码输入界面
+  if (needPassword) {
+    return (
+      <div className="article-page">
+        <div className="article">
+          <header className="article-header">
+            <h1 className="post-title">
+              <FontAwesomeIcon icon={faLock} style={{ marginRight: '8px', color: '#ff6b6b' }} />
+              {article.title}
+            </h1>
+            <div className="post-data">
+              <span className="meta-item">
+                <FontAwesomeIcon icon={faClock} className="fa-icon" />
+                {formatDate(article.publishTime || article.createTime)}
+              </span>
+            </div>
+          </header>
+          <div className="password-protected-content">
+            <div className="password-form-container">
+              <div className="password-icon">
+                <FontAwesomeIcon icon={faLock} size="3x" />
+              </div>
+              <h3>该文章需要密码访问</h3>
+              <p>请输入文章密码以查看完整内容</p>
+              <form onSubmit={handlePasswordSubmit} className="password-form">
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="请输入密码"
+                  className="password-input"
+                  autoFocus
+                />
+                {passwordError && <div className="password-error">{passwordError}</div>}
+                <button type="submit" className="password-submit" disabled={submitting}>
+                  {submitting ? '验证中...' : '确认访问'}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const bgColor = getRandomBgColor()
 

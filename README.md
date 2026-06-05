@@ -1,21 +1,29 @@
 # 博客系统 - Spring Boot + React 前后端分离项目
 
-一个基于 Spring Boot 和 React 的现代化个人博客系统，采用前后端分离架构，支持RBAC权限管理。
+一个基于 Spring Boot 和 React 的现代化个人博客系统，采用前后端分离架构，支持类似 Typecho 的独立页面模板化，支持基于角色的权限管理。
 
 ## 📋 项目简介
 
-本项目是从原有的 Typecho PHP 博客系统重构而来的完整前后端分离博客系统，保留了原有功能的同时，采用了更现代的技术栈和架构设计。
+本项目是从原有的 Typecho PHP 博客系统重构而来的完整前后端分离博客系统，保留了原有大部分功能的同时，采用了更现代的技术栈和架构设计，可使用内置Typecho迁移工具一键迁移文章及独立页、评论、标签、分类。
 
 ### ✨ 主要特性
 
-- 🔐 **完善的权限系统**：基于RBAC模型的权限管理，支持用户、角色、权限三级管理
-- 🎨 **现代化UI**：前台采用简洁优雅的设计，后台使用Ant Design Pro风格
-- 📝 **Markdown支持**：文章支持Markdown格式，代码高亮显示
+- 🎨 **现代化UI**：前台采用简洁优雅的设计，后台使用 Ant Design Pro 风格
+- 📝 **Markdown支持**：文章支持 Markdown 格式，代码高亮显示
+- 📄 **独立页面模板**：支持类似 Typecho 的独立页面模板化，可自定义页面模板
 - 💬 **评论系统**：支持评论回复、审核、点赞等功能
 - 🔍 **全文搜索**：支持文章标题、内容、标签搜索
 - 📱 **响应式设计**：完美适配PC端和移动端
-- 🚀 **JWT认证**：使用JWT实现无状态认证，支持Token刷新
-- 📊 **Swagger文档**：自动生成API接口文档
+- 🔐 **权限系统**：基于角色的权限管理，支持 ADMIN、STAFF、VISITOR 三种角色
+- 🚀 **JWT认证**：使用 JWT 实现无状态认证
+- 📊 **API文档**：使用 Knife4j 自动生成 API 接口文档
+- 🤖 **AI摘要**：集成 DeepSeek AI 自动生成文章摘要
+- 📡 **RSS订阅**：支持 RSS 订阅和 SiteMap 站点地图
+- 🌐 **朋友圈**：支持发布动态，可从 RSS 订阅拉取
+- 🎵 **网易云音乐集成**：支持展示网易云音乐歌单和歌曲
+- 😀 **B站表情包集成**：支持在评论中使用B站表情包
+- ⚙️ **自定义任务系统**：可扩展定制开发的定时任务系统
+- 🚀 **轻量部署**：依赖组件少，无需Redis，仅需MySQL，脚本一键部署线上服务器
 
 ## 🛠 技术栈
 
@@ -162,12 +170,14 @@ pnpm run dev
 ### 后台管理
 
 - ✅ 仪表盘数据统计
-- ✅ 文章管理（增删改查、发布、草稿）
+- ✅ 文章管理（增删改查、发布、草稿、版本历史）
+- ✅ 独立页面管理
 - ✅ 分类管理
 - ✅ 标签管理
 - ✅ 评论管理（审核、删除）
-- ✅ 用户管理（状态管理、密码重置）
-- ✅ 角色权限管理
+- ✅ 朋友圈管理（发布、RSS拉取）
+- ✅ 友链管理
+- ✅ 站点配置管理
 
 ### 前台展示
 
@@ -180,17 +190,22 @@ pnpm run dev
 
 ## 🔒 权限说明
 
-系统采用RBAC（基于角色的访问控制）模型：
+系统采用基于角色的访问控制：
 
-- 用户（User）：系统使用者
-- 角色（Role）：权限集合
-- 权限（Permission）：具体的操作权限
+### 角色说明
 
-### 默认角色
+1. **ADMIN**：超级管理员，拥有所有权限，可进行文章、配置等管理操作
+2. **STAFF**：工作人员，可访问后台管理界面，拥有部分管理权限
+3. **VISITOR**：访客角色，可访问后台但权限有限
 
-1. **超级管理员(ROLE_ADMIN)**：拥有所有权限
-2. **普通用户(ROLE_USER)**：拥有基本内容管理权限
-3. **访客(ROLE_GUEST)**：只能浏览内容
+## 状态规则
+| 状态 | 列表可见 | Feed可见 | 直接访问URL | 详情内容 |
+|-----|---------|---------|------------|---------|
+| 0-待审 | ❌ | ❌ | ❌ 404 | - |
+| 1-发布 | ✅ | ✅ | ✅ | 完整内容 |
+| 2-加密 | ✅ | ✅ 提示 | ✅ | 需密码 |
+| 3-隐藏 | ❌ | ❌ | ✅ | 完整内容 |
+| 4-私密 | ❌ | ❌ | ❌ 404 | - |
 
 ## 📖 API文档
 
@@ -201,30 +216,61 @@ pnpm run dev
 #### 认证相关
 
 - `POST /api/auth/login` - 用户登录
-- `POST /api/auth/register` - 用户注册
-- `POST /api/auth/refresh` - 刷新Token
 - `GET /api/auth/info` - 获取当前用户信息
 - `POST /api/auth/logout` - 退出登录
+- `PUT /api/auth/password` - 修改密码
+- `PUT /api/auth/profile` - 更新个人资料
 
 #### 文章相关
 
-- `GET /api/article/list` - 获取文章列表（前台）
+- `POST /api/article/article-list` - 获取文章列表（前台）
 - `GET /api/article/detail/{id}` - 获取文章详情
+- `GET /api/article/slug/{slug}` - 根据别名获取文章
+- `GET /api/article/timeline` - 时间线归档
+- `GET /api/article/archive` - 归档列表
+- `GET /api/article/random` - 随机文章
+- `GET /api/article/recommend` - 推荐文章
+- `POST /api/article/latest-article` - 最新文章
 - `GET /api/article/admin/list` - 获取文章列表（后台）
 - `POST /api/article/admin` - 创建文章
 - `PUT /api/article/admin` - 更新文章
 - `DELETE /api/article/admin/{id}` - 删除文章
+- `POST /api/article/admin/ai/summary` - AI生成文章摘要
+
+#### 独立页面
+
+- `GET /api/article/pages` - 获取独立页面列表
+- `GET /api/article/page/{slug}` - 获取独立页面详情
+- `POST /api/article/admin/pages` - 创建独立页面
 
 #### 分类标签
 
-- `GET /api/category/list` - 获取分类列表
+- `GET /api/category/category-list` - 获取分类列表
 - `GET /api/tag/list` - 获取标签列表
 
 #### 评论相关
 
 - `GET /api/comment/list/{articleId}` - 获取评论列表
 - `POST /api/comment/submit` - 提交评论
+- `POST /api/comment/like/{id}` - 点赞评论
 - `PUT /api/comment/admin/audit/{id}` - 审核评论
+
+#### 朋友圈
+
+- `GET /api/moment/list` - 获取朋友圈列表（前台）
+- `POST /api/moment/admin` - 添加动态
+- `POST /api/moment/admin/fetch` - 从RSS订阅拉取
+
+#### RSS & SiteMap
+
+- `GET /feed` - RSS订阅
+- `GET /sitemap.xml` - 站点地图
+
+#### 配置相关
+
+- `GET /api/config/site-config` - 获取站点配置（公开）
+- `GET /api/config/all` - 获取所有配置（后台）
+- `PUT /api/config/batch` - 批量更新配置
 
 ## 🔧 配置说明
 
@@ -233,10 +279,28 @@ pnpm run dev
 ```yaml
 jwt:
   secret: rawchen-blog-jwt-secret-key-2026-very-long-secret-key-for-security
-  expiration: 7200000           # Access Token过期时间（毫秒）
-  refresh-expiration: 604800000 # Refresh Token过期时间（毫秒）
+  expiration: 2592000000   # Access Token过期时间（毫秒），默认1个月
   token-prefix: Bearer
   header: Authorization
+```
+
+### 邮箱配置
+
+```yaml
+spring:
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: your_email@qq.com
+    password: your_auth_code
+    from: your_email@qq.com
+```
+
+### IP数据库配置
+
+```yaml
+ip2region:
+  xdb: file:./data/ip2region_v4.xdb
 ```
 
 ### OSS配置

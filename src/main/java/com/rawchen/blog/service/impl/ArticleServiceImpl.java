@@ -83,7 +83,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Page<Article> page = new Page<>(current, pageSize);
 
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Article::getStatus, 1) // 已发布
+        wrapper.in(Article::getStatus, 1, 2) // 发布或加密
                 .eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章
                 .orderByDesc(Article::getIsTop)
                 .orderByDesc(Article::getPublishTime);
@@ -136,25 +136,37 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Override
     public ArticleDetailVO getArticleDetail(Long id, String password) {
         Article article = articleMapper.selectById(id);
-        if (article == null || article.getStatus() != 1) {
+        if (article == null) {
             throw new BusinessException(ResultCode.ARTICLE_NOT_FOUND);
         }
 
-        // 检查密码
-        if (StringUtils.hasText(article.getPassword())) {
-            if (!article.getPassword().equals(password)) {
-                throw new BusinessException("文章需要密码访问");
-            }
+        // 状态判断：0-待审、4-私密完全不可访问
+        Integer status = article.getStatus();
+        if (status == 0 || status == 4) {
+            throw new BusinessException(ResultCode.ARTICLE_NOT_FOUND);
         }
 
         ArticleDetailVO detailVO = new ArticleDetailVO();
         BeanUtils.copyProperties(convertToVO(article), detailVO);
+
+        // 状态2-加密：检查密码
+        if (status == 2 && StringUtils.hasText(article.getPassword())) {
+            if (!article.getPassword().equals(password)) {
+                // 密码不匹配：返回基本信息，标记需要密码
+                detailVO.setNeedPassword(true);
+                detailVO.setContent(null);
+                detailVO.setContentHtml(null);
+                return detailVO;
+            }
+        }
+
+        // 状态1-发布、3-隐藏、2-加密(密码正确)：返回完整内容
         detailVO.setContent(article.getContent());
         detailVO.setContentHtml(article.getContentHtml());
 
-        // 查询上一篇下一篇（只查询POST类型）
+        // 查询上一篇下一篇（发布或加密的文章）
         Article prevArticle = articleMapper.selectOne(new LambdaQueryWrapper<Article>()
-                .eq(Article::getStatus, 1)
+                .in(Article::getStatus, 1, 2)
                 .eq(Article::getType, Article.ArticleType.POST)
                 .lt(Article::getPublishTime, article.getPublishTime())
                 .orderByDesc(Article::getPublishTime)
@@ -176,7 +188,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
 
         Article nextArticle = articleMapper.selectOne(new LambdaQueryWrapper<Article>()
-                .eq(Article::getStatus, 1)
+                .in(Article::getStatus, 1, 2)
                 .eq(Article::getType, Article.ArticleType.POST)
                 .gt(Article::getPublishTime, article.getPublishTime())
                 .orderByAsc(Article::getPublishTime)
@@ -525,7 +537,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Page<Article> page = new Page<>(current, size);
 
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Article::getStatus, 1)
+        wrapper.in(Article::getStatus, 1, 2)
                 .eq(Article::getType, Article.ArticleType.POST); // 只查询普通文章
 
         if (StringUtils.hasText(keyword)) {
@@ -555,7 +567,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Page<Article> page = new Page<>(current, size);
 
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Article::getStatus, 1)
+        wrapper.in(Article::getStatus, 1, 2)
                 .eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章
                 .orderByDesc(Article::getPublishTime);
 
@@ -576,7 +588,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 只查询需要的字段，避免查询content等大字段
         List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
                 .select(Article::getId, Article::getTitle, Article::getCategoryId, Article::getPublishTime)
-                .eq(Article::getStatus, 1)
+                .in(Article::getStatus, 1, 2)
                 .eq(Article::getType, Article.ArticleType.POST)
                 .orderByDesc(Article::getPublishTime));
 
@@ -615,7 +627,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
 
         List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
-                .eq(Article::getStatus, 1)
+                .in(Article::getStatus, 1, 2)
                 .eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章
                 .last("ORDER BY RAND() LIMIT " + limit));
 
@@ -629,7 +641,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
 
         List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
-                .eq(Article::getStatus, 1)
+                .in(Article::getStatus, 1, 2)
                 .eq(Article::getType, Article.ArticleType.POST) // 只查询普通文章
                 .eq(Article::getIsRecommend, 1)
                 .orderByDesc(Article::getPublishTime)
@@ -676,7 +688,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         // 过滤并批量转换
         List<Article> validArticles = articles.stream()
-                .filter(a -> a.getStatus() == 1 && a.getType() == Article.ArticleType.POST)
+                .filter(a -> (a.getStatus() == 1 || a.getStatus() == 2) && a.getType() == Article.ArticleType.POST)
                 .collect(Collectors.toList());
 
         return batchConvertToVO(validArticles);
@@ -690,7 +702,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
         List<Article> articles = articleMapper.selectList(new LambdaQueryWrapper<Article>()
                 .select(Article::getId, Article::getTitle, Article::getPublishTime)
-                .eq(Article::getStatus, 1)
+                .in(Article::getStatus, 1, 2)
                 .eq(Article::getType, Article.ArticleType.POST)
                 .orderByDesc(Article::getPublishTime)
                 .last("LIMIT " + limit));

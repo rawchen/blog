@@ -36,4 +36,9 @@ public class ArticleDetailVO extends ArticleVO implements Serializable {
      * 下一篇
      */
     private ArticleVO nextArticle;
+
+    /**
+     * 是否需要密码访问（加密文章密码不正确时为true）
+     */
+    private Boolean needPassword;
 }
