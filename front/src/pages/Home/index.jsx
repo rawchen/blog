@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { getArticleList } from '../../api/article'
 import Pagination from '../../components/Pagination'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faClock, faTags, faComment, faEye } from '@fortawesome/free-solid-svg-icons'
+import { faClock, faTags, faComment, faEye, faFire } from '@fortawesome/free-solid-svg-icons'
 import momentIcon from '../../assets/icons/moment.svg'
 import './index.css'
 
@@ -149,7 +149,12 @@ function Home() {
               />
             </Link>
             <div className="item-title">
-              <Link to={`/${article.id}`}>{article.title}</Link>
+              <Link to={`/${article.id}`}>
+                {article.isTop === 1 && (
+                  <FontAwesomeIcon icon={faFire} style={{ color: '#ff6b6b', marginRight: '6px' }} />
+                )}
+                {article.title}
+              </Link>
             </div>
             <div className="item-meta">
               <span className="meta-item">
