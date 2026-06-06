@@ -102,7 +102,7 @@ function TagPage() {
                   <Link to={`/${article.id}`}>
                     <div className="item-label">
                       <div className="item-title">
-                        <a>{article.title}</a>
+                        <span>{article.title}</span>
                       </div>
                       <div className="item-meta clearfix">
                         <div className="item-meta-date">

@@ -20,6 +20,29 @@ const templateComponents = {
 }
 
 function PageDetail({ page, commentPage = 1, anchorCommentId = null }) {
+  // 默认模板：恢复刷新前的滚动位置
+  useEffect(() => {
+    if (!page || page.template) return
+    const key = `scroll_page_${page.slug}`
+    const saved = sessionStorage.getItem(key)
+    if (saved) {
+      sessionStorage.removeItem(key)
+      requestAnimationFrame(() => {
+        window.scrollTo(0, parseInt(saved, 10))
+      })
+    }
+  }, [page])
+
+  // 页面卸载前保存滚动位置
+  useEffect(() => {
+    if (!page || page.template) return
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem(`scroll_page_${page.slug}`, String(window.scrollY))
+    }
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [page])
+
   if (!page) {
     return <NotFoundPage />
   }
@@ -37,27 +60,6 @@ function PageDetail({ page, commentPage = 1, anchorCommentId = null }) {
     )
   }
 
-  // 默认模板：恢复刷新前的滚动位置
-  useEffect(() => {
-    const key = `scroll_page_${page.slug}`
-    const saved = sessionStorage.getItem(key)
-    if (saved) {
-      sessionStorage.removeItem(key)
-      requestAnimationFrame(() => {
-        window.scrollTo(0, parseInt(saved, 10))
-      })
-    }
-  }, [page.slug])
-
-  // 页面卸载前保存滚动位置
-  useEffect(() => {
-    const handleBeforeUnload = () => {
-      sessionStorage.setItem(`scroll_page_${page.slug}`, String(window.scrollY))
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [page.slug])
-
   // 默认模板：渲染Markdown内容
   return (
     <div className="page-detail">
@@ -69,13 +71,13 @@ function PageDetail({ page, commentPage = 1, anchorCommentId = null }) {
             {new Date(page.publishTime).toLocaleDateString('zh-CN')}
           </span>
           <span className="meta-item">
-                  <FontAwesomeIcon icon={faComment} className="fa-icon" />
-                  <Link to="#comments">{page.commentCount || 0} 评论</Link>
-                </span>
+            <FontAwesomeIcon icon={faComment} className="fa-icon" />
+            <Link to="#comments">{page.commentCount || 0} 评论</Link>
+          </span>
           <span className="meta-item">
-                  <FontAwesomeIcon icon={faEye} className="fa-icon" />
+            <FontAwesomeIcon icon={faEye} className="fa-icon" />
             {page.viewCount || 0} 浏览
-                </span>
+          </span>
         </div>
       </div>
       <div className="page-content">

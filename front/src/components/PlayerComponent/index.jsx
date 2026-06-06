@@ -423,9 +423,9 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
             }}
           >
             {lyrics.map((line, index) => (
-              <lrc key={index} className={index === currentLyricIndex ? 'now' : ''}>
+              <span key={index} className={`lyric-line ${index === currentLyricIndex ? 'now' : ''}`}>
                 {line.text}
-              </lrc>
+              </span>
             ))}
           </div>
         </div>

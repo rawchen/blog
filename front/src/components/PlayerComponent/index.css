@@ -59,7 +59,7 @@
   transition: transform 0.3s ease-out;
 }
 
-.c-player .lyric .lyric-body lrc {
+.c-player .lyric .lyric-body .lyric-line {
   flex: 1;
   display: block;
   will-change: background;
@@ -72,7 +72,7 @@
   transition: 0.25s background ease;
 }
 
-.c-player .lyric .lyric-body lrc.now {
+.c-player .lyric .lyric-body .lyric-line.now {
   background: #ddd;
   color: #333;
   font-weight: 500;

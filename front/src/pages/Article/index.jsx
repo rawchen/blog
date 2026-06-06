@@ -347,7 +347,7 @@ function ArticleDetail({ commentPage = 1, anchorCommentId = null }) {
           {/* Post Info */}
           <div className="post-info">
             {isAuthenticated && (
-              <a class="post-info-edit" href={`/admin/article/edit/${article.id}`} target="_blank" rel="noopener noreferrer">
+              <a className="post-info-edit" href={`/admin/article/edit/${article.id}`} target="_blank" rel="noopener noreferrer">
                 <img src={eyeIcon} height="16px" width="16px" alt="编辑" />
               </a>
             )}

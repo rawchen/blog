@@ -30,6 +30,7 @@ const camelToSnake = {
   ossEnabled: 'oss_enabled',
   ossStyleArticle: 'oss_style_article',
   ossStyleCover: 'oss_style_cover',
+  ossStyleLogo: 'oss_style_logo',
   gravatarDomain: 'gravatar_domain',
   musicU: 'music_u',
   articlePageSize: 'article_page_size',
@@ -236,7 +237,7 @@ function Setting() {
                 <Input.TextArea rows={2}
                                 placeholder='跟踪脚本代码，如：<script async defer src="https://umami.example.com/umami.js"></script>'/>
               </Form.Item>
-              <Form.Item label={<span><Tooltip title="开启OSS云存储上传图片：文章图片处理样式/封面图片处理样式"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> OSS上传</span>}>
+              <Form.Item label={<span><Tooltip title="开启OSS云存储上传图片：文章图片处理样式/封面图片处理样式/Logo图片处理样式"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> OSS上传</span>}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <Form.Item name="oss_enabled" valuePropName="checked" noStyle>
                     <Switch checkedChildren="开" unCheckedChildren="关" onChange={(checked) => setOssEnabled(checked)}/>
@@ -248,6 +249,9 @@ function Setting() {
                       </Form.Item>
                       <Form.Item name="oss_style_cover" noStyle>
                         <Input placeholder="?x-oss-process=style/cover"/>
+                      </Form.Item>
+                      <Form.Item name="oss_style_logo" noStyle>
+                        <Input placeholder="?x-oss-process=style/logo"/>
                       </Form.Item>
                     </>
                   )}

@@ -130,6 +130,11 @@ public class SiteConfigVO implements Serializable {
     private String ossStyleCover;
 
     /**
+     * OSS Logo图片处理样式
+     */
+    private String ossStyleLogo;
+
+    /**
      * Gravatar头像域名
      */
     private String gravatarDomain;

@@ -255,3 +255,8 @@
     height: 35px;
   }
 }
+
+/* Logo preview hover delete */
+.logo-preview-wrapper:hover .logo-preview-delete {
+  opacity: 1 !important;
+}

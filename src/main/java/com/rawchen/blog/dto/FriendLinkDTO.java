@@ -63,4 +63,14 @@ public class FriendLinkDTO implements Serializable {
      * 排序
      */
     private Integer sortOrder;
+
+    /**
+     * 验证码会话ID（前台申请时需要）
+     */
+    private String captchaSessionId;
+
+    /**
+     * 验证码答案（前台申请时需要）
+     */
+    private Integer captchaAnswer;
 }

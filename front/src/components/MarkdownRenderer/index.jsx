@@ -241,6 +241,30 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
     'player-data': ({ id, type, autoplay }) => (
       <PlayerComponent key={id} id={id} type={type} autoplay={autoplay} />
     ),
+    // 自定义 paragraph 组件，避免块级元素被包裹在 <p> 内
+    p: ({ children, ...props }) => {
+      // 检查子元素是否包含自定义块级组件
+      const childArray = React.Children.toArray(children)
+      const hasBlockComponent = childArray.some(child => {
+        if (!child || typeof child !== 'object') return false
+        const type = child.type
+        // 检查是否是自定义组件（函数组件且名称包含 '-data' 或是 DPlayerComponent/PlayerComponent）
+        if (typeof type === 'function') {
+          const name = type.displayName || type.name || ''
+          return name.includes('-data') || name === 'DPlayerComponent' || name === 'PlayerComponent'
+        }
+        // 检查是否是自定义元素字符串
+        if (typeof type === 'string') {
+          return type.includes('-data')
+        }
+        return false
+      })
+      // 如果包含块级组件，直接返回子元素
+      if (hasBlockComponent) {
+        return <>{children}</>
+      }
+      return <p {...props}>{children}</p>
+    },
     // 标题组件 - 直接使用预处理生成的HTML标签（已有ID）
     h1: ({ children, ...props }) => <h1 {...props}>{children}</h1>,
     h2: ({ children, ...props }) => <h2 {...props}>{children}</h2>,
