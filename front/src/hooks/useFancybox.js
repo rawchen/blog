@@ -64,6 +64,13 @@ export default function useFancybox(options = {}) {
         Carousel: {
           Thumbs: {
             type: 'classic',
+            Carousel: {
+              vertical: true,
+
+              center: (ref) => {
+                return ref.getTotalSlideDim() > ref.getViewportDim();
+              },
+            },
           },
           Toolbar: {
             items: {
@@ -128,7 +135,7 @@ export default function useFancybox(options = {}) {
             display: {
               left: ['infobar'],
               middle: [],
-              right: ['viewOriginal', 'toggleFull', 'autoplay', 'fullscreen', 'thumbs', 'close'],
+              right: ['viewOriginal', 'toggleFull', 'fullscreen', 'thumbs', 'close'],
             },
           },
         },

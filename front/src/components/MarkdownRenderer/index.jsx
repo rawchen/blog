@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { useMemo, useEffect, useState, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -18,6 +18,71 @@ import { parseSmilies } from '../../utils/smilies'
 import DPlayerComponent from '../DPlayerComponent'
 import PlayerComponent from '../PlayerComponent'
 import './index.css'
+
+// PhotosGroup 组件 - 图片组并排显示
+function PhotosGroup({ images: initialImages }) {
+  const [images, setImages] = useState([])
+  const [loaded, setLoaded] = useState(false)
+  const containerRef = useRef(null)
+
+  // 初始化图片数据
+  useEffect(() => {
+    if (!initialImages || !Array.isArray(initialImages) || initialImages.length === 0) return
+    setImages(initialImages.map(img => ({
+      alt: img.alt || '',
+      src: img.src || '',
+      ratio: 1,
+      loaded: false
+    })))
+  }, [initialImages])
+
+  // 图片加载后获取比例
+  const handleImageLoad = (index, e) => {
+    const img = e.target
+    const ratio = img.naturalWidth / img.naturalHeight
+    setImages(prev => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], ratio, loaded: true }
+      return updated
+    })
+  }
+
+  // 检查是否所有图片都加载完成
+  useEffect(() => {
+    if (images.length > 0 && images.every(img => img.loaded)) {
+      setLoaded(true)
+    }
+  }, [images])
+
+  if (images.length === 0) return null
+
+  // 计算总比例
+  const totalRatio = images.reduce((sum, img) => sum + img.ratio, 0)
+
+  return (
+    <div className="photos" ref={containerRef} style={{ opacity: loaded ? 1 : 0, transition: 'opacity 0.3s' }}>
+      {images.map((img, index) => {
+        const flexValue = img.loaded ? Math.round((img.ratio / totalRatio) * 100 * images.length) : 100
+        const paddingTop = img.loaded ? (1 / img.ratio * 100) : 66.67
+        return (
+          <figure key={index} style={{ flex: `${flexValue} 1 0%` }}>
+            <div style={{ paddingTop: `${paddingTop}%` }}>
+              <a data-fancybox="article-gallery" href={img.src} style={{ display: 'contents' }}>
+                <img
+                  alt={img.alt}
+                  src={img.src}
+                  onLoad={(e) => handleImageLoad(index, e)}
+                  style={{ opacity: img.loaded ? 1 : 0 }}
+                />
+              </a>
+            </div>
+            <figcaption></figcaption>
+          </figure>
+        )
+      })}
+    </div>
+  )
+}
 
 // 代码块组件
 function CodeBlock({ className, children }) {
@@ -133,6 +198,22 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
     // 解析表情
     text = parseSmilies(text)
 
+    // 解析 [photos]...[/photos] 标签 - 使用全局数组存储数据
+    const photosGroups = []
+    text = text.replace(/\[photos\]([\s\S]*?)\[\/photos\]/g, (match, content) => {
+      // 提取所有图片
+      const imgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g
+      const images = []
+      let imgMatch
+      while ((imgMatch = imgRegex.exec(content)) !== null) {
+        images.push({ alt: imgMatch[1], src: imgMatch[2] })
+      }
+      if (images.length === 0) return ''
+      const index = photosGroups.length
+      photosGroups.push(images)
+      return `<photos-group index="${index}"></photos-group>`
+    })
+
     // HTML渲染处理
     if (!htmlRenderEnabled) {
       let smiliePlaceholders = []
@@ -153,12 +234,19 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
         playerPlaceholders.push(match)
         return `PLAYER_PH_${playerIndex++}`
       })
+      let photosPlaceholders = []
+      let photosIndex = 0
+      text = text.replace(/<photos-group[^>]*><\/photos-group>/gi, (match) => {
+        photosPlaceholders.push(match)
+        return `PHOTOS_PH_${photosIndex++}`
+      })
       text = text.replace(/<\/?[a-zA-Z][^>]*>/g, (tag) => {
         return tag.replace(/</g, '&lt;').replace(/>/g, '&gt;')
       })
       text = text.replace(/SMILIE_PH_(\d+)/g, (_, i) => smiliePlaceholders[parseInt(i)])
       text = text.replace(/DPLAYER_PH_(\d+)/g, (_, i) => dplayerPlaceholders[parseInt(i)])
       text = text.replace(/PLAYER_PH_(\d+)/g, (_, i) => playerPlaceholders[parseInt(i)])
+      text = text.replace(/PHOTOS_PH_(\d+)/g, (_, i) => photosPlaceholders[parseInt(i)])
     }
 
     // 计算目录并转换标题为带ID的HTML标签
@@ -218,7 +306,7 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
       return line
     })
 
-    return { processed: processedLines.join('\n'), tocItems }
+    return { processed: processedLines.join('\n'), tocItems, photosGroups }
   }, [content, htmlRenderEnabled])
 
   const processedContent = preprocessContent.processed
@@ -233,6 +321,10 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
 
   // 自定义组件
   const components = {
+    // photos-group 图片组
+    'photos-group': ({ index }) => (
+      <PhotosGroup images={preprocessContent.photosGroups?.[index] || []} />
+    ),
     // dplayer 短代码组件
     'dplayer-data': ({ url, pic, danmu, autoplay, addition }) => (
       <DPlayerComponent key={url} url={url} pic={pic} danmu={danmu} autoplay={autoplay} addition={addition} />
@@ -248,14 +340,14 @@ const MarkdownRenderer = React.memo(function MarkdownRenderer({ content, classNa
       const hasBlockComponent = childArray.some(child => {
         if (!child || typeof child !== 'object') return false
         const type = child.type
-        // 检查是否是自定义组件（函数组件且名称包含 '-data' 或是 DPlayerComponent/PlayerComponent）
+        // 检查是否是自定义组件（函数组件且名称包含 '-data' 或是 DPlayerComponent/PlayerComponent/PhotosGroup）
         if (typeof type === 'function') {
           const name = type.displayName || type.name || ''
-          return name.includes('-data') || name === 'DPlayerComponent' || name === 'PlayerComponent'
+          return name.includes('-data') || name.includes('-group') || name === 'DPlayerComponent' || name === 'PlayerComponent' || name === 'PhotosGroup'
         }
         // 检查是否是自定义元素字符串
         if (typeof type === 'string') {
-          return type.includes('-data')
+          return type.includes('-data') || type.includes('-group')
         }
         return false
       })

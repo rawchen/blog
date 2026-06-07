@@ -414,3 +414,46 @@
   border-radius: 8px;
   overflow: hidden;
 }
+
+/* Photos 图片组并排显示 */
+.markdown-body .photos {
+  width: 100%;
+  overflow: hidden;
+  margin: 16px auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-transition: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) all;
+  transition: 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) all;
+}
+
+.markdown-body .photos figure {
+  position: relative;
+  margin: 0px 6px;
+}
+
+.markdown-body .photos > figure:last-child {
+  margin-right: 0;
+}
+
+.markdown-body .photos > figure:first-child {
+  margin-left: 0;
+}
+
+.markdown-body .photos figure div {
+  position: relative;
+  height: 0;
+  width: 100%;
+}
+
+.markdown-body .photos figure div img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+}
