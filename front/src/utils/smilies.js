@@ -96,7 +96,9 @@ export const parseSmilies = (text) => {
 // 解析链接，将URL转换为可点击的a标签
 export const parseLinks = (text) => {
   if (!text) return ''
-  const urlRegex = /(https?:\/\/[^\s<]+)/g
+  // URL合法字符：字母、数字、以及特殊字符 -._~:/?#[]@!$&'()*+,;=%
+  // 遇到中文、中文标点等非URL字符时截断
+  const urlRegex = /(https?:\/\/[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=%]+)/g
   return text.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>')
 }
 
