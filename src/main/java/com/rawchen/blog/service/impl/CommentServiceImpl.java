@@ -337,6 +337,19 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 .orderByDesc(Comment::getCreateTime)
                 .last("LIMIT " + limit));
 
+        // 批量查询文章信息（仅PAGE类型需要slug）
+        List<Long> articleIds = comments.stream()
+                .map(Comment::getArticleId)
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+        Map<Long, Article> articleMap = articleIds.isEmpty() ? java.util.Collections.emptyMap() :
+                articleMapper.selectList(new LambdaQueryWrapper<Article>()
+                        .select(Article::getId, Article::getSlug, Article::getType)
+                        .in(Article::getId, articleIds))
+                        .stream()
+                        .collect(Collectors.toMap(Article::getId, a -> a));
+
         return comments.stream().map(comment -> {
             LatestCommentDTO dto = new LatestCommentDTO();
             dto.setId(comment.getId());
@@ -344,6 +357,13 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             dto.setContent(comment.getContent());
             dto.setCreateTime(comment.getCreateTime());
             dto.setNickname(comment.getNickname());
+            // 独立页面(PAGE)使用slug作为访问路径
+            if (comment.getArticleId() != null) {
+                Article article = articleMap.get(comment.getArticleId());
+                if (article != null && article.getType() == Article.ArticleType.PAGE) {
+                    dto.setArticleSlug(article.getSlug());
+                }
+            }
             return dto;
         }).collect(Collectors.toList());
     }

@@ -280,7 +280,7 @@ function Footer() {
               {recentComments.length > 0 ? (
                 recentComments.map(comment => (
                   <li key={comment.id}>
-                    <Link to={`/${comment.articleId}#comment-${comment.id}`}>
+                    <Link to={`/${comment.articleSlug || comment.articleId}#comment-${comment.id}`}>
                       {comment.nickname} : <span dangerouslySetInnerHTML={{ __html: renderSmilies(comment.content) }} />
                       {/*<span className="comment-author">{comment.nickname}:</span>*/}
                       {/*<span className="comment-content">*/}

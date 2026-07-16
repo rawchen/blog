@@ -19,6 +19,11 @@ public class LatestCommentDTO implements Serializable {
 
     private Long articleId;
 
+    /**
+     * 文章slug（仅当文章类型为PAGE时设置，用于拼接独立页面路径）
+     */
+    private String articleSlug;
+
     private String content;
 
     private LocalDateTime createTime;
