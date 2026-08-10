@@ -82,9 +82,10 @@ public interface AccessLogMapper extends BaseMapper<AccessLog> {
      * 获取省份分布统计 (中国)
      */
     @Select("SELECT province as name, COUNT(*) as count FROM sys_access_log " +
-            "WHERE create_time >= #{startTime} AND province IS NOT NULL AND province != '' AND province != '0' " +
-            "GROUP BY province ORDER BY count DESC LIMIT #{limit}")
-    List<ChartItemVO> findProvinceDistribution(@Param("startTime") LocalDateTime startTime, @Param("limit") int limit);
+            "WHERE create_time >= #{startTime} AND country = '中国' " +
+            "AND province IS NOT NULL AND province != '' AND province != '0' " +
+            "GROUP BY province ORDER BY count DESC")
+    List<ChartItemVO> findProvinceDistribution(@Param("startTime") LocalDateTime startTime);
 
     /**
      * 获取来源域名分布统计
