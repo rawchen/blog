@@ -938,7 +938,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 vo.setSummary(article.getSummary());
             } else if (StringUtils.hasText(article.getContent())) {
                 String plainText = stripMarkdown(article.getContent());
-                vo.setSummary(plainText.length() > 150 ? plainText.substring(0, 150) + "..." : plainText);
+                // 如果去掉所有标记后没有正文（全是 [photos]...[/photos] 等图片块），
+                // 则统计图片数量并给出默认摘要
+                if (!StringUtils.hasText(plainText)) {
+                    int imgCount = countImages(article.getContent());
+                    if (imgCount > 0) {
+                        vo.setSummary("该文章只有" + imgCount + "张图片哦");
+                    }
+                } else {
+                    vo.setSummary(plainText.length() > 150 ? plainText.substring(0, 150) + "..." : plainText);
+                }
             }
 
             // 从Map获取分类
@@ -971,6 +980,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private String stripMarkdown(String text) {
         if (text == null) return "";
         return text
+            // Remove [photos]...[/photos] custom image groups (and their inner images)
+            .replaceAll("\\[photos\\][\\s\\S]*?\\[/photos\\]", "")
             // Remove code blocks (```)
             .replaceAll("```[\\s\\S]*?```", "")
             // Remove inline code (`)
@@ -1001,6 +1012,24 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             // Remove extra whitespace and newlines
             .replaceAll("\\s+", " ")
             .trim();
+    }
+
+    /**
+     * 统计文章内容中的图片数量，包括：
+     * - Markdown 图片 ![alt](url)
+     * - 自定义 [photos]...[/photos] 图片组中的图片
+     * - HTML <img> 标签
+     */
+    private int countImages(String content) {
+        if (!StringUtils.hasText(content)) return 0;
+        int count = 0;
+        java.util.regex.Pattern p = java.util.regex.Pattern.compile("!\\[[^\\]]*\\]\\([^)]+\\)");
+        java.util.regex.Matcher m = p.matcher(content);
+        while (m.find()) count++;
+        java.util.regex.Pattern imgTag = java.util.regex.Pattern.compile("<img[^>]*>", java.util.regex.Pattern.CASE_INSENSITIVE);
+        java.util.regex.Matcher m2 = imgTag.matcher(content);
+        while (m2.find()) count++;
+        return count;
     }
 
     /**
