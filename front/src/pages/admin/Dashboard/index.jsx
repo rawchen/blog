@@ -227,6 +227,18 @@ function Dashboard() {
     }]
   }
 
+  // 访客国家分布
+  const countryChartData = {
+    labels: countryData.map(d => d.name),
+    datasets: [{
+      label: '访问量',
+      data: countryData.map(d => d.count),
+      backgroundColor: '#945FB9',
+      borderRadius: 4,
+      barThickness: 14
+    }]
+  }
+
   // 昨日今日页面类型对比
   const pageTypeCompareChartData = {
     labels: pageTypeCompareData.map(d => d.name),
@@ -365,11 +377,11 @@ function Dashboard() {
   const chinaMapOption = {
     tooltip: {
       trigger: 'item',
-      formatter: (params) => `${params.name}<br/>${params.value || 0} 次`
+      formatter: (params) => `${params.name}<br/>${params.data?.rawValue ?? params.value ?? 0} 次`
     },
     visualMap: {
       min: 0,
-      max: provinceData.length > 0 ? Math.max(...provinceData.map(d => d.count), 10) : 10,
+      max: provinceData.length > 0 ? Math.log2(Math.max(...provinceData.map(d => d.count), 10)) : 1,
       left: 'left',
       top: 'bottom',
       text: ['高', '低'],
@@ -393,7 +405,8 @@ function Dashboard() {
       },
       data: provinceData.map(d => ({
         name: d.name,
-        value: d.count
+        value: Math.log2(d.count || 1),
+        rawValue: d.count
       }))
     }]
   }
@@ -562,6 +575,15 @@ function Dashboard() {
       {/* 图表行1: 热门文章 / 分类文章 / 标签文章 */}
       <Row gutter={[8, 8]} style={{ marginTop: 8 }}>
         <Col xs={24} lg={6}>
+          <Card title="访客国家分布 (30天)" size="small" bodyStyle={{ padding: '12px 16px' }}>
+            {countryData.length > 0 ? (
+                <div style={{ height: 260 }}>
+                  <Bar data={countryChartData} options={horizontalBarOptions} />
+                </div>
+            ) : noData}
+          </Card>
+        </Col>
+        <Col xs={24} lg={6}>
           <Card title="访客城市分布 (30天)" size="small" bodyStyle={{ padding: '12px 16px' }}>
             {cityData.length > 0 ? (
                 <div style={{ height: 260 }}>
@@ -584,15 +606,6 @@ function Dashboard() {
             {osData.length > 0 ? (
                 <div style={{ height: 260 }}>
                   <Doughnut data={makeDoughnutData(osData)} options={doughnutOptions} plugins={[doughnutCenterLegend]} />
-                </div>
-            ) : noData}
-          </Card>
-        </Col>
-        <Col xs={24} lg={6}>
-          <Card title="访客国家分布 (30天)" size="small" bodyStyle={{ padding: '12px 16px' }}>
-            {countryData.length > 0 ? (
-                <div style={{ height: 260 }}>
-                  <Doughnut data={makeDoughnutData(countryData)} options={doughnutOptions} plugins={[doughnutCenterLegend]} />
                 </div>
             ) : noData}
           </Card>

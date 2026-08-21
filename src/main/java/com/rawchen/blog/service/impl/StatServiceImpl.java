@@ -267,7 +267,7 @@ public class StatServiceImpl implements StatService {
     @Override
     public List<ChartItemVO> getProvinceDistribution() {
         LocalDateTime startTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
-        return accessLogMapper.findProvinceDistribution(startTime, 10);
+        return accessLogMapper.findProvinceDistribution(startTime);
     }
 
     @Override
@@ -303,7 +303,7 @@ public class StatServiceImpl implements StatService {
     @Override
     public List<Map<String, Object>> getCityDistribution() {
         LocalDateTime startTime = LocalDateTime.now().minusDays(30).with(LocalTime.MIN);
-        return accessLogMapper.findCityDistribution(startTime, 20);
+        return accessLogMapper.findCityDistribution(startTime, 10);
     }
 
     @Override
