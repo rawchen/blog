@@ -183,4 +183,9 @@ public class SiteConfigVO implements Serializable {
      * 站点创建日期
      */
     private String siteCreateDate;
+
+    /**
+     * 导航链接（JSON格式）
+     */
+    private String navLinks;
 }

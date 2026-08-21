@@ -126,6 +126,11 @@ function ArticleEdit() {
         }
       }
     }
+    // 清理函数：当组件卸载或 id 变化时重置标记
+    return () => {
+      draftCheckedRef.current = false
+      isRemoteLoadedRef.current = false
+    }
   }, [id])
 
   // 编辑文章加载完成后检查是否有更新的草稿
@@ -192,7 +197,13 @@ function ArticleEdit() {
     setLoading(true)
     try {
       const res = await getArticleById(id)
-      form.setFieldsValue(res.data)
+      const data = {
+        ...res.data,
+        // 将数字类型转为布尔值供Switch组件使用
+        isTop: res.data.isTop === 1,
+        isRecommend: res.data.isRecommend === 1
+      }
+      form.setFieldsValue(data)
       setContentValue(res.data.content || '')
       // 编辑时将tagIds转为字符串数组供Select使用
       if (res.data.tagIds) {
@@ -516,12 +527,14 @@ function ArticleEdit() {
 
             <Form.Item>
               <Space>
-                <Form.Item name="isTop" valuePropName="checked" initialValue={false} noStyle>
-                  <Switch /> 置顶
+                <Form.Item name="isTop" valuePropName="checked" noStyle>
+                  <Switch />
                 </Form.Item>
-                <Form.Item name="isRecommend" valuePropName="checked" initialValue={false} noStyle>
-                  <Switch /> 推荐
+                <span>置顶</span>
+                <Form.Item name="isRecommend" valuePropName="checked" noStyle>
+                  <Switch />
                 </Form.Item>
+                <span>推荐</span>
                 <Popover
                   trigger="click"
                   placement="bottomRight"

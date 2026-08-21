@@ -44,3 +44,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+### AI ###
+/.codebuddy/
+/CLAUDE.md

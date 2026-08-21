@@ -41,7 +41,8 @@ const camelToSnake = {
   totalUv: 'total_uv',
   siteCreateDate: 'site_create_date',
   htmlRenderEnabled: 'html_render_enabled',
-  rewardEnabled: 'reward_enabled'
+  rewardEnabled: 'reward_enabled',
+  navLinks: 'nav_links'
 }
 
 // 字段映射：下划线 -> 驼峰
@@ -88,7 +89,21 @@ function Setting() {
           if (camelKey === 'siteCreateDate' && value) {
             value = dayjs(value)
           }
-          formValues[snakeKey] = value ?? ''
+          // 导航链接字段特殊处理
+          if (camelKey === 'navLinks' && value) {
+            try {
+              const navLinksArray = JSON.parse(value)
+              // 将数组拆分为单独的表单字段
+              navLinksArray.forEach((link, index) => {
+                formValues[`nav_link_${index + 1}_name`] = link.name || ''
+                formValues[`nav_link_${index + 1}_url`] = link.url || ''
+              })
+            } catch (e) {
+              console.error('解析导航链接失败', e)
+            }
+          } else {
+            formValues[snakeKey] = value ?? ''
+          }
         })
         form.setFieldsValue(formValues)
         setOssEnabled(formValues['oss_enabled'])
@@ -142,6 +157,25 @@ function Setting() {
       // 处理日期字段转字符串
       if (values.site_create_date && dayjs.isDayjs(values.site_create_date)) {
         values.site_create_date = values.site_create_date.format('YYYY-MM-DD')
+      }
+      // 处理导航链接字段转JSON字符串
+      const navLinksArray = []
+      for (let i = 1; i <= 4; i++) {
+        const name = values[`nav_link_${i}_name`]
+        const url = values[`nav_link_${i}_url`]
+        if (name && url) {
+          navLinksArray.push({ name, url })
+        }
+      }
+      if (navLinksArray.length > 0) {
+        values.nav_links = JSON.stringify(navLinksArray)
+      } else {
+        values.nav_links = ''
+      }
+      // 删除单独的导航链接字段
+      for (let i = 1; i <= 4; i++) {
+        delete values[`nav_link_${i}_name`]
+        delete values[`nav_link_${i}_url`]
       }
       // 直接发送下划线格式
       const configs = Object.entries(values)
@@ -286,6 +320,20 @@ function Setting() {
               </Form.Item>
               <Form.Item label={<span><Tooltip title="首页文章列表每页显示的文章数量。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 文章分页大小</span>} name="article_page_size">
                 <InputNumber min={1} max={50} style={{width: '100%'}} placeholder="默认10"/>
+              </Form.Item>
+              <Form.Item label={<span><Tooltip title="首页顶部导航链接，最多4个。留空则不显示。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 导航链接</span>}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <Form.Item name={`nav_link_${i}_name`} noStyle style={{ flex: 1 }}>
+                        <Input placeholder={`链接${i}名称`} />
+                      </Form.Item>
+                      <Form.Item name={`nav_link_${i}_url`} noStyle style={{ flex: 2 }}>
+                        <Input placeholder={`链接${i}URL`} />
+                      </Form.Item>
+                    </div>
+                  ))}
+                </div>
               </Form.Item>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 24px', marginBottom: 24 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>

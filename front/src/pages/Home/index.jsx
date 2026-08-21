@@ -115,24 +115,85 @@ function Home() {
           </div>
           <div className="item-meta" style={{ fontSize: '15px' }}>
             <div className="social-list">
-              <a href="https://code.rawchen.com" target="_blank" rel="noopener noreferrer"
-                 style={{border: 'none'}}>CODE</a>
-              丨
-              <a href="https://ai.rawchen.com" target="_blank" rel="noopener noreferrer" style={{border: 'none'}}>AI</a>
-              丨
-              <Link
-                  id="moment-span"
-                  to={`/moment`}
-              >
-                <img src={momentIcon} id="moment" />
-              </Link>
-              {/*<a id="moment-span" href="/moment"> </a>*/}
-              丨
-              <a href="https://pan.rawchen.com" target="_blank" rel="noopener noreferrer"
-                 style={{border: 'none'}}>PAN</a>
-              丨
-              <a href="https://link.rawchen.com" target="_blank" rel="noopener noreferrer"
-                 style={{border: 'none'}}>LINK</a>
+              {(() => {
+                // 解析导航链接配置
+                let navLinksArray = []
+                if (siteConfig.navLinks) {
+                  try {
+                    navLinksArray = JSON.parse(siteConfig.navLinks)
+                  } catch (e) {
+                    console.error('解析导航链接失败', e)
+                  }
+                }
+                
+                // 默认链接
+                const defaultLinks = [
+                  { name: 'BaiDu', url: 'https://baidu.com' },
+                  { name: 'Gitee', url: 'https://gitee.com' },
+                  { name: 'Bilibili', url: 'https://bilibili.com' },
+                  { name: 'GitHub', url: 'https://github.com' }
+                ]
+                
+                // 如果没有配置或配置不足4个，用默认链接补齐
+                if (navLinksArray.length === 0) {
+                  navLinksArray = defaultLinks
+                } else if (navLinksArray.length < 4) {
+                  // 用默认链接补齐到4个
+                  const needCount = 4 - navLinksArray.length
+                  navLinksArray = [...navLinksArray, ...defaultLinks.slice(0, needCount)]
+                }
+                
+                // 分割链接：前2个在左边，后2个在右边
+                const leftLinks = navLinksArray.slice(0, 2)
+                const rightLinks = navLinksArray.slice(2, 4)
+                
+                const elements = []
+                
+                // 渲染左侧链接（前2个）
+                leftLinks.forEach((link, index) => {
+                  elements.push(
+                    <a key={`left-${index}`} href={link.url} target="_blank" rel="noopener noreferrer" style={{ border: 'none' }}>
+                      {link.name}
+                    </a>
+                  )
+                  // 如果不是最后一个左侧链接，添加分隔符
+                  if (index < leftLinks.length - 1) {
+                    elements.push(<span key={`left-sep-${index}`}>丨</span>)
+                  }
+                })
+                
+                // 如果有左侧链接，添加分隔符
+                if (leftLinks.length > 0) {
+                  elements.push(<span key="sep-before-moment">丨</span>)
+                }
+                
+                // 添加时刻图标
+                elements.push(
+                  <Link key="moment" id="moment-span" to={`/moment`}>
+                    <img src={momentIcon} id="moment" alt="moment" />
+                  </Link>
+                )
+                
+                // 如果有右侧链接，添加分隔符
+                if (rightLinks.length > 0) {
+                  elements.push(<span key="sep-after-moment">丨</span>)
+                }
+                
+                // 渲染右侧链接（后2个）
+                rightLinks.forEach((link, index) => {
+                  elements.push(
+                    <a key={`right-${index}`} href={link.url} target="_blank" rel="noopener noreferrer" style={{ border: 'none' }}>
+                      {link.name}
+                    </a>
+                  )
+                  // 如果不是最后一个右侧链接，添加分隔符
+                  if (index < rightLinks.length - 1) {
+                    elements.push(<span key={`right-sep-${index}`}>丨</span>)
+                  }
+                })
+                
+                return elements
+              })()}
             </div>
           </div>
         </div>

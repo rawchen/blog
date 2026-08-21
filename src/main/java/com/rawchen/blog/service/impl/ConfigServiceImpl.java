@@ -63,6 +63,7 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
     private static final String KEY_RELATED_POSTS_ENABLED = "related_posts_enabled";
     private static final String KEY_ARTICLE_PAGE_SIZE = "article_page_size";
     private static final String KEY_MUSIC_U = "music_u";
+    private static final String KEY_NAV_LINKS = "nav_links";
 
     @Override
     public SiteConfigVO getSiteConfig() {
@@ -102,6 +103,7 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
         vo.setRewardEnabled(Boolean.parseBoolean(getConfigByKey(KEY_REWARD_ENABLED, "true")));
         vo.setRelatedPostsEnabled(Boolean.parseBoolean(getConfigByKey(KEY_RELATED_POSTS_ENABLED, "true")));
         vo.setArticlePageSize(Integer.parseInt(getConfigByKey(KEY_ARTICLE_PAGE_SIZE, "5")));
+        vo.setNavLinks(getConfigByKey(KEY_NAV_LINKS));
 
         return vo;
     }
