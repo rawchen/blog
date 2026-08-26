@@ -284,6 +284,7 @@ function CommentList({ articleId, initialPage = 1, anchorCommentId = null }) {
                   replyTo={replyTo}
                   cancelReply={cancelReply}
                   renderResponse={renderResponse}
+                  authorEmail={siteConfig.email}
                   commentFormProps={{
                     onSubmit: handleSubmit,
                     savedInfo: isLoggedIn ? null : savedInfo,

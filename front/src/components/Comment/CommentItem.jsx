@@ -78,7 +78,7 @@ const parseUserAgent = (ua) => {
   return { browser, os }
 }
 
-function CommentItem({ comment, onReply, depth = 1, gravatarDomain, replyTo, cancelReply, renderResponse, commentFormProps }) {
+function CommentItem({ comment, onReply, depth = 1, gravatarDomain, replyTo, cancelReply, renderResponse, commentFormProps, authorEmail }) {
   const {
     id,
     nickname,
@@ -96,7 +96,7 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain, replyTo, can
 
   const displayName = nickname || author || '游客'
   const displayAvatar = avatar || getAvatarUrl(email, gravatarDomain)
-  const isAuthor = userId && userId !== 0 // 文章作者
+  const isAuthor = email && authorEmail && email.toLowerCase() === authorEmail.toLowerCase() // 博主
   const { browser, os } = parseUserAgent(userAgent)
   const isReplying = replyTo?.id === id
 
@@ -232,6 +232,7 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain, replyTo, can
                 cancelReply={cancelReply}
                 renderResponse={renderResponse}
                 commentFormProps={commentFormProps}
+                authorEmail={authorEmail}
               />
             ))}
           </ol>
