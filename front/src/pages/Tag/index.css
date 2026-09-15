@@ -53,7 +53,8 @@
   margin-bottom: 10px;
 }
 
-.tag-page .post-list-item-container .item-label .item-title a {
+.tag-page .post-list-item-container .item-label .item-title a,
+.tag-page .post-list-item-container .item-label .item-title span {
   font-size: 14px;
   color: #313131;
   /*display: block;*/
@@ -62,22 +63,23 @@
   /*text-overflow: ellipsis;*/
 }
 
-.tag-page .post-list-item-container .item-label .item-title a:hover {
+.tag-page .post-list-item-container .item-label .item-title a:hover,
+.tag-page .post-list-item-container .item-label .item-title span:hover {
   color: #eb5055;
 }
 
 .tag-page .post-list-item-container .item-label .item-meta {
   position: absolute;
+  left: 0;
   right: 0;
   bottom: 0;
-  width: 100%;
-  padding: 0 15px 15px;
+  padding: 0 20px 15px;
   text-align: left;
+  box-sizing: border-box;
 }
 
 .tag-page .post-list-item-container .item-label .item-meta .item-meta-date {
   padding-bottom: 5px;
-  padding-left: 5px;
   color: #5f5f5f;
   font-size: 12px;
 }
