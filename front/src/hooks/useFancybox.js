@@ -2,6 +2,12 @@ import { useState, useEffect } from "react";
 import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
+// 判断是否为竖屏移动设备
+function getPortraitMobile() {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(max-width: 768px) and (orientation: portrait)').matches;
+}
+
 // 从 localStorage 获取 ossStyle 配置
 function getOssStyle() {
   try {
@@ -52,6 +58,21 @@ let currentOssStyle = '';
 
 export default function useFancybox(options = {}) {
   const [root, setRoot] = useState(null);
+  const [portraitMobile, setPortraitMobile] = useState(getPortraitMobile);
+
+  // 监听竖屏移动设备状态变化（窗口尺寸/方向变化）
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mql = window.matchMedia('(max-width: 768px) and (orientation: portrait)');
+    const handler = (e) => setPortraitMobile(e.matches);
+    if (mql.addEventListener) {
+      mql.addEventListener('change', handler);
+      return () => mql.removeEventListener('change', handler);
+    } else {
+      mql.addListener(handler);
+      return () => mql.removeListener(handler);
+    }
+  }, []);
 
   useEffect(() => {
     if (root) {
@@ -65,7 +86,8 @@ export default function useFancybox(options = {}) {
           Thumbs: {
             type: 'classic',
             Carousel: {
-              vertical: true,
+              // 竖屏移动设备：缩略图水平显示在底部；其它：垂直显示在左侧
+              vertical: !portraitMobile,
 
               center: (ref) => {
                 return ref.getTotalSlideDim() > ref.getViewportDim();
@@ -158,7 +180,7 @@ export default function useFancybox(options = {}) {
       Fancybox.bind(root, "[data-fancybox]", fancyboxOptions);
       return () => Fancybox.unbind(root, "[data-fancybox]");
     }
-  }, [root, options]);
+  }, [root, options, portraitMobile]);
 
   return [setRoot];
 }
