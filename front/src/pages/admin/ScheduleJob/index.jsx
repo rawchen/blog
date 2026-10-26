@@ -268,7 +268,11 @@ function ScheduleJob() {
   const getHandlerLabel = (name) => handlers[name] || handlerLabels[name] || name || '-'
 
   const columns = [
-    { title: '任务ID', dataIndex: 'id', width: 80 },
+    {
+      title: '序号',
+      width: 80,
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1
+    },
     { title: '任务名称', dataIndex: 'jobName' },
     {
       title: '任务类型', dataIndex: 'jobType', width: 100,

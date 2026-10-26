@@ -56,7 +56,11 @@ function CommentList() {
   }
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', width: 80 },
+    {
+      title: '序号',
+      width: 80,
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1
+    },
     { title: '昵称', dataIndex: 'nickname', width: 120 },
     { title: '邮箱', dataIndex: 'email', width: 180 },
     { title: '内容', dataIndex: 'content', ellipsis: true, render: (text) => <span dangerouslySetInnerHTML={{ __html: renderSmilies(text) }} /> },

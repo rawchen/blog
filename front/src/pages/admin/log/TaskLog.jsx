@@ -52,8 +52,11 @@ function TaskLog() {
   }
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', width: 80 },
-    { title: '任务ID', dataIndex: 'jobId', width: 80 },
+    {
+      title: '序号',
+      width: 80,
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1
+    },
     { title: '任务名称', dataIndex: 'jobName', width: 150 },
     { title: '执行ID', dataIndex: 'executionId', width: 130 },
     {
@@ -165,8 +168,6 @@ function TaskLog() {
       >
         {currentLog && (
           <Descriptions column={2} bordered>
-            <Descriptions.Item label="ID">{currentLog.id}</Descriptions.Item>
-            <Descriptions.Item label="任务ID">{currentLog.jobId}</Descriptions.Item>
             <Descriptions.Item label="任务名称">{currentLog.jobName}</Descriptions.Item>
             <Descriptions.Item label="执行ID">{currentLog.executionId}</Descriptions.Item>
             <Descriptions.Item label="状态">

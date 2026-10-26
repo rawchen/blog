@@ -94,7 +94,11 @@ function AccessLog() {
   }
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', width: 80 },
+    {
+      title: '序号',
+      width: 80,
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1
+    },
     {
       title: '操作',
       dataIndex: 'operation',
@@ -204,7 +208,6 @@ function AccessLog() {
       >
         {currentLog && (
           <Descriptions column={2} bordered>
-            <Descriptions.Item label="ID">{currentLog.id}</Descriptions.Item>
             <Descriptions.Item label="操作">
               <Tag color={operationMap[currentLog.operation]?.color || 'default'}>
                 {operationMap[currentLog.operation]?.text || currentLog.operation}

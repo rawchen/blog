@@ -66,7 +66,11 @@ function CategoryList() {
   }
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', width: 80 },
+    {
+      title: '序号',
+      width: 80,
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1
+    },
     { title: '分类名称', dataIndex: 'categoryName' },
     { title: '别名', dataIndex: 'categorySlug' },
     { title: '描述', dataIndex: 'description' },

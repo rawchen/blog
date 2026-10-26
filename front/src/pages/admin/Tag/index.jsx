@@ -66,7 +66,11 @@ function TagList() {
   }
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', width: 80 },
+    {
+      title: '序号',
+      width: 80,
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1
+    },
     { title: '标签名称', dataIndex: 'tagName' },
     { title: '别名', dataIndex: 'tagSlug' },
     { title: '描述', dataIndex: 'description' },

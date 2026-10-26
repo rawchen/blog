@@ -106,7 +106,11 @@ function FriendLinkList() {
   }
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', width: 60 },
+    {
+      title: '序号',
+      width: 60,
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1
+    },
     {
       title: '网站名称',
       width: 200,

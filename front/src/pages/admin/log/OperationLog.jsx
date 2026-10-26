@@ -104,7 +104,11 @@ function OperationLog() {
   }
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', width: 80 },
+    {
+      title: '序号',
+      width: 80,
+      render: (_, __, index) => (pagination.current - 1) * pagination.pageSize + index + 1
+    },
     { title: '用户名', dataIndex: 'username', width: 100 },
     {
       title: '操作类型',
@@ -223,9 +227,7 @@ function OperationLog() {
       >
         {currentLog && (
           <Descriptions column={2} bordered>
-            <Descriptions.Item label="ID">{currentLog.id}</Descriptions.Item>
             <Descriptions.Item label="用户名">{currentLog.username}</Descriptions.Item>
-            <Descriptions.Item label="用户ID">{currentLog.userId}</Descriptions.Item>
             <Descriptions.Item label="操作类型">
               <Tag color={operationTypeMap[currentLog.operationType]?.color || 'default'}>
                 {operationTypeMap[currentLog.operationType]?.text || currentLog.operationType}
