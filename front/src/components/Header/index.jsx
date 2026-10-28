@@ -88,11 +88,17 @@ function Header() {
   // 公开的页面（status=1）用于桌面端导航
   const publicPages = pages.filter(p => p.status === 1)
 
+  // 站点 Logo：亮色用 siteLogo，暗色用 siteLogoDark（后台「网站基础设置」可分别配置）
+  const lightLogo = siteConfig.siteLogo || '/logo.png'
+  const darkLogo = siteConfig.siteLogoDark || '/logo-dark.png'
+
   return (
     <header className="web-header" ref={headerRef}>
       <div className="header-content">
         <Link to="/" className="logo" onClick={scrollToTop}>
-          <img src={siteConfig.siteLogo || 'logo.png'} alt={siteConfig.siteName || 'RawChen Blog'} />
+          {/* 亮色 / 暗色主题分别使用对应的 Logo，由 CSS 按 data-theme 切换 */}
+          <img className="logo-img logo-img-light" src={lightLogo} alt={siteConfig.siteName || 'RawChen Blog'} />
+          <img className="logo-img logo-img-dark" src={darkLogo} alt={siteConfig.siteName || 'RawChen Blog'} />
         </Link>
 
         <div className="header-right">

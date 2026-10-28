@@ -69,6 +69,19 @@
   outline: 0;
 }
 
+/* 默认 Logo：亮色用 logo.png，暗色用 logo-dark.png（由 data-theme 切换，无闪烁） */
+.logo-img-dark {
+  display: none;
+}
+
+:root[data-theme='dark'] .logo-img-light {
+  display: none;
+}
+
+:root[data-theme='dark'] .logo-img-dark {
+  display: block;
+}
+
 .header-right {
   display: flex;
   align-items: center;

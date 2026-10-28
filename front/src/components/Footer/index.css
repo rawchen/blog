@@ -181,6 +181,19 @@
   height: 64px;
 }
 
+/* 页脚 Logo：亮色用 logo-footer.png，暗色用 logo-footer-dark.png（由 data-theme 切换，无闪烁） */
+.footer-logo-img-dark {
+  display: none;
+}
+
+:root[data-theme='dark'] .footer-logo-img-light {
+  display: none;
+}
+
+:root[data-theme='dark'] .footer-logo-img-dark {
+  display: block;
+}
+
 .footer-meta .meta-copyright .info-text p {
   font-size: 13px;
   line-height: 20px;

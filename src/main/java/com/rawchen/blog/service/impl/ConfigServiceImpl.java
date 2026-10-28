@@ -35,7 +35,9 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
     private static final String KEY_SITE_DESCRIPTION = "site_description";
     private static final String KEY_SITE_KEYWORDS = "site_keywords";
     private static final String KEY_SITE_LOGO = "site_logo";
+    private static final String KEY_SITE_LOGO_DARK = "site_logo_dark";
     private static final String KEY_SITE_FOOTER_LOGO = "site_footer_logo";
+    private static final String KEY_SITE_FOOTER_LOGO_DARK = "site_footer_logo_dark";
     private static final String KEY_SITE_FAVICON = "site_favicon";
     private static final String KEY_FOOTER_INFO = "footer_info";
     private static final String KEY_SITE_ICP = "site_icp";
@@ -74,7 +76,9 @@ public class ConfigServiceImpl extends ServiceImpl<ConfigMapper, Config> impleme
         vo.setSiteDescription(getConfigByKey(KEY_SITE_DESCRIPTION, "一个简单的博客系统"));
         vo.setSiteKeywords(getConfigByKey(KEY_SITE_KEYWORDS, "博客,技术"));
         vo.setSiteLogo(getConfigByKey(KEY_SITE_LOGO));
+        vo.setSiteLogoDark(getConfigByKey(KEY_SITE_LOGO_DARK));
         vo.setSiteFooterLogo(getConfigByKey(KEY_SITE_FOOTER_LOGO));
+        vo.setSiteFooterLogoDark(getConfigByKey(KEY_SITE_FOOTER_LOGO_DARK));
         vo.setSiteFavicon(getConfigByKey(KEY_SITE_FAVICON));
         vo.setFooterInfo(getConfigByKey(KEY_FOOTER_INFO));
         vo.setSiteIcp(getConfigByKey(KEY_SITE_ICP));

@@ -94,6 +94,10 @@ function Footer() {
   const [recentComments, setRecentComments] = useState([])
   const descriptionRef = useRef(null)
 
+  // 页脚 Logo：亮色用 siteFooterLogo，暗色用 siteFooterLogoDark（后台「网站基础设置」可分别配置）
+  const lightFooterLogo = siteConfig.siteFooterLogo || '/logo-footer.png'
+  const darkFooterLogo = siteConfig.siteFooterLogoDark || '/logo-footer-dark.png'
+
   useEffect(() => {
     loadRecentArticles()
     loadRecentComments()
@@ -200,11 +204,9 @@ function Footer() {
           <div className="meta-item meta-copyright">
             <div className="meta-copyright-info">
               <Link to="/" className="info-logo">
-                {siteConfig.siteFooterLogo ? (
-                  <img src={siteConfig.siteFooterLogo} alt={siteConfig.siteName || 'Blog'} />
-                ) : (
-                  siteConfig.siteName || 'RawChen'
-                )}
+                {/* 亮色 / 暗色主题分别使用对应的 Logo，由 CSS 按 data-theme 切换 */}
+                <img className="footer-logo-img footer-logo-img-light" src={lightFooterLogo} alt={siteConfig.siteName || 'Blog'} />
+                <img className="footer-logo-img footer-logo-img-dark" src={darkFooterLogo} alt={siteConfig.siteName || 'Blog'} />
               </Link>
               <div className="info-text">
                 <p id="yephy" ref={descriptionRef}></p>

@@ -40,9 +40,19 @@ public class SiteConfigVO implements Serializable {
     private String siteLogo;
 
     /**
+     * 站点Logo（暗色主题）
+     */
+    private String siteLogoDark;
+
+    /**
      * 页脚Logo
      */
     private String siteFooterLogo;
+
+    /**
+     * 页脚Logo（暗色主题）
+     */
+    private String siteFooterLogoDark;
 
     /**
      * 站点Favicon

@@ -11,7 +11,9 @@ const camelToSnake = {
   siteDescription: 'site_description',
   siteKeywords: 'site_keywords',
   siteLogo: 'site_logo',
+  siteLogoDark: 'site_logo_dark',
   siteFooterLogo: 'site_footer_logo',
+  siteFooterLogoDark: 'site_footer_logo_dark',
   siteFavicon: 'site_favicon',
   footerInfo: 'footer_info',
   skillList: 'skill_list',
@@ -105,6 +107,13 @@ function Setting() {
             formValues[snakeKey] = value ?? ''
           }
         })
+        // 暗色主题 Logo 未配置时给出默认值，便于直接修改
+        if (!formValues['site_logo_dark']) {
+          formValues['site_logo_dark'] = '/logo-dark.png'
+        }
+        if (!formValues['site_footer_logo_dark']) {
+          formValues['site_footer_logo_dark'] = '/logo-footer-dark.png'
+        }
         form.setFieldsValue(formValues)
         setOssEnabled(formValues['oss_enabled'])
         setCommentEnabled(formValues['comment_enabled'])
@@ -227,11 +236,29 @@ function Setting() {
               <Form.Item label="站点关键词" name="site_keywords">
                 <Input placeholder="多个关键词用逗号分隔" />
               </Form.Item>
-              <Form.Item label="站点Logo" name="site_logo">
-                <Input placeholder="Logo图片URL" />
+              <Form.Item
+                label={<span><Tooltip title="浅色主题使用的站点 Logo；暗色主题请填写右侧的暗色 Logo。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 站点Logo</span>}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Form.Item name="site_logo" noStyle>
+                    <Input placeholder="浅色主题 Logo，如 /logo.png" style={{ flex: 1, minWidth: 0 }} />
+                  </Form.Item>
+                  <Form.Item name="site_logo_dark" noStyle>
+                    <Input placeholder="暗色主题 Logo，如 /logo-dark.png" style={{ flex: 1, minWidth: 0 }} />
+                  </Form.Item>
+                </div>
               </Form.Item>
-              <Form.Item label="页脚Logo" name="site_footer_logo">
-                <Input placeholder="页脚Logo图片URL" />
+              <Form.Item
+                label={<span><Tooltip title="浅色主题使用的页脚 Logo；暗色主题请填写右侧的暗色 Logo。"><QuestionCircleOutlined style={{ color: '#999', marginLeft: 4 }} /></Tooltip> 页脚Logo</span>}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <Form.Item name="site_footer_logo" noStyle>
+                    <Input placeholder="浅色主题 页脚Logo，如 /logo-footer.png" style={{ flex: 1, minWidth: 0 }} />
+                  </Form.Item>
+                  <Form.Item name="site_footer_logo_dark" noStyle>
+                    <Input placeholder="暗色主题 页脚Logo，如 /logo-footer-dark.png" style={{ flex: 1, minWidth: 0 }} />
+                  </Form.Item>
+                </div>
               </Form.Item>
               <Form.Item label="站点Favicon" name="site_favicon">
                 <Input placeholder="Favicon图标URL" />
