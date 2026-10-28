@@ -5,9 +5,9 @@
   right: 0;
   height: 70px;
   padding: 0;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--header-bg);
   backdrop-filter: blur(10px);
-  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--header-shadow);
   z-index: 1000;
   line-height: 68px;
   display: block;
@@ -50,17 +50,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--text-inverse);
   font-size: 18px;
   font-weight: bold;
 }
 
 .admin-layout .logo {
-  border-bottom: 1px solid #445a77;
+  border-bottom: 1px solid var(--border-strong);
 }
 
 .logo:hover {
-  color: #eb5055;
+  color: var(--accent);
 }
 
 .logo img {
@@ -72,7 +72,7 @@
 .header-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  /*gap: 6px;*/
 }
 
 .header-right .svg-inline--fa {
@@ -88,7 +88,7 @@
 
 .nav a {
   font-family: 'Josefin Sans', 'Noto Serif SC', sans-serif;
-  color: #313131;
+  color: var(--text-primary);
   text-decoration: none;
   transition: color 0.3s;
   transition-duration: 0.3s;
@@ -102,7 +102,7 @@
 
 .nav a:hover,
 .nav a.current {
-/*color: #3b82f6;*/
+/*color: var(--link-color);*/
 }
 
 .nav a.current::after {
@@ -112,7 +112,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  /*background: #3b82f6;*/
+  /*background: var(--link-color);*/
 }
 
 /* 下拉菜单 */
@@ -127,7 +127,7 @@
   margin: -10px 0 0 -50px;
   padding: 0;
   border-radius: 15px;
-  background-color: rgba(238, 238, 238, 0.95);
+  background-color: var(--dropdown-bg);
   opacity: 0;
   visibility: hidden;
   transition: 0.3s;
@@ -141,7 +141,7 @@
   left: 43px;
   border-right: 7px solid transparent;
   border-left: 7px solid transparent;
-  border-bottom: 7px solid rgba(238, 238, 238, 0.95);
+  border-bottom: 7px solid var(--dropdown-border);
   content: '';
 }
 
@@ -151,7 +151,7 @@
 }
 
 .dropdown-item {
-  color: #2b2e33;
+  color: var(--text-primary);
   font-size: 15px;
   line-height: 1;
   display: block;
@@ -165,9 +165,9 @@
 }
 
 .dropdown-item:hover {
-  color: #ec5454;
+  color: var(--accent);
   border: none;
-  background-color: #e8e8e8;
+  background-color: var(--dropdown-hover);
   border-radius: 15px;
 }
 
@@ -183,8 +183,8 @@
 }
 
 .nav a:hover {
-  background-color: #ffeded54;
-  color: #ec5454;
+  background-color: var(--accent-soft);
+  color: var(--accent);
 }
 
 .nav a:hover:before,
@@ -200,7 +200,7 @@
   left: 50%;
   right: 50%;
   top: 70px;
-  background: #ec5454;
+  background: var(--accent);
   height: 3px;
   transition: all 0.2s;
   opacity: 0;
@@ -210,7 +210,7 @@
 }
 
 .nav a.current {
-  color: #eb5055;
+  color: var(--accent);
 }
 
 .nav-dropdown {
@@ -230,7 +230,7 @@
   margin: -10px 0 0 -50px;
   padding: 0;
   border-radius: 15px;
-  background-color: rgba(238, 238, 238, 0.95);
+  background-color: var(--dropdown-bg);
   opacity: 0;
   visibility: hidden;
   transition: 0.3s;
@@ -245,7 +245,7 @@
   left: 43px;
   border-right: 7px solid transparent;
   border-left: 7px solid transparent;
-  border-bottom: 7px solid rgba(238, 238, 238, 0.95);
+  border-bottom: 7px solid var(--dropdown-border);
   content: '';
 }
 
@@ -268,9 +268,9 @@
 }
 
 .nav-dropdown ul li a:hover {
-  color: #ec5454;
+  color: var(--accent);
   border: none;
-  background-color: #e8e8e8;
+  background-color: var(--dropdown-hover);
   border-radius: 15px;
 }
 
@@ -301,7 +301,7 @@
   height: 2px;
   margin-top: -1px;
   transition: all 0.4s ease-in-out;
-  background: #313131;
+  background: var(--text-primary);
 }
 
 .icon-menu:after,
@@ -313,7 +313,7 @@
   content: '';
   transition: all 0.4s ease-in-out;
   transform-origin: 50% 50% 0;
-  background: #313131;
+  background: var(--text-primary);
 }
 
 .icon-menu:after {
@@ -331,7 +331,7 @@
 .navbar-mobile-menu-on .icon-menu.cross .middle,
 .navbar-mobile-menu-on .icon-menu.cross:after,
 .navbar-mobile-menu-on .icon-menu.cross:before {
-  background: #eb5055;
+  background: var(--accent);
 }
 
 .navbar-mobile-menu-on .icon-menu.cross .middle {
@@ -346,7 +346,7 @@
 .navbar-mobile-menu-on .icon-menu.cross:before {
   top: 5px;
   transform: rotate(45deg);
-  box-shadow: 0 0 0 #fff;
+  box-shadow: 0 0 0 var(--dropdown-bg);
 }
 
 .navbar-mobile-menu ul {
@@ -359,7 +359,7 @@
   overflow: hidden;
   margin: 0;
   padding: 0;
-  background-color: rgba(238, 238, 238, 0.95);
+  background-color: var(--dropdown-bg);
   box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s;
   transform: translate(210px, 0);
@@ -401,7 +401,7 @@
   width: 13px;
   height: 13px;
   transform: rotate(-45deg);
-  color: #313131;
+  color: var(--text-primary);
   border: solid 2px currentColor;
   border-radius: 50%;
 }
@@ -417,28 +417,62 @@
 }
 
 .navbar-search:hover .icon-search {
-  color: #eb5055;
+  color: var(--accent);
 }
 
 /* 头部操作区 */
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 15px;
+  /*gap: 15px;*/
 }
 
 .search-toggle {
   cursor: pointer;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 16px;
   padding: 0px 15px;
-  transition: color 0.3s;
+  /*transition: color 0.3s;*/
+  transition: color 0.3s, transform 0.3s;
+}
+
+.search-toggle:hover {
+  transform: scale(1.1);
+}
+
+/* 放大镜图形视觉重心偏上，下移 2px 与太阳/月亮对齐 */
+.search-toggle svg {
+  transform: translateY(2px);
+}
+
+/* 主题切换按钮（太阳 / 月亮） */
+.theme-toggle {
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 16px;
+  padding: 0px 15px;
+  background: transparent;
+  border: none;
+  outline: none;
+  line-height: inherit;
+  transition: color 0.3s, transform 0.3s;
+}
+
+.theme-toggle:hover {
+  color: var(--accent);
+  /*transform: rotate(20deg);*/
+  transform: scale(1.1);
+}
+
+.theme-toggle:active {
+  transform: scale(1.3);
 }
 
 /* 移动端搜索按钮 - 默认隐藏 */
 .mobile-actions {
   display: none;
   align-items: center;
+  gap: 8px;
 }
 
 /* 响应式 */
@@ -457,7 +491,25 @@
   }
 
   .mobile-search-toggle {
-    padding: 0 20px;
+    padding: 0 4px;
+    line-height: 70px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mobile-search-toggle svg {
+    transform: translateY(-2px);
+  }
+
+  .mobile-theme-toggle {
+    padding: 0 4px;
     line-height: 70px;
   }
+
+  .mobile-theme-toggle svg {
+    transform: translateY(-3px);
+  }
+
+
 }

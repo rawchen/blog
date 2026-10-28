@@ -1,10 +1,10 @@
 .table-of-contents {
   position: sticky;
   top: 80px;
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 8px;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-md);
   max-height: calc(100vh - 100px);
   overflow-y: auto;
 }
@@ -13,12 +13,12 @@
   margin: 0 0 12px;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-heading);
 }
 
 .toc-title i {
   margin-right: 8px;
-  color: #1890ff;
+  color: var(--link-bright);
 }
 
 .toc-list {
@@ -34,7 +34,7 @@
 
 .toc-item a {
   display: block;
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
   text-decoration: none;
   cursor: pointer;
@@ -43,11 +43,11 @@
 }
 
 .toc-item a:hover {
-  color: #1890ff;
+  color: var(--link-bright);
 }
 
 .toc-item.active > a {
-  color: #1890ff;
+  color: var(--link-bright);
   font-weight: 500;
 }
 
@@ -77,10 +77,10 @@
 }
 
 .table-of-contents::-webkit-scrollbar-thumb {
-  background: #ddd;
+  background: var(--bg-muted);
   border-radius: 2px;
 }
 
 .table-of-contents::-webkit-scrollbar-thumb:hover {
-  background: #ccc;
+  background: var(--bg-muted);
 }

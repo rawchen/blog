@@ -1,0 +1,267 @@
+/**
+ * ============================================================
+ *  主题令牌（Design Tokens）
+ *  亮色 / 暗色 双主题
+ *
+ *  切换方式：<html data-theme="light|dark">
+ *  暗色令牌取自 2BLOG 主题的暗色盘（深蓝黑基调）
+ * ============================================================
+ */
+
+/* ---------------- 亮色（默认） ---------------- */
+/* [data-theme='light'] 单独声明一份，便于后台管理等子区域强制保持亮色 */
+:root,
+:root[data-theme='light'],
+[data-theme='light'] {
+  color-scheme: light;
+
+  /* 文字 */
+  --text-primary: #313131;
+  --text-heading: #333;
+  --text-secondary: #5f5f5f;
+  --text-muted: #767676;
+  --text-tertiary: #999;
+  --text-disabled: #ccc;
+  --text-inverse: #fff;
+  --text-link: #4c94dd;
+  --text-code: #313131;
+
+  /* 背景 */
+  --bg-body: #f3f3f3;
+  --bg-main: #f7f7f7;
+  --bg-card: #fff;
+  --bg-card-hover: #f9f9f9;
+  --bg-subtle: #f5f5f5;
+  --bg-hover: #f0f0f0;
+  --bg-muted: #eee;
+  --bg-input: #fff;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  /* 代码块始终为深色（okaidia 语法高亮） */
+  --bg-code: #2d2d2d;
+  --bg-code-mid: #31353e;
+  --bg-code-alt: #3a485b;
+  --bg-code-deep: #1c2839;
+  --bg-code-strong: #141923;
+  --code-fg: #ccc;
+  --bg-info-soft: #e6f7ff;
+  --bg-success-soft: #f6ffed;
+  --bg-danger-soft: #fff2f0;
+  --bg-warning-soft: #fffbe6;
+  --bg-purple-soft: #f9f0ff;
+
+  /* 边框 */
+  --border-color: #eaeaea;
+  --border-light: #eee;
+  --border-strong: #ddd;
+  --border-accent: rgba(184, 197, 214, 0.2);
+  --border-glass: rgba(255, 255, 255, 0.3);
+
+  /* 强调色 */
+  --accent: #eb5055;
+  --accent-hover: #ea5055;
+  --accent-soft: rgba(235, 80, 85, 0.14);
+  --link-color: #4c94dd;
+  --success: #46c47c;
+  --warning: #f9bb3c;
+  --info: #6fa3ef;
+  --purple: #bc99c4;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.12);
+
+  /* 顶栏 / 浮层 */
+  --header-bg: rgba(255, 255, 255, 0.7);
+  --header-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
+  --dropdown-bg: rgba(238, 238, 238, 0.95);
+  --dropdown-border: rgba(238, 238, 238, 0.95);
+  --dropdown-hover: #e8e8e8;
+
+  /* 滚动条 / 选中 */
+  --scrollbar-thumb: #bbb;
+  --scrollbar-track: #eee;
+  --selection-bg: rgba(152, 200, 255, 0.23);
+
+  /* 背景纹理 */
+  --body-pattern: url('./assets/images/bg.png');
+  --body-pattern-size: auto;
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --bg-card-glass: rgba(247, 247, 247, 0.72);
+  --bg-hover-glass: rgba(240, 240, 240, 0.63);
+  --bg-fade: rgba(237, 237, 237, 0.26);
+
+  /* 特殊元素 */
+  --caret-color: #000;
+  --contact-qq: #ff8888;
+  --contact-email: #a0cfcf;
+  --contact-telegram: #80cddc;
+  --bg-orange: #f68e5f;
+  --count-hover: #2b2b2b;
+
+  /* 标签 / 分类装饰色（亮暗一致，保持原有观感） */
+  --tag-blue: #6fa3ef;
+  --tag-orange: #ff9800;
+  --tag-green: #46c47c;
+  --tag-yellow: #f9bb3c;
+  --tag-purple: #bc99c4;
+  --tag-red: #e8583d;
+  --tag-cyan: #6bc4de;
+
+  /* 提示 / 错误 */
+  --error: #ff4d4f;
+  --error-soft: #ff6b6b;
+  --danger-text: #ff9f9f;
+  --danger-bg: #ffdcde;
+  --accent-pink: #ff808e;
+  --accent-pale: #ffa8a8;
+  --link-soft: #63a1df;
+  --link-bright: #1890ff;
+  --blockquote-border: #70a6ff;
+}
+
+/* ---------------- 暗色 ---------------- */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* 文字 */
+  --text-primary: #d5dde5;
+  --text-heading: #e8eef4;
+  --text-secondary: #a3b0bc;
+  --text-muted: #8a95a1;
+  --text-tertiary: #78848f;
+  --text-disabled: #55606b;
+  --text-inverse: #fff;
+  --text-link: #6fa3ef;
+  --text-code: #d5dde5;
+
+  /* 背景 */
+  --bg-body: #0a141c;
+  --bg-main: #0e161e;
+  --bg-card: #131e28;
+  --bg-card-hover: #1a2632;
+  --bg-subtle: #16212b;
+  --bg-hover: #1e2a36;
+  --bg-muted: #1c2733;
+  --bg-input: #101a23;
+  --bg-overlay: rgba(0, 0, 0, 0.68);
+  /* 代码块始终为深色（okaidia 语法高亮） */
+  --bg-code: #0d1620;
+  --bg-code-mid: #16222e;
+  --bg-code-alt: #1c2839;
+  --bg-code-deep: #101a23;
+  --bg-code-strong: #1a2733;
+  --code-fg: #b3bec9;
+  --bg-info-soft: rgba(111, 163, 239, 0.16);
+  --bg-success-soft: rgba(70, 196, 124, 0.16);
+  --bg-danger-soft: rgba(235, 80, 85, 0.18);
+  --bg-warning-soft: rgba(249, 187, 60, 0.18);
+  --bg-purple-soft: rgba(188, 153, 196, 0.18);
+
+  /* 边框 */
+  --border-color: #26323d;
+  --border-light: #1f2a34;
+  --border-strong: #33404c;
+  --border-accent: rgba(255, 255, 255, 0.08);
+  --border-glass: rgba(255, 255, 255, 0.12);
+
+  /* 强调色 */
+  --accent: #f0686d;
+  --accent-hover: #ff7b80;
+  --accent-soft: rgba(240, 104, 109, 0.18);
+  --link-color: #6fa3ef;
+  --success: #4fd18a;
+  --warning: #f9bb3c;
+  --info: #6fa3ef;
+  --purple: #bc99c4;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.55);
+
+  /* 顶栏 / 浮层 */
+  --header-bg: rgba(10, 20, 28, 0.72);
+  --header-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
+  --dropdown-bg: rgba(28, 41, 52, 0.95);
+  --dropdown-border: rgba(28, 41, 52, 0.95);
+  --dropdown-hover: #263341;
+
+  /* 滚动条 / 选中 */
+  --scrollbar-thumb: #3a4855;
+  --scrollbar-track: #0e161e;
+  --selection-bg: rgba(111, 163, 239, 0.3);
+
+  /* 背景纹理 */
+  --body-pattern: radial-gradient(rgba(28, 41, 52) 1px, transparent 1px);
+  --body-pattern-size: 10px 10px;
+  --bg-glass: rgba(255, 255, 255, 0.06);
+  --bg-card-glass: rgba(19, 30, 40, 0.72);
+  --bg-hover-glass: rgba(30, 42, 54, 0.63);
+  --bg-fade: rgba(19, 30, 40, 0.26);
+
+  /* 特殊元素 */
+  --caret-color: #d5dde5;
+  --contact-qq: #c97070;
+  --contact-email: #7fb3b3;
+  --contact-telegram: #6fb3c0;
+  --bg-orange: #f68e5f;
+  --count-hover: #263341;
+
+  /* 标签 / 分类装饰色（亮暗一致，保持原有观感） */
+  --tag-blue: #6fa3ef;
+  --tag-orange: #ff9800;
+  --tag-green: #46c47c;
+  --tag-yellow: #f9bb3c;
+  --tag-purple: #bc99c4;
+  --tag-red: #e8583d;
+  --tag-cyan: #6bc4de;
+
+  /* 提示 / 错误 */
+  --error: #ff4d4f;
+  --error-soft: #ff6b6b;
+  --danger-text: #ff9f9f;
+  --danger-bg: #ffdcde;
+  --accent-pink: #ff808e;
+  --accent-pale: #ffa8a8;
+  --link-soft: #63a1df;
+  --link-bright: #1890ff;
+  --blockquote-border: #70a6ff;
+}
+
+/* ---------------- 主题过渡 ---------------- */
+html,
+body,
+.web-header,
+.web-layout,
+.web-main,
+.web-footer {
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+}
+
+/* 暗色下的页面底色 */
+:root[data-theme='dark'] body {
+  background-color: var(--bg-body);
+}
+
+/* 后台管理端强制保持亮色 */
+:root[data-theme='dark'] body:has(.admin-layout),
+:root[data-theme='dark'] body:has(.login-container) {
+  background-color: #f3f3f3;
+  background-image: none;
+}
+
+/* 暗色下滚动条 */
+:root[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+}
+
+:root[data-theme='dark'] ::-webkit-scrollbar-track {
+  background-color: var(--scrollbar-track);
+}
+
+/* 暗色下 Prism 代码高亮（okaidia 在亮色下也保留，这里仅微调容器） */
+:root[data-theme='dark'] pre[class*='language-'],
+:root[data-theme='dark'] code[class*='language-'] {
+  text-shadow: none;
+}

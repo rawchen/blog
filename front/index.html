@@ -19,6 +19,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blog</title>
     <script>
+      /* 主题预读：避免首屏闪白
+         规则：手动切换过 → 沿用 localStorage 记录；否则 19:00-06:00 暗色，其余亮色 */
+      (function () {
+        try {
+          var KEY = 'blog_theme_mode'
+          var mode = localStorage.getItem(KEY)
+          if (mode !== 'light' && mode !== 'dark') {
+            var h = new Date().getHours()
+            mode = (h >= 19 || h < 6) ? 'dark' : 'light'
+          }
+          document.documentElement.setAttribute('data-theme', mode)
+          document.documentElement.style.colorScheme = mode
+        } catch (e) {}
+      })();
+    </script>
+    <script>
       try {
         var cached = localStorage.getItem('site_config')
         if (cached) {

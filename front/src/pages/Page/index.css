@@ -1,5 +1,5 @@
 .page-detail {
-  background-color: #f9f9f9;
+  background-color: var(--bg-card-hover);
   box-shadow: 0 0 55px 0 rgb(0 0 0 / 1%);
   max-width: 970px;
   margin: 0 auto;
@@ -13,38 +13,38 @@
 .page-header {
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .page-header h1::before {
   content: '[';
   font-weight: 600;
-  color: #ea5055;
+  color: var(--accent);
   margin-right: 12px;
 }
 
 .page-header h1::after {
   content: ']';
   font-weight: 600;
-  color: #ea5055;
+  color: var(--accent);
   margin-left: 12px;
 }
 
 .page-title {
   font-size: 21px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-heading);
   /*margin-bottom: 10px;*/
 }
 
 .page-meta {
   font-size: 12px;
-  color: #5f5f5f;
+  color: var(--text-secondary);
 }
 
 .page-meta a {
-  color: #5f5f5f;
-  border-bottom: 1px dashed #a0a0a0;
+  color: var(--text-secondary);
+  border-bottom: 1px dashed var(--border-strong);
 }
 
 .page-meta span {
@@ -53,18 +53,18 @@
 
 .page-content {
   line-height: 1.8;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .page-empty {
   text-align: center;
-  color: #999;
+  color: var(--text-tertiary);
   padding: 50px 0;
 }
 
 .page-not-found {
   text-align: center;
   padding: 100px 0;
-  color: #999;
+  color: var(--text-tertiary);
   font-size: 18px;
 }

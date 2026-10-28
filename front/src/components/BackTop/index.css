@@ -25,7 +25,7 @@
 }
 
 .cd-top:hover {
-  background-color: #e86256;
+  background-color: var(--accent);
   opacity: 1;
 }
 

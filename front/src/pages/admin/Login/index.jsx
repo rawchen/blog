@@ -24,7 +24,7 @@ function Login() {
   }
 
   return (
-    <div className="login-container">
+    <div className="login-container" data-theme="light">
       <Card className="login-card" title="博客后台管理系统">
         <Form form={form} onFinish={handleSubmit} initialValues={{ username: 'visitor', password: '123456' }}>
           <Form.Item

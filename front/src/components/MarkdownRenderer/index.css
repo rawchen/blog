@@ -2,7 +2,7 @@
 .markdown-body {
   font-size: 16px;
   line-height: 1.8;
-  /*color: #333;*/
+  /*color: var(--text-heading);*/
   word-wrap: break-word;
 }
 
@@ -20,23 +20,23 @@
 .markdown-body h1 {
   margin: 20px 10px 20px 0;
   padding-left: 9px;
-  border-left: 6px solid #ea5055;
+  border-left: 6px solid var(--accent);
   font-weight: 700;
   line-height: 1.4;
   font-size: 1.4em;
-  color: #222;
+  color: var(--text-heading);
 }
 
 .markdown-body h2 {
   margin: 20px 0;
   font-size: 1.3em;
   font-weight: 650;
-  color: #333;
+  color: var(--text-heading);
 }
 
 .markdown-body h2:before {
   border-radius: 50%;
-  background-color: #ea5055;
+  background-color: var(--accent);
   content: '';
   width: 8px;
   display: inline-block;
@@ -50,11 +50,11 @@
   margin: 20px 0;
   font-size: 1.2em;
   font-weight: 600;
-  color: #444;
+  color: var(--text-secondary);
 }
 
 .markdown-body h3:before {
-  background-color: #ea5055;
+  background-color: var(--accent);
   content: '';
   width: 6px;
   display: inline-block;
@@ -81,7 +81,7 @@
   top: 0;
   left: -15px;
   content: '#';
-  color: #ea5055;
+  color: var(--accent);
 }
 
 .markdown-body p {
@@ -94,8 +94,8 @@
 
 .markdown-body p a {
   margin: 0px 5px;
-  color: #4c94dd;
-  border-bottom: 1px dotted #ccc;
+  color: var(--link-color);
+  border-bottom: 1px dotted var(--border-strong);
   position: relative;
 }
 
@@ -122,7 +122,7 @@
 .markdown-body img {
   max-width: 100%;
   box-sizing: content-box;
-  /* background-color: #fff; */
+  /* background-color: var(--bg-card); */
   border-radius: 4px;
   margin: 8px 0;
 }
@@ -136,12 +136,10 @@
 
 .markdown-body li {
   margin: 4px 0;
-}
-
-.markdown-body blockquote {
+}.markdown-body blockquote{
   padding: 8px 20px;
-  background: linear-gradient(to right, #dceaff, #ededed42);
-  border-left: 4px solid #70a6ff;
+  background: linear-gradient(to right, var(--bg-info-soft), var(--bg-fade));
+  border-left: 4px solid var(--blockquote-border);
   border-radius: 0 5px 5px 0;
   margin: 20px 0;
 }
@@ -150,12 +148,10 @@
 .markdown-body blockquote p {
   /*margin: 0;*/
   white-space: pre-line;
-}
-
-.markdown-body blockquote:before {
-  background: #70a6ff;
+}.markdown-body blockquote:before{
+  background: var(--blockquote-border);
   border-radius: 50%;
-  color: #fff;
+  color: var(--text-inverse);
   content: '\0021';
   font-family: Dosis, 'Source Sans Pro', 'Helvetica Neue', Arial, sans-serif;
   font-size: 16px;
@@ -187,27 +183,27 @@
 .markdown-body table td,
 .markdown-body table th {
   padding: 6px 13px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-strong);
   text-align: center;
 }
 
 .markdown-body table tr {
-  border-top: 1px solid #ccc;
-  background-color: #fff;
+  border-top: 1px solid var(--border-strong);
+  background-color: var(--bg-card);
 }
 
 .markdown-body table tr:hover {
-  background-color: #f7f7f7;
+  background-color: var(--bg-main);
 }
 
 .markdown-body table thead tr {
-  background-color: #f7f7f7;
+  background-color: var(--bg-main);
 }
 
 .markdown-body table a {
   margin: 0px 5px;
-  color: #4c94dd;
-  border-bottom: 1px dotted #ccc;
+  color: var(--link-color);
+  border-bottom: 1px dotted var(--border-strong);
   position: relative;
 }
 
@@ -231,7 +227,7 @@
   height: 0.25em;
   padding: 0;
   margin: 24px 0;
-  background-color: #e1e4e8;
+  background-color: var(--bg-muted);
   border: 0;
 }
 
@@ -240,7 +236,7 @@
   position: relative;
   margin: 0 0 16px;
   border-radius: 6px;
-  background-color: #2d2d2d;
+  background-color: var(--bg-code);
 }
 
 .code-block-wrapper:hover .code-block-actions {
@@ -261,7 +257,7 @@
   margin: 0;
   /*padding: 1.3em;*/
   background-color: rgba(27, 31, 35, 0.05);
-  color: #fff;
+  color: var(--text-inverse);
   tab-size: 4;
 }
 
@@ -271,10 +267,8 @@
   background-color: transparent;
   border-radius: 0;
   white-space: pre;
-}
-
-.markdown-body .inline-code {
-  /* background-color: #f0f0f0; */
+}.markdown-body .inline-code{
+  /* 行内代码：固定使用浅色渐变 + 深色文字，亮暗主题观感一致 */
   background: linear-gradient(to right, #ffc3aa, #ff8d8d);
   margin: 2px 4px;
   border-radius: 5px;
@@ -298,14 +292,14 @@
 }
 
 .code-block-lang {
-  color: #666;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
 .code-block-copy {
   padding: 4px 10px;
   background-color: rgba(255, 255, 255, 0.1);
-  color: #ccc;
+  color: var(--code-fg);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -315,7 +309,7 @@
 
 .code-block-copy:hover {
   background-color: rgba(255, 255, 255, 0.2);
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 /* Task List */
@@ -345,7 +339,7 @@
 }
 
 .token.class-name {
-  color: #66d9ef !important;
+  color: var(--info) !important;
 }
 
 .hljs-operator {
@@ -357,7 +351,7 @@
 }
 
 .hljs-title.class_ {
-  color: #66d9ef !important;
+  color: var(--info) !important;
 }
 
 /* Mobile Responsive */
@@ -387,7 +381,7 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #fff;
+  color: var(--text-inverse);
   opacity: 0.8;
   transition: opacity 0.2s;
 }

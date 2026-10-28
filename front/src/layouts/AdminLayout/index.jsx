@@ -137,7 +137,7 @@ function AdminLayout() {
   ]
 
   return (
-    <Layout className={`admin-layout ${collapsed ? 'sider-collapsed' : ''}`}>
+    <Layout className={`admin-layout ${collapsed ? 'sider-collapsed' : ''}`} data-theme="light">
       <Sider trigger={null} collapsible collapsed={collapsed}>
         <div className="logo" onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>{collapsed ? 'BLOG' : '博客管理系统'}</div>
         <SimpleBar className="admin-sider-scrollbar">

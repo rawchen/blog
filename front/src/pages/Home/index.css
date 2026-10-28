@@ -11,7 +11,7 @@
   display: inline-block;
   width: 100%;
   margin: 0;
-  background-color: #f7f7f7b8;
+  background-color: var(--bg-card-glass);
 }
 
 .home-hero-container {
@@ -46,7 +46,7 @@
   font-weight: bold;
   font-size: 21px;
   line-height: 17px;
-  color: #313131;
+  color: var(--text-primary);
 }
 
 .home-hero-meta {
@@ -54,7 +54,7 @@
   font-weight: bold;
   font-size: 15px;
   margin-top: 15px;
-  color: #5f5f5f;
+  color: var(--text-secondary);
 }
 
 .home-hero-meta p {
@@ -80,11 +80,11 @@
 }
 
 .post-onelist-item:nth-child(n) {
-  background-color: #f7f7f7b8;
+  background-color: var(--bg-card-glass);
 }
 
 .post-onelist-item:nth-child(2n) {
-  background-color: #f0f0f0a1;
+  background-color: var(--bg-hover-glass);
 }
 
 .post-onelist-item-container {
@@ -120,12 +120,12 @@
   font-weight: bold;
   font-size: 21px;
   line-height: 17px;
-  color: #313131;
+  color: var(--text-primary);
   transition: color 0.3s;
 }
 
 .post-onelist-item-container .item-title a:hover {
-  color: #eb5055;
+  color: var(--accent);
 }
 
 .post-onelist-item-container .item-content {
@@ -135,7 +135,7 @@
 }
 
 .post-onelist-item-container .item-content p {
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.8;
   font-size: 15px;
 }
@@ -143,15 +143,15 @@
 .post-onelist-item-container .item-meta {
   font-size: 12px;
   text-align: center;
-  color: #5f5f5f;
+  color: var(--text-secondary);
   /*margin-top: 15px;*/
 }
 
 .post-onelist-item-container .item-meta a {
-  color: #5f5f5f;
+  color: var(--text-secondary);
   padding-left: 8px;
   padding-right: 8px;
-  background-image: linear-gradient(transparent calc(65% - 5px), #ff9898 5px);
+  background-image: linear-gradient(transparent calc(65% - 5px), var(--danger-text) 5px);
   background-size: 0;
   background-repeat: no-repeat;
   display: inline;
@@ -159,7 +159,7 @@
 }
 
 .post-onelist-item-container .item-meta a:hover {
-  color: #000;
+  color: var(--text-heading);
   background-size: 100%;
 }
 
@@ -177,14 +177,14 @@
   width: 55px;
   height: 2px;
   margin: 20px auto 0;
-  background-color: #eb5055;
+  background-color: var(--accent);
 }
 
 /* Tags in post list */
 .post-tags {
   margin: 0;
   padding: 5px 0 15px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--border-strong);
 }
 
 .post-tags a {
@@ -200,45 +200,45 @@
 }
 
 .post-tags a:nth-child(1n) {
-  color: #fff;
-  border: 1px solid #6fa3ef;
+  color: var(--text-inverse);
+  border: 1px solid var(--tag-blue);
   border-radius: 15px;
-  background: #6fa3ef;
+  background: var(--tag-blue);
 }
 
 .post-tags a:nth-child(2n) {
-  color: #fff;
-  border: 1px solid #ff9800;
+  color: var(--text-inverse);
+  border: 1px solid var(--tag-orange);
   border-radius: 15px;
-  background: #ff9800;
+  background: var(--tag-orange);
 }
 
 .post-tags a:nth-child(3n) {
-  color: #fff;
-  border: 1px solid #46c47c;
+  color: var(--text-inverse);
+  border: 1px solid var(--tag-green);
   border-radius: 15px;
-  background: #46c47c;
+  background: var(--tag-green);
 }
 
 .post-tags a:nth-child(4n) {
-  color: #fff;
-  border: 1px solid #f9bb3c;
+  color: var(--text-inverse);
+  border: 1px solid var(--tag-yellow);
   border-radius: 15px;
-  background: #f9bb3c;
+  background: var(--tag-yellow);
 }
 
 .post-tags a:nth-child(5n) {
-  color: #fff;
-  border: 1px solid #bc99c4;
+  color: var(--text-inverse);
+  border: 1px solid var(--tag-purple);
   border-radius: 15px;
-  background: #bc99c4;
+  background: var(--tag-purple);
 }
 
 .post-tags a:nth-child(6n) {
-  color: #fff;
-  border: 1px solid #e8583d;
+  color: var(--text-inverse);
+  border: 1px solid var(--tag-red);
   border-radius: 15px;
-  background: #e8583d;
+  background: var(--tag-red);
 }
 
 .post-tags a::before {
@@ -246,10 +246,10 @@
 }
 
 .post-tags a:hover {
-  color: #5f5f5f;
-  border: 1px solid #f7f7f7;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
   outline-style: none;
-  background: #f7f7f7;
+  background: var(--bg-main);
 }
 
 /* Pagination */
@@ -267,7 +267,7 @@
 .lists-navigator ol li {
   margin: 0 0.125em;
   display: inline-block;
-  color: #5f5f5f;
+  color: var(--text-secondary);
 }
 
 .lists-navigator ol li a {
@@ -275,19 +275,19 @@
   font-family: inherit;
   font-weight: 500;
   border-radius: 8px;
-  color: #a9a9a9;
+  color: var(--text-tertiary);
   text-decoration: none;
   transition: all 0.15s linear;
 }
 
 .lists-navigator ol li a:hover {
-  color: #ff9f9f;
-  background-color: #ffdcde;
+  color: var(--danger-text);
+  background-color: var(--danger-bg);
 }
 
 .lists-navigator ol li.current a {
-  background-color: #ff808e;
-  color: #ffffff;
+  background-color: var(--accent-pink);
+  color: var(--text-inverse);
   transition: all 0.15s linear;
 }
 
@@ -296,7 +296,7 @@
   animation-name: flash;
   width: 4px;
   height: 30px;
-  background-color: #000;
+  background-color: var(--caret-color);
   margin-left: 5px;
   animation-duration: 2s;
   animation-fill-mode: both;

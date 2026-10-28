@@ -4,12 +4,14 @@ import { useSelector } from 'react-redux'
 import { getCategoryList } from '../../api/category'
 import { getPageList } from '../../api/article'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faSun, faMoon } from '@fortawesome/free-solid-svg-icons'
 import Headroom from 'headroom.js'
+import { resolveTheme, toggleTheme, THEME_DARK } from '../../utils/theme'
 import './index.css'
 
 function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [theme, setThemeState] = useState(() => resolveTheme())
   const siteConfig = useSelector(state => state.siteConfig.data) || {}
   const [categories, setCategories] = useState([])
   const [pages, setPages] = useState([])
@@ -21,6 +23,15 @@ function Header() {
   useEffect(() => {
     loadCategories()
     loadPages()
+  }, [])
+
+  // 主题变化时同步图标（手动切换 / 到达 19:00、06:00 自动切换）
+  useEffect(() => {
+    const onThemeChange = (e) => {
+      setThemeState(e.detail && e.detail.theme ? e.detail.theme : resolveTheme())
+    }
+    document.addEventListener('themechange', onThemeChange)
+    return () => document.removeEventListener('themechange', onThemeChange)
   }, [])
 
   useEffect(() => {
@@ -64,6 +75,11 @@ function Header() {
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // 切换亮色 / 暗色主题
+  const handleToggleTheme = () => {
+    setThemeState(toggleTheme())
   }
 
   // 是否有搜索页面（只要存在 template=search 的页面就显示搜索图标）
@@ -131,6 +147,16 @@ function Header() {
                 <FontAwesomeIcon icon={faSearch} />
               </Link>
             )}
+            {/* 主题切换按钮 - 亮色主题显示太阳图标，暗色主题显示月亮图标 */}
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={handleToggleTheme}
+              title={theme === THEME_DARK ? '当前为暗色模式，点击切换到亮色' : '当前为亮色模式，点击切换到暗色'}
+              aria-label={theme === THEME_DARK ? '当前为暗色模式，点击切换到亮色' : '当前为亮色模式，点击切换到暗色'}
+            >
+              <FontAwesomeIcon icon={theme === THEME_DARK ? faMoon : faSun} />
+            </button>
           </div>
         </div>
 
@@ -141,6 +167,15 @@ function Header() {
               <FontAwesomeIcon icon={faSearch} />
             </Link>
           )}
+          <button
+            type="button"
+            className="theme-toggle mobile-theme-toggle"
+            onClick={handleToggleTheme}
+            title={theme === THEME_DARK ? '当前为暗色模式，点击切换到亮色' : '当前为亮色模式，点击切换到暗色'}
+            aria-label={theme === THEME_DARK ? '当前为暗色模式，点击切换到亮色' : '当前为亮色模式，点击切换到暗色'}
+          >
+            <FontAwesomeIcon icon={theme === THEME_DARK ? faMoon : faSun} />
+          </button>
           <div
             className={`navbar-mobile-menu ${mobileMenuOpen ? 'navbar-mobile-menu-on' : ''}`}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

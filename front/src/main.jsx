@@ -11,9 +11,14 @@ import App from './App'
 import store from './store'
 import { setSiteConfig } from './store/modules/siteConfig'
 import { setSiteStat } from './store/modules/siteStat'
+import './theme.css'
 import './index.css'
 import { getSiteConfig } from './api/config'
 import { getSiteStat } from './api/stat'
+import { initTheme } from './utils/theme'
+
+// 初始化主题（手动优先，否则按 19:00-06:00 自动判断）
+initTheme()
 
 // 应用站点配置到 DOM
 export function applySiteConfig(data) {

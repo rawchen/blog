@@ -1,6 +1,6 @@
 /* Archive Page Styles */
 .archive-page {
-  background-color: #f9f9f9;
+  background-color: var(--bg-card-hover);
   padding: 120px 20px 40px;
   max-width: 940px;
   margin: 0 auto;
@@ -11,12 +11,12 @@
   /*position: relative;*/
   margin: 10px auto;
   padding: 0 30px;
-  color: #5f5f5f;
+  color: var(--text-secondary);
   clear: both;
 }
 
 .archive-page .categorys-title a {
-  color: #5f5f5f;
+  color: var(--text-secondary);
 }
 
 .archive-page .categorys-title::before {
@@ -24,7 +24,7 @@
   /* top: 0; */
   left: 15px;
   content: '#';
-  color: #eb5055;
+  color: var(--accent);
 }
 
 .archive-page .post-lists {
@@ -54,30 +54,30 @@
   overflow: hidden;
   width: 100%;
   padding: 0;
-  border: 1px solid rgba(184, 197, 214, 0.2);
+  border: 1px solid var(--border-accent);
   border-radius: 3px;
-  background: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .archive-page .post-list-item-container:hover {
   transform: scale(1.03);
-  /* background: #ea5055; */
+  /* background: var(--accent); */
 }
 
 .archive-page .post-list-item-container:hover .item-label .item-title a {
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 .archive-page .post-list-item-container:hover .item-label .item-meta .item-meta-date {
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 .archive-page .post-list-item-container .item-label {
   height: 113px;
   padding: 25px 20px 40px;
-  /* background: #fff; */
+  /* background: var(--bg-card); */
 }
 
 .archive-page .post-list-item-container .item-label .item-title {
@@ -93,7 +93,7 @@
   /*overflow: hidden;*/
   /*white-space: nowrap;*/
   /*text-overflow: ellipsis;*/
-  color: #313131;
+  color: var(--text-primary);
 }
 
 .archive-page .post-list-item-container .item-label .item-meta {
@@ -103,7 +103,7 @@
   width: 100%;
   padding: 0 15px 15px;
   text-align: left;
-  color: #fff;
+  color: var(--text-inverse);
 }
 
 .archive-page .post-list-item-container .item-label .item-meta .item-meta-date {
@@ -114,14 +114,14 @@
   padding-left: 9px;
   text-align: right;
   text-transform: none;
-  color: #5f5f5f;
+  color: var(--text-secondary);
 }
 
 /* Archives Count Stats */
 .archives-count {
   width: 100%;
   text-align: center;
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 5px;
   /* background-color: #ffffff94; */
 }
@@ -136,7 +136,7 @@
 .archives-count code {
   display: block;
   font-size: 2em;
-  color: #707070;
+  color: var(--text-muted);
   background: transparent !important;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -144,42 +144,42 @@
 }
 
 .archives-count .archives-count-item:hover {
-  background: #2b2b2b;
+  background: var(--count-hover);
 }
 
 /* Archive Header */
 .archive-header {
   margin-bottom: 10px;
   padding: 20px;
-  /* background: #fff; */
+  /* background: var(--bg-card); */
   border-radius: 3px;
   border-bottom: 1px solid rgb(241 241 241);
-  /* box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04); */
+  /* box-shadow: var(--shadow-sm); */
 }
 
 .archive-header h1 {
   font-size: 21px;
   font-weight: 600;
   margin-bottom: 10px;
-  color: #313131;
+  color: var(--text-primary);
 }
 
 .archive-header h1::before {
   content: '[';
   font-weight: 600;
-  color: #ea5055;
+  color: var(--accent);
   margin-right: 12px;
 }
 
 .archive-header h1::after {
   content: ']';
   font-weight: 600;
-  color: #ea5055;
+  color: var(--accent);
   margin-left: 12px;
 }
 
 .archive-header p {
-  color: #5f5f5f;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -194,7 +194,7 @@
   position: relative;
   margin: 10px auto;
   padding: 0 30px;
-  color: #5f5f5f;
+  color: var(--text-secondary);
   clear: both;
 }
 
@@ -203,7 +203,7 @@
   top: 0;
   left: 15px;
   content: '#';
-  color: #eb5055;
+  color: var(--accent);
 }
 
 /* Responsive */

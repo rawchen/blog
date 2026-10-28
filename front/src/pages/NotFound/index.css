@@ -12,13 +12,11 @@
   text-align: center;
   position: relative;
   z-index: 1;
-}
-
-.not-found-code {
+}.not-found-code{
   font-size: 150px;
   font-weight: 700;
   line-height: 1;
-  background: linear-gradient(135deg, #eb5055 0%, #ff808e 100%);
+  background: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -38,13 +36,13 @@
 .not-found-title {
   font-size: 28px;
   font-weight: 600;
-  color: #313131;
+  color: var(--text-primary);
   margin-bottom: 15px;
 }
 
 .not-found-desc {
   font-size: 16px;
-  color: #666;
+  color: var(--text-secondary);
   margin-bottom: 30px;
   max-width: 400px;
   margin-left: auto;
@@ -72,28 +70,28 @@
 }
 
 .btn-home {
-  background: #eb5055;
-  color: #fff;
-  border: 2px solid #eb5055;
+  background: var(--accent);
+  color: var(--text-inverse);
+  border: 2px solid var(--accent);
 }
 
 .btn-home:hover {
-  color: #fff;
-  background: #e03a40;
-  border-color: #e03a40;
+  color: var(--text-inverse);
+  background: var(--accent);
+  border-color: var(--accent);
   transform: translateY(-2px);
   box-shadow: 0 5px 20px rgba(235, 80, 85, 0.3);
 }
 
 .btn-back {
   background: transparent;
-  color: #666;
-  border: 2px solid #ddd;
+  color: var(--text-secondary);
+  border: 2px solid var(--border-strong);
 }
 
 .btn-back:hover {
-  border-color: #999;
-  color: #333;
+  border-color: var(--border-strong);
+  color: var(--text-heading);
   transform: translateY(-2px);
 }
 
@@ -116,7 +114,7 @@
 .circle-1 {
   width: 300px;
   height: 300px;
-  background: #eb5055;
+  background: var(--accent);
   top: -100px;
   right: -100px;
   animation: pulse 4s ease-in-out infinite;
@@ -125,7 +123,7 @@
 .circle-2 {
   width: 200px;
   height: 200px;
-  background: #3498db;
+  background: var(--link-color);
   bottom: -50px;
   left: -50px;
   animation: pulse 5s ease-in-out infinite 1s;
@@ -134,7 +132,7 @@
 .circle-3 {
   width: 150px;
   height: 150px;
-  background: #2ecc71;
+  background: var(--success);
   top: 50%;
   left: 10%;
   animation: pulse 6s ease-in-out infinite 2s;

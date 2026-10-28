@@ -1,6 +1,6 @@
 /* Moments Page Styles (朋友圈) */
 .moments-page {
-  background-color: #f9f9f9;
+  background-color: var(--bg-card-hover);
   max-width: 970px;
   margin: 0 auto;
   padding: 120px 20px;
@@ -14,32 +14,32 @@
 .moments-header h1 {
   font-size: 21px;
   font-weight: 600;
-  color: #313131;
+  color: var(--text-primary);
   margin-bottom: 10px;
 }
 
 .moments-header h1::before {
   content: '[';
   font-weight: 600;
-  color: #ea5055;
+  color: var(--accent);
   margin-right: 12px;
 }
 
 .moments-header h1::after {
   content: ']';
   font-weight: 600;
-  color: #ea5055;
+  color: var(--accent);
   margin-left: 12px;
 }
 
 .moments-meta {
   font-size: 12px;
-  color: #5f5f5f;
+  color: var(--text-secondary);
 }
 
 /* Comment Container Style for Moments */
 .moments-container {
-  /* background-color: #f3f3f3; */
+  /* background-color: var(--bg-body); */
 }
 
 .moments-list {
@@ -54,9 +54,9 @@
   margin: 20px 0;
   /* border: 1px solid rgba(184, 197, 214, .2); */
   border-radius: 3px 30px 14px 14px;
-  background: #fff;
+  background: var(--bg-card);
   -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, .02);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, .02);
+  box-shadow: var(--shadow-sm);
 }
 
 .moment-item:hover {
@@ -67,12 +67,12 @@
   transition-duration: .3s;
   -webkit-transform: scale(1.01);
   transform: scale(1.01);
-  background: linear-gradient(to right, #8198df3d, #ffffff)
+  background: linear-gradient(to right, #8198df3d, var(--bg-card))
 }
 
 .moment-link {
   display: block;
-  color: #3f7895;
+  color: var(--text-secondary);
   text-decoration: none;
   position: relative;
 }
@@ -85,7 +85,7 @@
 .moment-title {
   font-size: 16px;
   font-weight: 600;
-  color: #3a3a3a;
+  color: var(--text-heading);
   margin-bottom: 10px;
   line-height: 1.5;
 }
@@ -101,7 +101,7 @@
 .moment-content {
   flex: 7;
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.8;
 }
 
@@ -124,15 +124,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
+  background: var(--bg-subtle);
   font-size: 24px;
-  color: #999;
+  color: var(--text-tertiary);
   border-radius: 5px;
 }
 
 .image-loading-placeholder.image-error {
-  background: #f0f0f0;
-  color: #ccc;
+  background: var(--bg-hover);
+  color: var(--text-secondary);
 }
 
 /* Moment Footer */
@@ -142,7 +142,7 @@
   align-items: center;
   margin-top: 15px;
   padding-top: 15px;
-  border-top: 1px dashed #eee;
+  border-top: 1px dashed var(--border-light);
 }
 
 /* Moment Author */
@@ -150,7 +150,7 @@
   display: inline-flex;
   /* align-items: center; */
   font-size: 12px;
-  color: #3a3a3a;
+  color: var(--text-heading);
 }
 
 .moment-author img {
@@ -173,7 +173,7 @@
 /* Moment Time */
 .moment-time {
   font-size: 12px;
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 /* Moment Image */
@@ -203,24 +203,20 @@
   display: inline-block;
   padding: 8px 14px;
   border-radius: 5px;
-  color: #666;
+  color: var(--text-secondary);
   text-decoration: none;
   transition: all 0.3s;
   cursor: pointer;
-}
-
-.pagination-item a:hover {
-  background: #ffdcde;
-  color: #ff9f9f;
-}
-
-.pagination-item.current a {
-  background: #ff808e;
-  color: #fff;
+}.pagination-item a:hover{
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}.pagination-item.current a{
+  background: var(--accent-pink);
+  color: var(--text-inverse);
 }
 
 .pagination-item.disabled span {
-  color: #ccc;
+  color: var(--text-secondary);
   cursor: not-allowed;
 }
 
@@ -228,22 +224,22 @@
 .moments-empty {
   text-align: center;
   padding: 60px 20px;
-  color: #999;
-  background: #fff;
+  color: var(--text-tertiary);
+  background: var(--bg-card);
   border-radius: 3px;
 }
 
 .moments-empty i {
   font-size: 48px;
   margin-bottom: 15px;
-  color: #ddd;
+  color: var(--text-disabled);
 }
 
 /* Loading */
 .moments-loading {
   text-align: center;
   padding: 40px;
-  color: #999;
+  color: var(--text-tertiary);
 }
 
 /* Responsive */

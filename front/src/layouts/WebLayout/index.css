@@ -32,7 +32,7 @@ html:has(.web-layout) {
 }
 
 ::selection {
-  background-color: #98c8ff3b;
+  background-color: var(--selection-bg);
 }
 
 @media (min-width: 650px) {
@@ -43,17 +43,17 @@ html:has(.web-layout) {
 
   ::-webkit-scrollbar-thumb {
     cursor: pointer;
-    background-color: #bbb;
+    background-color: var(--scrollbar-thumb);
   }
 
   ::-webkit-scrollbar-track {
-    background-color: #eee;
+    background-color: var(--scrollbar-track);
   }
 }
 
 a {
   text-decoration: none;
-  color: #313131;
+  color: var(--text-primary);
   outline: 0;
   transition: color 0.3s;
 }
@@ -61,7 +61,7 @@ a {
 a:active,
 a:focus,
 a:hover {
-  color: #eb5055;
+  color: var(--accent);
   outline: 0;
 }
 
@@ -77,48 +77,36 @@ a:hover {
 
 .clearfix {
   zoom: 1;
-}
-
-.bg-orange {
-  background-color: #f68e5f !important;
+}.bg-orange{
+  background-color: var(--bg-orange) !important;
 }
 
 .bg-white {
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: var(--bg-glass);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
 }
 
 .bg-grey {
-  background-color: #f7f7f7 !important;
+  background-color: var(--bg-main) !important;
 }
 
 .bg-deepgrey {
   background-color: rgba(0, 0, 0, 0.5) !important;
-}
-
-.bg-blue {
-  background-color: #6fa3ef !important;
-}
-
-.bg-purple {
-  background-color: #bc99c4 !important;
-}
-
-.bg-green {
-  background-color: #46c47c !important;
-}
-
-.bg-yellow {
-  background-color: #f9bb3c !important;
-}
-
-.bg-red {
-  background-color: #e8583d !important;
+}.bg-blue{
+  background-color: var(--tag-blue) !important;
+}.bg-purple{
+  background-color: var(--tag-purple) !important;
+}.bg-green{
+  background-color: var(--tag-green) !important;
+}.bg-yellow{
+  background-color: var(--tag-yellow) !important;
+}.bg-red{
+  background-color: var(--tag-red) !important;
 }
 
 .text-white {
-  color: #fff !important;
+  color: var(--text-inverse) !important;
 }
 
 /* Layout */
@@ -126,7 +114,7 @@ a:hover {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f7f7f7;
+  background: var(--bg-main);
 }
 
 
@@ -135,12 +123,12 @@ a:hover {
 .web-main {
   flex: 1;
   /* padding-top: 70px; */
-  background-image: url(../../assets/images/bg.png);
+  background-image: var(--body-pattern);
   background-position: left top;
-  background-size: auto;
+  background-size: var(--body-pattern-size);
   background-repeat: repeat;
   background-attachment: fixed;
-  background-color: #f7f7f7 !important;
+  background-color: var(--bg-main) !important;
 }
 
 .main-content {

@@ -1,8 +1,8 @@
 .tag-cloud-wrapper {
-  background: #fff;
+  background: var(--bg-card);
   padding: 20px;
   border-radius: 5px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--shadow-sm);
 }
 
 .tag-cloud-title {
@@ -10,8 +10,8 @@
   font-weight: 600;
   margin-bottom: 15px;
   padding-bottom: 10px;
-  border-bottom: 1px solid #f0f0f0;
-  color: #333;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-heading);
 }
 
 .tag-cloud {
@@ -24,17 +24,17 @@
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;
-  background: #f5f5f5;
+  background: var(--bg-subtle);
   border-radius: 15px;
   font-size: 13px;
-  color: #666;
+  color: var(--text-secondary);
   text-decoration: none;
   transition: all 0.3s;
 }
 
 .tag-item:hover {
-  background: #eb5055;
-  color: #fff;
+  background: var(--accent);
+  color: var(--text-inverse);
   transform: translateY(-2px);
 }
 
@@ -52,5 +52,5 @@
 }
 
 .tag-item:hover .tag-count {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--border-glass);
 }

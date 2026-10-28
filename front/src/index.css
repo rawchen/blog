@@ -13,9 +13,9 @@ body {
   font-size: 14px;
   line-height: 1.8;
   margin: 0 auto;
-  color: #313131;
+  color: var(--text-primary);
   text-rendering: geometricPrecision;
-  background-color: #f3f3f3;
+  background-color: var(--bg-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
@@ -36,7 +36,7 @@ body {
   transform: translate(-50%, -50%) scale(0);
   padding: 10px 20px;
   background: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  color: var(--text-inverse);
   border-radius: 2px;
   font-size: 14px;
   z-index: 2147483647;
@@ -59,9 +59,9 @@ blockquote, dl, ol, p, pre, ul {
 .empty {
   text-align: center;
   padding: 30px 20px;
-  color: #999;
+  color: var(--text-tertiary);
   font-size: 16px;
-  /*background: #fff;*/
+  /*background: var(--bg-card);*/
   border-radius: 8px;
 }
 
@@ -125,15 +125,15 @@ blockquote, dl, ol, p, pre, ul {
 }
 
 .about-contact .qq {
-  background-color: #ff8888;
+  background-color: var(--contact-qq);
 }
 
 .about-contact .email {
-  background-color: #a0cfcf;
+  background-color: var(--contact-email);
 }
 
 .about-contact .telegram {
-  background-color: #80cddc;
+  background-color: var(--contact-telegram);
 }
 
 .about-contact .qq:hover, .about-contact .email:hover, .about-contact .telegram:hover {
@@ -144,7 +144,7 @@ blockquote, dl, ol, p, pre, ul {
 
 .about-contact .content {
   font-weight: bold;
-  color: #fff;
+  color: var(--text-inverse);
   line-height: 30px;
   font-size: 16px;
   letter-spacing: .5px;
@@ -154,7 +154,7 @@ blockquote, dl, ol, p, pre, ul {
   position: absolute;
   font-size: 63px;
   font-weight: bold;
-  color: #fff;
+  color: var(--text-inverse);
   left: 16px;
   bottom: -26px;
   /* opacity: .4; */
@@ -207,5 +207,5 @@ blockquote, dl, ol, p, pre, ul {
   padding: 5px;
   margin-left: 0px;
   /* border: 4px dotted #fcce8a; */
-  border: 4px dotted #d2d8d9;
+  border: 4px dotted var(--border-strong);
 }

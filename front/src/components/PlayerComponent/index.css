@@ -13,7 +13,7 @@
   margin: 20px 0;
   border-radius: 8px;
   overflow: hidden;
-  background: #fff;
+  background: var(--bg-card);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
 }
 
@@ -27,7 +27,7 @@
 .c-player svg {
   width: 100%;
   height: 100%;
-  fill: #333;
+  fill: var(--text-heading);
   display: block;
 }
 
@@ -44,7 +44,7 @@
   display: flex;
   height: 15em;
   width: 100%;
-  background: #eee;
+  background: var(--bg-muted);
   overflow: hidden;
 }
 
@@ -68,13 +68,13 @@
   font-size: large;
   font-family: "LiHei Pro", "Microsoft Yahei", sans-serif;
   width: 100%;
-  color: #666;
+  color: var(--text-secondary);
   transition: 0.25s background ease;
 }
 
 .c-player .lyric .lyric-body .lyric-line.now {
-  background: #ddd;
-  color: #333;
+  background: var(--bg-muted);
+  color: var(--text-heading);
   font-weight: 500;
 }
 
@@ -135,7 +135,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #333;
+  color: var(--text-heading);
 }
 
 .c-player .controls .c-left .music-description .music-meta .music-artist {
@@ -144,9 +144,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.c-player .controls .c-left .play-icon {
+}.c-player .controls .c-left .play-icon{
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,7 +152,7 @@
   width: 3.2em;
   height: 3.2em;
   border-radius: 100%;
-  background-color: #6bc4de;
+  background-color: var(--tag-cyan);
   color: white;
   cursor: pointer;
   transition: transform 0.2s;
@@ -189,16 +187,14 @@
 .c-player .controls .c-center .time .time-body {
   margin: 0 1%;
   height: 0.5em;
-  background-color: #ccc;
+  background-color: var(--bg-muted);
   display: flex;
   border-radius: 0.5em;
   flex: 1;
-}
-
-.c-player .controls .c-center .time .time-line {
+}.c-player .controls .c-center .time .time-line{
   width: 0%;
   height: 100%;
-  background-color: #359abc;
+  background-color: var(--tag-cyan);
   will-change: width;
   transition: 0.1s width ease-in;
   position: relative;
@@ -207,13 +203,11 @@
 
 .c-player .controls .c-center .time .time-line.dragging {
   transition: none;
-}
-
-.c-player .controls .c-center .time .time-point {
+}.c-player .controls .c-center .time .time-point{
   width: 1em;
   height: 1em;
   margin: -0.25em -0.5em 0 0;
-  background-color: #6bc4de;
+  background-color: var(--tag-cyan);
   border-radius: 100%;
   position: absolute;
   right: 0;
@@ -234,7 +228,7 @@
 
 .c-player .controls .c-center .time .time-text {
   font-size: 0.7em;
-  color: #666;
+  color: var(--text-secondary);
   margin-left: 0.5em;
   min-width: 5em;
 }
@@ -267,27 +261,23 @@
   visibility: hidden;
   width: 0;
   height: 0.5em;
-  background-color: #ccc;
+  background-color: var(--bg-muted);
   display: flex;
   border-radius: 0.5em;
   transition: width 0.2s;
-}
-
-.c-player .controls .c-right .volume .volume-line {
+}.c-player .controls .c-right .volume .volume-line{
   width: 0%;
   height: 100%;
-  background-color: #359abc;
+  background-color: var(--tag-cyan);
   will-change: width;
   transition: 0.1s width ease-in;
   position: relative;
   border-radius: 0.5em;
-}
-
-.c-player .controls .c-right .volume .volume-point {
+}.c-player .controls .c-right .volume .volume-point{
   width: 1em;
   height: 1em;
   margin: -0.25em -0.5em 0 0;
-  background-color: #6bc4de;
+  background-color: var(--tag-cyan);
   border-radius: 100%;
   position: absolute;
   right: 0;
@@ -356,22 +346,22 @@
 .c-player .controls .c-right .list-button.active .list-power,
 .c-player .controls .c-right .lyric-button.active .lyric-power {
   background: rgba(53, 154, 188, 0.2);
-  color: #359abc;
+  color: var(--info);
 }
 
 .c-player .controls .c-right .list-button.active .list-power svg,
 .c-player .controls .c-right .lyric-button.active .lyric-power svg {
-  fill: #359abc;
+  fill: var(--info);
 }
 
 /* 禁用状态的列表按钮 */
 .c-player .controls .c-right .list-button.disabled .list-power {
-  color: #ccc;
+  color: var(--text-secondary);
   cursor: not-allowed;
 }
 
 .c-player .controls .c-right .list-button.disabled .list-power svg {
-  fill: #ccc;
+  fill: var(--text-secondary);
 }
 
 .c-player .controls .c-right .list-button.disabled .list-power:hover,
@@ -417,10 +407,8 @@
 .c-player .list .list-body .list-item:active::before,
 .c-player .list .list-body .list-item.active::before {
   width: 0.4em;
-}
-
-.c-player .list .list-body .list-item::before {
-  background: #6bc4de;
+}.c-player .list .list-body .list-item::before{
+  background: var(--tag-cyan);
   transition: 0.2s width 0s ease;
   float: left;
   height: 2.5em;
@@ -436,7 +424,7 @@
 
 .c-player .list .list-body .list-item .music-name {
   flex: 1;
-  color: #333;
+  color: var(--text-heading);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -455,13 +443,11 @@
   justify-content: center;
   padding: 2em;
   background: rgba(255, 255, 255, 0.95);
-  color: #666;
+  color: var(--text-secondary);
   font-size: 14px;
-}
-
-.c-player .player-error-overlay {
+}.c-player .player-error-overlay{
   background: rgba(255, 240, 240, 0.95);
-  color: #ff4d4f;
+  color: var(--error);
 }
 
 /* 响应式 - 600px以下 */
