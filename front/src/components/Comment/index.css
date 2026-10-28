@@ -209,6 +209,11 @@
   cursor: pointer;
 }
 
+/* 暗色主题：替换回复图标 */
+:root[data-theme='dark'] .comment-meta .comment-reply {
+  background-image: url('../../assets/images/reply-ico-dark.png');
+}
+
 .comment-meta .comment-reply:hover {
   opacity: 1;
 }
@@ -279,6 +284,11 @@
   border-bottom: none;
   background: var(--bg-card) url('../../assets/images/comments-bg.jpg') right center no-repeat;
   background-size: 200px;
+}
+
+/* 暗色主题：替换评论框背景图 */
+:root[data-theme='dark'] .comment-form textarea.form-control {
+  background-image: url('../../assets/images/comments-bg-dark.jpg');
 }
 
 .comment-form .input-control {
