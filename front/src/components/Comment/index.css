@@ -247,6 +247,13 @@
   border-radius: 3px;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  /* 评论框点击缩小的过渡动画 */
+  transition: transform 0.35s ease;
+}
+
+/* 按下评论框（含点击输入框、表情、按钮等内部元素）时整体缩小，松开后平滑还原 */
+.comment-form:active {
+  transform: scale(0.99);
 }
 
 .comment-form .form-control {
