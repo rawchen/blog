@@ -121,6 +121,11 @@
   color: black;
 }
 
+/* 暗色主题下 hover 文字需为浅色，不能沿用亮色主题的黑色 */
+:root[data-theme='dark'] .icp a:hover {
+  color: var(--text-primary);
+}
+
 .footer-icons {
   padding-top: 5px;
 }
@@ -236,6 +241,11 @@
   color: black;
 }
 
+/* 暗色主题下 hover 文字需为浅色，不能沿用亮色主题的黑色 */
+:root[data-theme='dark'] .footer-meta .meta-posts li a:hover {
+  color: var(--text-primary);
+}
+
 .footer-meta .meta-comments li {
   font-size: 13px;
   line-height: 25px;
@@ -254,6 +264,11 @@
 .footer-meta .meta-comments li a:hover {
   border-bottom: 3px solid var(--border-strong);
   color: black;
+}
+
+/* 暗色主题下 hover 文字需为浅色，不能沿用亮色主题的黑色 */
+:root[data-theme='dark'] .footer-meta .meta-comments li a:hover {
+  color: var(--text-primary);
 }
 
 .footer-icon {
