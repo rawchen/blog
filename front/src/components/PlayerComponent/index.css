@@ -14,7 +14,8 @@
   border-radius: 8px;
   overflow: hidden;
   background: var(--bg-card);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
 .c-player * {
@@ -69,7 +70,7 @@
   font-family: "LiHei Pro", "Microsoft Yahei", sans-serif;
   width: 100%;
   color: var(--text-secondary);
-  transition: 0.25s background ease;
+  transition: 0.25s background ease, 0.35s color ease;
 }
 
 .c-player .lyric .lyric-body .lyric-line.now {
@@ -81,10 +82,11 @@
 /* 控制区域 */
 .c-player .controls {
   z-index: 1;
-  background: white;
+  background: var(--bg-card);
   height: 4em;
   display: flex;
-  box-shadow: rgb(0 0 0 / 1%) 0px 2px 8px;
+  box-shadow: var(--shadow-md);
+  transition: background-color 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
 .c-player .controls .c-left {
@@ -140,7 +142,7 @@
 
 .c-player .controls .c-left .music-description .music-meta .music-artist {
   font-size: 0.7em;
-  color: grey;
+  color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -304,14 +306,14 @@
   width: 100%;
   height: 100%;
   border-radius: 10%;
-  color: grey;
+  color: var(--text-muted);
   transition: all 0.2s ease-in;
   cursor: pointer;
 }
 
 .c-player .controls .c-right .volume .volume-power:hover,
 .c-player .controls .c-right .volume .volume-power:active {
-  background: rgba(117, 117, 117, 0.3);
+  background: var(--bg-hover);
 }
 
 .c-player .controls .c-right .volume .volume-power svg {
@@ -325,7 +327,7 @@
   width: 100%;
   height: 100%;
   border-radius: 10%;
-  color: grey;
+  color: var(--text-muted);
   transition: all 0.2s ease-in;
   cursor: pointer;
 }
@@ -334,7 +336,7 @@
 .c-player .controls .c-right .list-button .list-power:active,
 .c-player .controls .c-right .lyric-button .lyric-power:hover,
 .c-player .controls .c-right .lyric-button .lyric-power:active {
-  background: rgba(117, 117, 117, 0.3);
+  background: var(--bg-hover);
 }
 
 .c-player .controls .c-right .list-button .list-power svg,
@@ -374,7 +376,7 @@
   will-change: height;
   transition: all 0.25s;
   max-height: 20em;
-  background: white;
+  background: var(--bg-card);
   overflow: auto;
 }
 
@@ -394,13 +396,13 @@
 }
 
 .c-player .list .list-body .list-item:nth-child(2n-1) {
-  background: rgba(117, 117, 117, 0.04);
+  background: var(--bg-subtle);
 }
 
 .c-player .list .list-body .list-item:hover,
 .c-player .list .list-body .list-item:active,
 .c-player .list .list-body .list-item.active {
-  background: rgba(117, 117, 117, 0.13);
+  background: var(--bg-hover);
 }
 
 .c-player .list .list-body .list-item:hover::before,
@@ -431,7 +433,7 @@
 }
 
 .c-player .list .list-body .list-item .music-artist {
-  color: grey;
+  color: var(--text-muted);
   font-size: 0.85em;
 }
 
@@ -442,11 +444,12 @@
   align-items: center;
   justify-content: center;
   padding: 2em;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-card);
   color: var(--text-secondary);
   font-size: 14px;
+  transition: background-color 0.35s ease, color 0.35s ease;
 }.c-player .player-error-overlay{
-  background: rgba(255, 240, 240, 0.95);
+  background: var(--bg-danger-soft);
   color: var(--error);
 }
 
@@ -511,4 +514,39 @@
 /* Markdown渲染中的播放器样式 */
 .markdown-body .c-player {
   margin: 20px 0;
+}
+
+/* ---------------- 暗色主题适配 ---------------- */
+:root[data-theme='dark'] .c-player {
+  border: 1px solid var(--border-color);
+}
+
+/* 暗色下各区块之间加一条细分割线，避免深色背景糊成一片 */
+:root[data-theme='dark'] .c-player .lyric {
+  border-bottom: 1px solid var(--border-light);
+}
+
+:root[data-theme='dark'] .c-player .controls {
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* 暗色下当前播放的歌词行用卡片色提亮 */
+:root[data-theme='dark'] .c-player .lyric .lyric-body .lyric-line.now {
+  background: var(--bg-card);
+}
+
+/* 暗色下封面图加一点边框，避免与深色背景融合 */
+:root[data-theme='dark'] .c-player .controls .c-left .music-description .image img {
+  border-right: 1px solid var(--border-light);
+}
+
+/* 暗色下时间/音量进度槽加深，与高亮进度形成对比 */
+:root[data-theme='dark'] .c-player .controls .c-center .time .time-body,
+:root[data-theme='dark'] .c-player .controls .c-right .volume .volume-body {
+  background-color: var(--bg-muted);
+}
+
+/* 暗色下播放按钮与进度条描边 */
+:root[data-theme='dark'] .c-player .controls .c-left .play-icon {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
