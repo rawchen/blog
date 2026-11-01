@@ -97,13 +97,118 @@
   display: flex;
 }
 
-.c-player .controls .c-left .music-description .image,
-.c-player .controls .c-left .music-description .image img {
+.c-player .controls .c-left .music-description .image {
+  position: relative;
   height: 4em;
   width: 4em;
+  margin: 0;
+}
+
+/* ---------------- 黑胶唱片 & 唱臂 ---------------- */
+.c-player {
+  --c-player-vinyl: #1b1b1b;
+  --c-player-vinyl-groove: #2b2b2b;
+  --c-player-tonearm: var(--text-secondary);
+}
+
+/* 唱片盘：播放时旋转 */
+.c-player .controls .c-left .music-description .image .vinyl {
+  position: absolute;
+  left: 0.15em;
+  top: 0.15em;
+  width: 3.7em;
+  height: 3.7em;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.18) 0 10%, transparent 46%),
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      var(--c-player-vinyl) 0 1px,
+      var(--c-player-vinyl-groove) 1px 3px
+    );
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), var(--shadow-sm);
+  animation: cplayer-vinyl-spin 20s linear infinite;
+  animation-play-state: paused;
+}
+
+.c-player.playing .controls .c-left .music-description .image .vinyl {
+  animation-play-state: running;
+}
+
+/* 唱片中心封面（随唱片一起旋转） */
+.c-player .controls .c-left .music-description .image .vinyl .vinyl-disc {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2em;
+  height: 2em;
+  margin: -1em 0 0 -1em;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.45);
+}
+
+.c-player .controls .c-left .music-description .image .vinyl .vinyl-disc .vinyl-cover {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   margin: 0;
   box-shadow: none;
+}
+
+/* 唱片中心孔 */
+.c-player .controls .c-left .music-description .image .vinyl .vinyl-hole {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.3em;
+  height: 0.3em;
+  margin: -0.15em 0 0 -0.15em;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.82);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+/* 唱臂：暂停时抬起，播放时落到唱片外圈 */
+.c-player .controls .c-left .music-description .image .tonearm {
+  position: absolute;
+  left: 3.65em;
+  top: 0.03em;
+  width: 1.4em;
+  height: 2.28em;
+  pointer-events: none;
+  background-color: var(--c-player-tonearm);
+  -webkit-mask: url('../../assets/images/net-music-needle.png') center / contain no-repeat;
+  mask: url('../../assets/images/net-music-needle.png') center / contain no-repeat;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.28));
+  transform-origin: 14% 7.3%;
+  transform: rotate(-25deg) scaleX(-1);
+  transition: transform 0.6s cubic-bezier(0.34, 1.16, 0.64, 1);
+}
+
+.c-player.playing .controls .c-left .music-description .image .tonearm {
+  transform: rotate(-10.2deg) scaleX(-1);
+}
+
+@keyframes cplayer-vinyl-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-player .controls .c-left .music-description .image .vinyl {
+    animation: none;
+  }
+
+  .c-player .controls .c-left .music-description .image .tonearm {
+    transition: none;
+  }
 }
 
 .c-player .controls .c-left .music-description .music-meta {
@@ -286,12 +391,14 @@
 }
 
 .c-player .controls .c-right .volume:hover,
-.c-player .controls .c-right .volume:active {
+.c-player .controls .c-right .volume:active,
+.c-player .controls .c-right .volume.dragging {
   width: 12em;
 }
 
 .c-player .controls .c-right .volume:hover .volume-body,
-.c-player .controls .c-right .volume:active .volume-body {
+.c-player .controls .c-right .volume:active .volume-body,
+.c-player .controls .c-right .volume.dragging .volume-body {
   visibility: visible;
   width: 100%;
 }
@@ -471,6 +578,16 @@
     visibility: hidden !important;
   }
 
+  .c-player .controls .c-right .volume.dragging,
+  .c-player .controls .c-right:hover .volume {
+    width: 100% !important;
+  }
+
+  .c-player .controls .c-right .volume.dragging .volume-body {
+    width: 100% !important;
+    visibility: visible !important;
+  }
+
   .c-player .controls .c-right:hover .list-button,
   .c-player .controls .c-right:hover .lyric-button,
   .c-player .controls .c-right.hover .list-button,
@@ -535,9 +652,14 @@
   background: var(--bg-card);
 }
 
+/* 暗色下唱臂改为浅色，唱片保持深色 */
+:root[data-theme='dark'] .c-player {
+  --c-player-tonearm: #d5dde5;
+}
+
 /* 暗色下封面图加一点边框，避免与深色背景融合 */
-:root[data-theme='dark'] .c-player .controls .c-left .music-description .image img {
-  border-right: 1px solid var(--border-light);
+:root[data-theme='dark'] .c-player .controls .c-left .music-description .image .vinyl .vinyl-disc .vinyl-cover {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
 }
 
 /* 暗色下时间/音量进度槽加深，与高亮进度形成对比 */

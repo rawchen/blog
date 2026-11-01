@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import './index.css'
 import playerManager, { generatePlayerId } from './playerManager'
+import { getStoredVolume, setStoredVolume, subscribeVolumeChange } from '../../utils/playerVolume'
 
 // 播放/暂停图标
 const PlayIcon = () => (
@@ -49,16 +50,23 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [volume, setVolume] = useState(0.8)
+  const [volume, setVolume] = useState(() => getStoredVolume())
   const [isMuted, setIsMuted] = useState(false)
   const [showLyric, setShowLyric] = useState(false)
   const [showList, setShowList] = useState(true)
   const [lyricsCache, setLyricsCache] = useState({})
   const [isDragging, setIsDragging] = useState(false)
   const [dragTime, setDragTime] = useState(0)
+  const [isVolumeDragging, setIsVolumeDragging] = useState(false)
 
   const audioRef = useRef(null)
   const lyricBodyRef = useRef(null)
+  const volumeBarRef = useRef(null)
+  const volumeRef = useRef(volume)
+
+  useEffect(() => {
+    volumeRef.current = volume
+  }, [volume])
 
   // 生成唯一播放器ID
   const playerId = useMemo(() => generatePlayerId(), [])
@@ -78,6 +86,13 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
     }
     return playerManager.register(playerInstance)
   }, [playerId])
+
+  // 订阅全局音量：其它播放器修改音量后实时同步（音量宽度随之重绘）
+  useEffect(() => {
+    return subscribeVolumeChange((next) => {
+      setVolume(prev => (Math.abs(prev - next) < 0.001 ? prev : next))
+    })
+  }, [])
 
   // 加载音乐数据
   useEffect(() => {
@@ -151,6 +166,12 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
     }
   }, [songs, currentIndex, playerId])
 
+  // 将全局音量同步到音频元素（音量变化、静音、切换歌曲时均生效）
+  useEffect(() => {
+    if (!audioRef.current) return
+    audioRef.current.volume = isMuted ? 0 : volume
+  }, [volume, isMuted, songs, currentIndex])
+
   // 切换歌曲时更新音频源
   useEffect(() => {
     if (!audioRef.current || songs.length === 0) return
@@ -177,7 +198,6 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
         }
         if (songUrl) {
           audioRef.current.src = songUrl
-          audioRef.current.volume = isMuted ? 0 : volume
           if (isPlaying) {
             audioRef.current.play().catch(() => {})
           }
@@ -312,16 +332,61 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
     }
   }, [isDragging, getTimeFromX])
 
-  // 音量调整
-  const handleVolumeChange = useCallback((e) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
+  // 音量调整：写入 localStorage 并实时同步到其它播放器
+  const applyVolume = useCallback((percent) => {
     setVolume(percent)
-    if (audioRef.current) {
-      audioRef.current.volume = percent
-    }
     setIsMuted(false)
+    setStoredVolume(percent)
   }, [])
+
+  // 根据横坐标换算音量比例
+  const getVolumeFromX = useCallback((clientX) => {
+    if (!volumeBarRef.current) return volumeRef.current
+    const rect = volumeBarRef.current.getBoundingClientRect()
+    if (!rect.width) return volumeRef.current
+    return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
+  }, [])
+
+  // 点击音量条
+  const handleVolumeChange = useCallback((e) => {
+    const clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX)
+    if (clientX === undefined || clientX === null) return
+    applyVolume(getVolumeFromX(clientX))
+  }, [applyVolume, getVolumeFromX])
+
+  // 拖动音量条
+  const handleVolumeDragStart = useCallback((e) => {
+    e.preventDefault()
+    setIsVolumeDragging(true)
+    const clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX)
+    if (clientX === undefined || clientX === null) return
+    applyVolume(getVolumeFromX(clientX))
+  }, [applyVolume, getVolumeFromX])
+
+  useEffect(() => {
+    if (!isVolumeDragging) return
+
+    const handleDragMove = (e) => {
+      const clientX = e.clientX ?? (e.touches && e.touches[0]?.clientX)
+      if (clientX === undefined || clientX === null) return
+      applyVolume(getVolumeFromX(clientX))
+    }
+
+    const handleDragEnd = () => {
+      setIsVolumeDragging(false)
+    }
+
+    document.addEventListener('mousemove', handleDragMove)
+    document.addEventListener('mouseup', handleDragEnd)
+    document.addEventListener('touchmove', handleDragMove)
+    document.addEventListener('touchend', handleDragEnd)
+    return () => {
+      document.removeEventListener('mousemove', handleDragMove)
+      document.removeEventListener('mouseup', handleDragEnd)
+      document.removeEventListener('touchmove', handleDragMove)
+      document.removeEventListener('touchend', handleDragEnd)
+    }
+  }, [isVolumeDragging, applyVolume, getVolumeFromX])
 
   // 切换歌曲
   const playSong = useCallback((index) => {
@@ -411,7 +476,7 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   if (!id) return null
 
   return (
-    <div className="c-player">
+    <div className={`c-player ${isPlaying ? 'playing' : ''}`}>
       {/* 歌词区域 */}
       {showLyric && lyrics.length > 0 && (
         <div className="lyric">
@@ -436,9 +501,15 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
         <div className="c-left">
           <div className="music-description">
             <div className="image">
-              {currentSong?.pic && (
-                <img src={currentSong.pic} alt={currentSong.name} />
-              )}
+              <div className="vinyl">
+                <div className="vinyl-disc">
+                  {currentSong?.pic && (
+                    <img className="vinyl-cover" src={currentSong.pic} alt={currentSong.name} />
+                  )}
+                </div>
+                <span className="vinyl-hole" aria-hidden="true"></span>
+              </div>
+              <div className="tonearm" aria-hidden="true"></div>
             </div>
             <div className="music-meta">
               <div className="music-name">{currentSong?.name || '未知歌曲'}</div>
@@ -464,13 +535,19 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
         </div>
 
         <div className="c-right">
-          <div className="volume">
+          <div className={`volume ${isVolumeDragging ? 'dragging' : ''}`}>
             <div className="volume-button">
               <div className="volume-power" onClick={() => setIsMuted(!isMuted)}>
                 <VolumeIcon muted={isMuted} />
               </div>
             </div>
-            <div className="volume-body" onClick={handleVolumeChange}>
+            <div
+              className="volume-body"
+              ref={volumeBarRef}
+              onClick={handleVolumeChange}
+              onMouseDown={handleVolumeDragStart}
+              onTouchStart={handleVolumeDragStart}
+            >
               <div className="volume-line" style={{ width: `${isMuted ? 0 : volume * 100}%` }}>
                 <div className="volume-point"></div>
               </div>
