@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import './index.css'
 import playerManager, { generatePlayerId } from './playerManager'
 import { getStoredVolume, setStoredVolume, subscribeVolumeChange } from '../../utils/playerVolume'
@@ -58,6 +59,7 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   const [isDragging, setIsDragging] = useState(false)
   const [dragTime, setDragTime] = useState(0)
   const [isVolumeDragging, setIsVolumeDragging] = useState(false)
+  const [coverPreview, setCoverPreview] = useState(null)
 
   const audioRef = useRef(null)
   const lyricBodyRef = useRef(null)
@@ -456,6 +458,31 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   }, [showList, songs.length, playerId])
 
   const currentSong = songs[currentIndex]
+
+  // 鼠标移入唱片封面：放大预览封面图
+  const handleCoverPreviewEnter = useCallback((event) => {
+    if (!currentSong?.pic) return
+    const rect = event.currentTarget.getBoundingClientRect()
+    const previewWidth = Math.min(240, window.innerWidth * 0.7)
+    const margin = 12
+    const half = previewWidth / 2
+    const centerX = Math.min(
+      Math.max(rect.left + rect.width / 2, half + margin),
+      Math.max(window.innerWidth - half - margin, half + margin)
+    )
+    // 上方空间不足时改为显示在下方
+    const below = rect.top < 300
+    setCoverPreview({
+      x: centerX,
+      y: below ? rect.bottom : rect.top,
+      below
+    })
+  }, [currentSong?.pic])
+
+  const handleCoverPreviewLeave = useCallback(() => {
+    setCoverPreview(null)
+  }, [])
+
   const lrcUrl = currentSong?.lrc
   const lyricText = lrcUrl ? (lyricsCache[lrcUrl] || '') : ''
   const lyrics = parseLyric(lyricText)
@@ -500,7 +527,11 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
       <div className="controls">
         <div className="c-left">
           <div className="music-description">
-            <div className="image">
+            <div
+              className="image"
+              onMouseEnter={handleCoverPreviewEnter}
+              onMouseLeave={handleCoverPreviewLeave}
+            >
               <div className="vinyl">
                 <div className="vinyl-disc">
                   {currentSong?.pic && (
@@ -600,6 +631,21 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
         <div className="player-error-overlay">
           <span>{error}</span>
         </div>
+      )}
+
+      {/* 封面放大预览浮层（挂载到 body，避免被播放器的 overflow 裁剪） */}
+      {coverPreview && currentSong?.pic && createPortal(
+        <div
+          className={`c-player-cover-preview ${coverPreview.below ? 'below' : ''}`}
+          style={{ left: `${coverPreview.x}px`, top: `${coverPreview.y}px` }}
+        >
+          <img className="cover-img" src={currentSong.pic} alt={currentSong?.name || '歌曲封面'} />
+          <div className="cover-info">
+            <span className="cover-name">{currentSong?.name || '未知歌曲'}</span>
+            <span className="cover-artist">{currentSong?.artist || '未知歌手'}</span>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   )

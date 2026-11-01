@@ -175,7 +175,7 @@
 .c-player .controls .c-left .music-description .image .tonearm {
   position: absolute;
   left: 3.65em;
-  top: 0.03em;
+  top: 0em;
   width: 1.4em;
   height: 2.28em;
   pointer-events: none;
@@ -189,7 +189,7 @@
 }
 
 .c-player.playing .controls .c-left .music-description .image .tonearm {
-  transform: rotate(-10.2deg) scaleX(-1);
+  transform: rotate(-15deg) scaleX(-1);
 }
 
 @keyframes cplayer-vinyl-spin {
@@ -208,6 +208,110 @@
 
   .c-player .controls .c-left .music-description .image .tonearm {
     transition: none;
+  }
+}
+
+/* ---------------- 封面悬停放大预览 ---------------- */
+/* 唱片区可作为放大预览的触发区域 */
+.c-player .controls .c-left .music-description .image {
+  cursor: zoom-in;
+}
+
+/* 悬停时中心封面同步轻微放大（唱片本体仍在旋转） */
+.c-player .controls .c-left .music-description .image .vinyl .vinyl-disc {
+  transition: transform 0.35s cubic-bezier(0.34, 1.16, 0.64, 1);
+}
+
+.c-player .controls .c-left .music-description .image:hover .vinyl .vinyl-disc {
+  transform: scale(1.28);
+}
+
+.c-player .controls .c-left .music-description .image:hover .vinyl {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35), 0 0 16px rgba(53, 154, 188, 0.5), var(--shadow-sm);
+}
+
+/* 放大预览浮层（通过 portal 挂载在 body 上） */
+.c-player-cover-preview {
+  --c-player-preview-shift: calc(-100% - 12px);
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  max-width: 70vw;
+  padding: 6px;
+  border-radius: 10px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.3);
+  transform: translate(-50%, var(--c-player-preview-shift)) scale(0.88);
+  transform-origin: bottom center;
+  opacity: 0;
+  pointer-events: none;
+  animation: cplayer-cover-preview-in 0.22s cubic-bezier(0.34, 1.16, 0.64, 1) forwards;
+}
+
+/* 空间不足显示在下方时，改为从上往下展开 */
+.c-player-cover-preview.below {
+  --c-player-preview-shift: 12px;
+  transform-origin: top center;
+}
+
+.c-player-cover-preview .cover-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--bg-muted);
+}
+
+.c-player-cover-preview .cover-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 4px 4px;
+  overflow: hidden;
+}
+
+.c-player-cover-preview .cover-name {
+  font-size: 13px;
+  color: var(--text-heading);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.c-player-cover-preview .cover-artist {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes cplayer-cover-preview-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, var(--c-player-preview-shift)) scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, var(--c-player-preview-shift)) scale(1);
+  }
+}
+
+/* 降低动效偏好：取消放大预览的过渡动画 */
+@media (prefers-reduced-motion: reduce) {
+  .c-player .controls .c-left .music-description .image .vinyl .vinyl-disc {
+    transition: none;
+  }
+
+  .c-player-cover-preview {
+    animation: none;
+    opacity: 1;
+    transform: translate(-50%, var(--c-player-preview-shift)) scale(1);
   }
 }
 

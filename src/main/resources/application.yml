@@ -5,7 +5,7 @@ spring:
   application:
     name: blog
   profiles:
-    active: dev
+    active: prod
   # 解决 Spring Boot 2.6+ 与 Springfox/Knife4j 的兼容性问题
   mvc:
     pathmatch:
