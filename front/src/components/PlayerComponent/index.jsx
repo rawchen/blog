@@ -3,6 +3,25 @@ import { createPortal } from 'react-dom'
 import './index.css'
 import playerManager, { generatePlayerId } from './playerManager'
 import { getStoredVolume, setStoredVolume, subscribeVolumeChange } from '../../utils/playerVolume'
+import {
+  analyzeAudioWaveform,
+  bucketPeaks,
+  generateFallbackWaveform,
+  pseudoRandom,
+  resolveAnalysisUrl,
+  sampleEnvelope,
+  WAVE_PEAK_COUNT
+} from './waveform'
+
+// 字符串 -> 稳定的数字种子（用于降级波形的确定性生成）
+const hashString = (str) => {
+  let hash = 2166136261
+  for (let i = 0; i < (str || '').length; i++) {
+    hash ^= str.charCodeAt(i)
+    hash = Math.imul(hash, 16777619)
+  }
+  return hash >>> 0
+}
 
 // 播放/暂停图标
 const PlayIcon = () => (
@@ -60,15 +79,44 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   const [dragTime, setDragTime] = useState(0)
   const [isVolumeDragging, setIsVolumeDragging] = useState(false)
   const [coverPreview, setCoverPreview] = useState(null)
+  // 波形条形数据（高度 0~1）
+  const [waveBars, setWaveBars] = useState([])
 
   const audioRef = useRef(null)
   const lyricBodyRef = useRef(null)
   const volumeBarRef = useRef(null)
   const volumeRef = useRef(volume)
+  // 波形容器：用于写入 --wave-progress / --wave-bounce
+  const waveRootRef = useRef(null)
+  // 细分波形数据（峰值 + RMS）与当前显示条数
+  const wavePeaksRef = useRef(null)
+  const waveCountRef = useRef(40)
+  // 解码后的音频包络数据
+  const waveDataRef = useRef(null)
+  // 波形缓存，避免同一首歌重复下载
+  const waveCacheRef = useRef(new Map())
+  // 当前展示时间（拖拽时与音频进度解耦）
+  const waveTimeRef = useRef(0)
+  // 律动动画状态
+  const waveAnimRef = useRef({ bounce: 0 })
+  // 最新的波形条数据与 DOM 节点（供动画循环逐条写 transform）
+  const waveBarsRef = useRef([])
+  const waveNodesRef = useRef({ base: [], played: [] })
 
   useEffect(() => {
     volumeRef.current = volume
   }, [volume])
+
+  // 波形条数据变化时同步到 ref，并缓存两层条形的 DOM 节点
+  useEffect(() => {
+    waveBarsRef.current = waveBars
+    const root = waveRootRef.current
+    if (!root) return
+    waveNodesRef.current = {
+      base: Array.from(root.querySelectorAll('.wave-layer-base .wave-bar')),
+      played: Array.from(root.querySelectorAll('.wave-layer-played .wave-bar'))
+    }
+  }, [waveBars])
 
   // 生成唯一播放器ID
   const playerId = useMemo(() => generatePlayerId(), [])
@@ -255,6 +303,157 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
     fetchLyric()
   }, [songs, currentIndex, lyricsCache])
 
+  // 波形分析：拉取并解码当前歌曲，生成波形条形 + 响度包络
+  const currentSongUrl = songs[currentIndex]?.url || ''
+
+  // 按显示条数聚合细分数据，并给每根条分配独立的抖动幅度与相位
+  const applyWaveBars = useCallback((count) => {
+    const data = wavePeaksRef.current
+    // 无论数据是否就绪都要记录期望条数，避免分析完成后条数停在初始值
+    const size = Math.max(16, Math.min(count, data ? data.peaks.length : count))
+    waveCountRef.current = size
+    if (!data) return
+    const heights = bucketPeaks(data.peaks, data.rms, size)
+    setWaveBars(heights.map((height, index) => ({
+      height,
+      gain: height,
+      // 抖动幅度与相位由下标确定性生成：切歌后形态稳定，相邻条错落不同
+      jitter: 0.3 + pseudoRandom(index * 2 + 7) * 1.1,
+      phase: pseudoRandom(index * 2 + 13) * Math.PI * 2
+    })))
+  }, [])
+
+  useEffect(() => {
+    const songUrl = currentSongUrl
+
+    if (!songUrl) {
+      setWaveBars([])
+      wavePeaksRef.current = null
+      waveDataRef.current = null
+      return
+    }
+
+    // 命中缓存直接复用，避免同一首歌重复下载
+    const cached = waveCacheRef.current.get(songUrl)
+    if (cached) {
+      waveDataRef.current = cached
+      wavePeaksRef.current = { peaks: cached.peaks, rms: cached.rms }
+      applyWaveBars(waveCountRef.current)
+      return
+    }
+
+    let cancelled = false
+    setWaveBars([])
+    wavePeaksRef.current = null
+    waveDataRef.current = null
+
+    const loadWave = async () => {
+      try {
+        const song = songs[currentIndex] || {}
+        const analysisUrl = await resolveAnalysisUrl(song)
+        if (!analysisUrl) throw new Error('缺少音频地址')
+        const result = await analyzeAudioWaveform(analysisUrl, WAVE_PEAK_COUNT)
+        if (cancelled) return
+        const data = {
+          peaks: result.peaks,
+          rms: result.rms,
+          envelope: result.envelope,
+          frameDuration: result.frameDuration
+        }
+        waveDataRef.current = data
+        wavePeaksRef.current = { peaks: result.peaks, rms: result.rms }
+        waveCacheRef.current.set(songUrl, data)
+        applyWaveBars(waveCountRef.current)
+      } catch (err) {
+        console.warn('波形分析失败，改用降级波形:', err)
+        if (cancelled) return
+        wavePeaksRef.current = generateFallbackWaveform(WAVE_PEAK_COUNT, hashString(songUrl))
+        waveDataRef.current = null
+        applyWaveBars(waveCountRef.current)
+      }
+    }
+
+    loadWave()
+    return () => { cancelled = true }
+  }, [currentSongUrl, applyWaveBars])
+
+  // 波形动画：播放时按音乐响度整体伸长缩短，每根条再叠加独立相位的抖动
+  useEffect(() => {
+    const root = waveRootRef.current
+    if (!root) return
+
+    const reduceMotion = typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    // 复位：清掉逐条 transform，回到静态波形
+    const resetTransform = () => {
+      const nodes = waveNodesRef.current
+      nodes.base.forEach((el) => { el.style.transform = '' })
+      nodes.played.forEach((el) => { el.style.transform = '' })
+    }
+
+    if (!isPlaying && !isDragging) {
+      waveAnimRef.current.bounce = 0
+      root.style.setProperty('--wave-bounce', '0')
+      resetTransform()
+      return
+    }
+
+    let raf = 0
+    const loop = () => {
+      raf = requestAnimationFrame(loop)
+
+      const audio = audioRef.current
+      const t = isDragging ? waveTimeRef.current : (audio ? audio.currentTime : 0)
+
+      if (duration > 0) {
+        const percent = Math.max(0, Math.min(100, (t / duration) * 100))
+        root.style.setProperty('--wave-progress', `${percent}%`)
+      }
+
+      let target = 0
+      if (isPlaying && !reduceMotion) {
+        const data = waveDataRef.current
+        if (data) {
+          // 真实响度包络
+          target = sampleEnvelope(data.envelope, data.frameDuration, t)
+        } else {
+          // 无包络数据时的模拟律动
+          target = 0.25 + Math.random() * 0.3
+        }
+      }
+
+      const state = waveAnimRef.current
+      // 起音快、衰减慢，贴近真实音乐的律动
+      const factor = target > state.bounce ? 0.5 : 0.12
+      state.bounce += (target - state.bounce) * factor
+      root.style.setProperty('--wave-bounce', state.bounce.toFixed(3))
+
+      // 逐条抖动：整体随音乐伸长的同时，每根条按自己的相位小幅错落起伏
+      const bars = waveBarsRef.current
+      const nodes = waveNodesRef.current
+      if (bars.length && nodes.base.length) {
+        const now = performance.now() / 1000
+        const amp = reduceMotion ? 0 : 0.18
+        for (let i = 0; i < bars.length; i++) {
+          const bar = bars[i]
+          const wobble = 1 + amp * bar.jitter * Math.sin(now * 9.5 + bar.phase)
+          const scale = (1 + state.bounce * bar.gain * 0.55) * wobble
+          const transform = `scaleY(${scale.toFixed(3)})`
+          const base = nodes.base[i]
+          if (base) base.style.transform = transform
+          // 已播放层写入完全相同的值，保证蓝灰两侧条形严格同高
+          const played = nodes.played[i]
+          if (played) played.style.transform = transform
+        }
+      }
+    }
+
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [isPlaying, isDragging, duration])
+
   // 播放/暂停
   const togglePlay = useCallback(() => {
     if (!audioRef.current) return
@@ -271,7 +470,7 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
     }
   }, [isPlaying, playerId])
 
-  // 进度条点击
+  // 波形进度条点击
   const handleProgressClick = useCallback((e) => {
     if (!audioRef.current) return
     const rect = e.currentTarget.getBoundingClientRect()
@@ -279,10 +478,27 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
     const newTime = percent * duration
     audioRef.current.currentTime = newTime
     setCurrentTime(newTime)
+    waveTimeRef.current = newTime
   }, [duration])
 
-  // 进度条拖动
+  // 波形进度条拖动
   const progressBarRef = useRef(null)
+
+  // 波形区域宽度变化时，重新决定波形条数（每条约 5px）
+  useEffect(() => {
+    const el = progressBarRef.current
+    if (!el || typeof ResizeObserver === 'undefined') return
+
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect?.width || 0
+      if (!width) return
+      // 每条约 2.5px，条形更细密，接近 waveplayer 的观感
+      const count = Math.floor(width / 2.5)
+      if (count !== waveCountRef.current) applyWaveBars(count)
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [applyWaveBars])
 
   const getTimeFromX = useCallback((clientX) => {
     if (!progressBarRef.current) return 0
@@ -298,6 +514,7 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
     if (clientX) {
       const newTime = getTimeFromX(clientX)
       setDragTime(newTime)
+      waveTimeRef.current = newTime
     }
   }, [getTimeFromX])
 
@@ -309,15 +526,17 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
       if (clientX) {
         const newTime = getTimeFromX(clientX)
         setDragTime(newTime)
+        waveTimeRef.current = newTime
       }
     }
 
     const handleDragEnd = (e) => {
-      const clientX = e.clientX || (e.changedTouches && e.changedTouches[0]?.clientX)
-      if (audioRef.current && clientX) {
+      const clientX = e.clientX ?? (e.changedTouches && e.changedTouches[0]?.clientX)
+      if (audioRef.current && clientX !== undefined && clientX !== null) {
         const newTime = getTimeFromX(clientX)
         audioRef.current.currentTime = newTime
         setCurrentTime(newTime)
+        waveTimeRef.current = newTime
       }
       setIsDragging(false)
     }
@@ -489,6 +708,14 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   const displayTime = isDragging ? dragTime : currentTime
   const progress = duration > 0 ? (displayTime / duration) * 100 : 0
 
+  // 暂停/静止状态下同步波形播放头（点击跳转、暂停时切换进度）
+  useEffect(() => {
+    if (isPlaying || isDragging) return
+    const root = waveRootRef.current
+    if (!root) return
+    root.style.setProperty('--wave-progress', `${progress}%`)
+  }, [progress, isPlaying, isDragging])
+
   const getCurrentLyricIndex = () => {
     for (let i = lyrics.length - 1; i >= 0; i--) {
       if (currentTime >= lyrics[i].time) {
@@ -554,9 +781,33 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
 
         <div className="c-center">
           <div className="time">
-            <div className="time-body" ref={progressBarRef} onClick={handleProgressClick}>
-              <div className={`time-line ${isDragging ? 'dragging' : ''}`} style={{ width: `${progress}%` }}>
-                <div className="time-point" onMouseDown={handleDragStart} onTouchStart={handleDragStart}></div>
+            <div
+              className="wave-body"
+              ref={progressBarRef}
+              onClick={handleProgressClick}
+              onMouseDown={handleDragStart}
+              onTouchStart={handleDragStart}
+            >
+              <div className="wave-track" ref={waveRootRef}>
+                <div className="wave-layer wave-layer-base">
+                  {waveBars.map((bar, index) => (
+                    <span
+                      key={`base-${index}`}
+                      className="wave-bar"
+                      style={{ height: `${bar.height * 100}%`, '--bar-gain': bar.gain }}
+                    ></span>
+                  ))}
+                </div>
+                <div className="wave-layer wave-layer-played">
+                  {waveBars.map((bar, index) => (
+                    <span
+                      key={`played-${index}`}
+                      className="wave-bar"
+                      style={{ height: `${bar.height * 100}%`, '--bar-gain': bar.gain }}
+                    ></span>
+                  ))}
+                </div>
+                <span className="wave-cursor"></span>
               </div>
             </div>
             <span className="time-text">
