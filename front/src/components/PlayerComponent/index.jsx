@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
+import React, { useEffect, useLayoutEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import './index.css'
 import playerManager, { generatePlayerId } from './playerManager'
@@ -12,6 +12,17 @@ import {
   sampleEnvelope,
   WAVE_PEAK_COUNT
 } from './waveform'
+
+// 波形疏密以「物理像素」为基准：
+// 浏览器缩放（100% / 125% / 200%）与屏幕分辨率不同的时候，
+// 同样的 CSS 宽度在屏幕上占据的物理宽度并不相同，
+// 按 CSS 像素算条数会让疏密观感随缩放比例变化，因此这里统一换算成物理像素。
+const WAVE_PHYSICAL_PITCH = 7 // 每根条占用的物理像素数（条宽 + 间隙）
+const WAVE_PHYSICAL_GAP = 2 // 条与条之间的物理像素间隙
+const WAVE_PHYSICAL_RADIUS = 2 // 条形圆角的物理像素半径
+
+// 当前设备缩放比（含浏览器页面缩放），即 1 个 CSS 像素对应多少物理像素
+const getDevicePixelRatio = () => (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1)
 
 // 字符串 -> 稳定的数字种子（用于降级波形的确定性生成）
 const hashString = (str) => {
@@ -101,22 +112,53 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   const waveAnimRef = useRef({ bounce: 0 })
   // 最新的波形条数据与 DOM 节点（供动画循环逐条写 transform）
   const waveBarsRef = useRef([])
-  const waveNodesRef = useRef({ base: [], played: [] })
+  const waveNodesRef = useRef([])
 
   useEffect(() => {
     volumeRef.current = volume
   }, [volume])
 
-  // 波形条数据变化时同步到 ref，并缓存两层条形的 DOM 节点
-  useEffect(() => {
+  // 波形布局：条形的 left/width 与背景对齐全部由同一个步距推导，
+  // 保证每根条等宽、间隙一致，同时蓝/灰分界精确落在播放进度处
+  const syncWaveLayout = useCallback(() => {
+    // waveRootRef 指向的就是 .wave-track 本身
+    const track = waveRootRef.current
+    if (!track) return
+    const bars = Array.from(track.querySelectorAll('.wave-layer .wave-bar'))
+    const count = bars.length
+    if (!count) return
+
+    const width = track.getBoundingClientRect().width
+    if (!width) return
+
+    // 步距 = 轨道宽 / 条数（左右对称），条宽 = 步距 - 间隙
+    // 间隙与圆角都按物理像素折算，保证不同缩放比例下的观感一致
+    const dpr = getDevicePixelRatio()
+    const gap = WAVE_PHYSICAL_GAP / dpr
+    const radius = WAVE_PHYSICAL_RADIUS / dpr
+    const pitch = width / count
+    const barWidth = Math.max(1, pitch - gap)
+
+    bars.forEach((el, i) => {
+      const left = i * pitch
+      el.style.left = `${left}px`
+      el.style.width = `${barWidth}px`
+      el.style.borderRadius = `${radius}px`
+      // 背景是一张与轨道等宽的渐变图，按该条的偏移对齐到轨道坐标
+      el.style.backgroundSize = `${width}px 100%`
+      el.style.backgroundPosition = `${-left}px 0`
+    })
+  }, [])
+
+  // 波形条数据变化时同步到 ref，缓存 DOM 节点并重排布局
+  // 用 useLayoutEffect 让 left/width 在浏览器绘制前写入，避免首帧错位
+  useLayoutEffect(() => {
     waveBarsRef.current = waveBars
     const root = waveRootRef.current
     if (!root) return
-    waveNodesRef.current = {
-      base: Array.from(root.querySelectorAll('.wave-layer-base .wave-bar')),
-      played: Array.from(root.querySelectorAll('.wave-layer-played .wave-bar'))
-    }
-  }, [waveBars])
+    waveNodesRef.current = Array.from(root.querySelectorAll('.wave-layer .wave-bar'))
+    syncWaveLayout()
+  }, [waveBars, syncWaveLayout])
 
   // 生成唯一播放器ID
   const playerId = useMemo(() => generatePlayerId(), [])
@@ -388,9 +430,7 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
 
     // 复位：清掉逐条 transform，回到静态波形
     const resetTransform = () => {
-      const nodes = waveNodesRef.current
-      nodes.base.forEach((el) => { el.style.transform = '' })
-      nodes.played.forEach((el) => { el.style.transform = '' })
+      waveNodesRef.current.forEach((el) => { el.style.transform = '' })
     }
 
     if (!isPlaying && !isDragging) {
@@ -433,19 +473,15 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
       // 逐条抖动：整体随音乐伸长的同时，每根条按自己的相位小幅错落起伏
       const bars = waveBarsRef.current
       const nodes = waveNodesRef.current
-      if (bars.length && nodes.base.length) {
+      if (bars.length && nodes.length) {
         const now = performance.now() / 1000
         const amp = reduceMotion ? 0 : 0.18
         for (let i = 0; i < bars.length; i++) {
           const bar = bars[i]
           const wobble = 1 + amp * bar.jitter * Math.sin(now * 9.5 + bar.phase)
           const scale = (1 + state.bounce * bar.gain * 0.55) * wobble
-          const transform = `scaleY(${scale.toFixed(3)})`
-          const base = nodes.base[i]
-          if (base) base.style.transform = transform
-          // 已播放层写入完全相同的值，保证蓝灰两侧条形严格同高
-          const played = nodes.played[i]
-          if (played) played.style.transform = transform
+          const node = nodes[i]
+          if (node) node.style.transform = `translateY(-50%) scaleY(${scale.toFixed(3)})`
         }
       }
     }
@@ -484,7 +520,7 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   // 波形进度条拖动
   const progressBarRef = useRef(null)
 
-  // 波形区域宽度变化时，重新决定波形条数（每条约 5px）
+  // 波形区域宽度变化（或页面缩放比例变化）时，重新决定波形条数
   useEffect(() => {
     const el = progressBarRef.current
     if (!el || typeof ResizeObserver === 'undefined') return
@@ -492,13 +528,32 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
     const observer = new ResizeObserver((entries) => {
       const width = entries[0]?.contentRect?.width || 0
       if (!width) return
-      // 每条约 2.5px，条形更细密，接近 waveplayer 的观感
-      const count = Math.floor(width / 2.5)
+      // 条数按物理像素折算：缩放 125% 时每条占 7/1.25 个 CSS 像素，
+      // 因此观感与 200% 缩放、1080p 屏幕时保持一致
+      const count = Math.floor((width * getDevicePixelRatio()) / WAVE_PHYSICAL_PITCH)
       if (count !== waveCountRef.current) applyWaveBars(count)
+      // 宽度变化后重新对齐每根条的位置与背景
+      syncWaveLayout()
     })
     observer.observe(el)
     return () => observer.disconnect()
-  }, [applyWaveBars])
+  }, [applyWaveBars, syncWaveLayout])
+
+  // 浏览器页面缩放改变时 devicePixelRatio 会变化（CSS 宽度未必变），
+  // 这里额外监听一次，用新的缩放比重算条数
+  useEffect(() => {
+    const onZoomChange = () => {
+      const el = progressBarRef.current
+      if (!el) return
+      const width = el.getBoundingClientRect().width
+      if (!width) return
+      const count = Math.floor((width * getDevicePixelRatio()) / WAVE_PHYSICAL_PITCH)
+      if (count !== waveCountRef.current) applyWaveBars(count)
+      syncWaveLayout()
+    }
+    window.addEventListener('resize', onZoomChange)
+    return () => window.removeEventListener('resize', onZoomChange)
+  }, [applyWaveBars, syncWaveLayout])
 
   const getTimeFromX = useCallback((clientX) => {
     if (!progressBarRef.current) return 0
@@ -789,19 +844,10 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
               onTouchStart={handleDragStart}
             >
               <div className="wave-track" ref={waveRootRef}>
-                <div className="wave-layer wave-layer-base">
+                <div className="wave-layer">
                   {waveBars.map((bar, index) => (
                     <span
-                      key={`base-${index}`}
-                      className="wave-bar"
-                      style={{ height: `${bar.height * 100}%`, '--bar-gain': bar.gain }}
-                    ></span>
-                  ))}
-                </div>
-                <div className="wave-layer wave-layer-played">
-                  {waveBars.map((bar, index) => (
-                    <span
-                      key={`played-${index}`}
+                      key={index}
                       className="wave-bar"
                       style={{ height: `${bar.height * 100}%`, '--bar-gain': bar.gain }}
                     ></span>

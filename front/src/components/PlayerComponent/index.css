@@ -210,9 +210,9 @@
     transition: none;
   }
 
-  /* 波形不再随音乐律动伸缩 */
+  /* 波形不再随音乐律动伸缩（保留居中位移） */
   .c-player .controls .c-center .time .wave-bar {
-    transform: none;
+    transform: translateY(-50%);
     will-change: auto;
   }
 }
@@ -418,35 +418,35 @@
   inset: 0;
 }
 
+/* 波形层：条形绝对定位，left/width 由 JS 按统一步距精确计算，
+   避免 flex 均分时的小数宽度累积误差导致间隙忽宽忽窄 */
 .c-player .controls .c-center .time .wave-layer {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5px;
   pointer-events: none;
 }
 
-/* 已播放部分：裁剪露出高亮波形 */
-.c-player .controls .c-center .time .wave-layer-played {
-  clip-path: inset(0 calc(100% - var(--wave-progress)) 0 0);
-}
-
 .c-player .controls .c-center .time .wave-bar {
-  flex: 1 1 0;
-  min-width: 1px;
+  position: absolute;
+  top: 50%;
   min-height: 2px;
   border-radius: 1px;
+  /* 每根条的增益，由 JS 逐条写入；此处给出默认值 */
+  --bar-gain: 0;
   background-color: var(--border-strong);
+  /* 每根条的背景是一张「与轨道等宽」的渐变图，JS 按该条的横向偏移对齐，
+     于是蓝/灰分界精确落在播放进度处。
+     蓝色与灰色是同一条形，只是着色不同，所以永远完全重合，不会露灰边。 */
+  background-image: linear-gradient(
+    90deg,
+    var(--tag-cyan) 0 var(--wave-progress),
+    var(--border-strong) var(--wave-progress) 100%
+  );
+  background-repeat: no-repeat;
   transform-origin: center center;
   /* 播放时由 JS 逐条写入 transform（整体伸长 + 每根条独立相位的抖动），
      这里只提供暂停时的静态形态 */
-  transform: scaleY(calc(1 + var(--wave-bounce) * var(--bar-gain, 0) * 0.55));
-}
-
-.c-player .controls .c-center .time .wave-layer-played .wave-bar {
-  background-color: var(--tag-cyan);
+  transform: translateY(-50%) scaleY(calc(1 + var(--wave-bounce) * 0.55));
 }
 
 /* 播放头 */
