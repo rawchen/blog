@@ -24,6 +24,18 @@ const WAVE_PHYSICAL_RADIUS = 2 // 条形圆角的物理像素半径
 // 当前设备缩放比（含浏览器页面缩放），即 1 个 CSS 像素对应多少物理像素
 const getDevicePixelRatio = () => (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1)
 
+// 描出圆角矩形路径（不依赖 ctx.roundRect，兼容旧浏览器）
+const traceRoundRect = (ctx, x, y, w, h, r) => {
+  const rr = Math.max(0, Math.min(r, w / 2, h / 2))
+  ctx.beginPath()
+  ctx.moveTo(x + rr, y)
+  ctx.arcTo(x + w, y, x + w, y + h, rr)
+  ctx.arcTo(x + w, y + h, x, y + h, rr)
+  ctx.arcTo(x, y + h, x, y, rr)
+  ctx.arcTo(x, y, x + w, y, rr)
+  ctx.closePath()
+}
+
 // 字符串 -> 稳定的数字种子（用于降级波形的确定性生成）
 const hashString = (str) => {
   let hash = 2166136261
@@ -97,7 +109,7 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   const lyricBodyRef = useRef(null)
   const volumeBarRef = useRef(null)
   const volumeRef = useRef(volume)
-  // 波形容器：用于写入 --wave-progress / --wave-bounce
+  // 波形容器：用于写入 --wave-progress（驱动播放头位置）
   const waveRootRef = useRef(null)
   // 细分波形数据（峰值 + RMS）与当前显示条数
   const wavePeaksRef = useRef(null)
@@ -108,57 +120,115 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   const waveCacheRef = useRef(new Map())
   // 当前展示时间（拖拽时与音频进度解耦）
   const waveTimeRef = useRef(0)
-  // 律动动画状态
-  const waveAnimRef = useRef({ bounce: 0 })
-  // 最新的波形条数据与 DOM 节点（供动画循环逐条写 transform）
+  // 律动动画状态：bounce 为整体伸长量，time 为动画时间轴，
+  // amp 为抖动幅度（静止时为 0），reduce 为系统「减少动态效果」
+  const waveAnimRef = useRef({ bounce: 0, time: 0, amp: 0, reduce: false })
+  // 波形条数据（供绘制使用）
   const waveBarsRef = useRef([])
-  const waveNodesRef = useRef([])
+  // 画布引用与绘制状态
+  const waveCanvasRef = useRef(null)
+  // 播放进度（0~1），绘制时作为青/灰分界
+  const waveProgressRef = useRef(0)
+  // 主题色缓存：--tag-cyan / --border-strong 跟随 data-theme 变化
+  const waveThemeRef = useRef({ cyan: '', gray: '', dirty: true })
 
   useEffect(() => {
     volumeRef.current = volume
   }, [volume])
 
-  // 波形布局：条形的 left/width 与背景对齐全部由同一个步距推导，
-  // 保证每根条等宽、间隙一致，同时蓝/灰分界精确落在播放进度处
-  const syncWaveLayout = useCallback(() => {
-    // waveRootRef 指向的就是 .wave-track 本身
-    const track = waveRootRef.current
-    if (!track) return
-    const bars = Array.from(track.querySelectorAll('.wave-layer .wave-bar'))
+  // 绘制波形到 canvas：
+  // 条形的步距 / 间隙 / 圆角与 DOM 版保持同一套规则（按物理像素折算），
+  // 颜色分界直接按播放进度切两段绘制，不再依赖背景偏移那套技巧。
+  const drawWave = useCallback(() => {
+    const canvas = waveCanvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const rect = canvas.getBoundingClientRect()
+    const cssW = rect.width
+    const cssH = rect.height
+    if (!cssW || !cssH) return
+
+    // backing store 按设备像素比分配，缩放比例变化时自动重建
+    const dpr = getDevicePixelRatio()
+    const targetW = Math.max(1, Math.round(cssW * dpr))
+    const targetH = Math.max(1, Math.round(cssH * dpr))
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW
+      canvas.height = targetH
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    ctx.clearRect(0, 0, cssW, cssH)
+
+    // 主题色：--tag-cyan / --border-strong 跟随 data-theme 变化
+    const theme = waveThemeRef.current
+    if (theme.dirty) {
+      const style = getComputedStyle(canvas)
+      theme.cyan = style.getPropertyValue('--tag-cyan').trim() || '#6bc4de'
+      theme.gray = style.getPropertyValue('--border-strong').trim() || '#dddddd'
+      theme.dirty = false
+    }
+
+    const bars = waveBarsRef.current
     const count = bars.length
     if (!count) return
 
-    const width = track.getBoundingClientRect().width
-    if (!width) return
+    const anim = waveAnimRef.current
+    const now = anim.time
+    const amp = anim.amp || 0
 
-    // 步距 = 轨道宽 / 条数（左右对称），条宽 = 步距 - 间隙
-    // 间隙与圆角都按物理像素折算，保证不同缩放比例下的观感一致
-    const dpr = getDevicePixelRatio()
+    // canvas 上下各留一倍空间（CSS 中 height: 200%），轨道高度是它的一半
+    const trackHeight = cssH / 2
+    const centerY = cssH / 2
     const gap = WAVE_PHYSICAL_GAP / dpr
     const radius = WAVE_PHYSICAL_RADIUS / dpr
-    const pitch = width / count
+    const minHeight = 2 / dpr
+    const pitch = cssW / count
     const barWidth = Math.max(1, pitch - gap)
+    const cut = waveProgressRef.current * cssW
 
-    bars.forEach((el, i) => {
-      const left = i * pitch
-      el.style.left = `${left}px`
-      el.style.width = `${barWidth}px`
-      el.style.borderRadius = `${radius}px`
-      // 背景是一张与轨道等宽的渐变图，按该条的偏移对齐到轨道坐标
-      el.style.backgroundSize = `${width}px 100%`
-      el.style.backgroundPosition = `${-left}px 0`
-    })
+    const fillBar = (x, y, w, h, color) => {
+      ctx.fillStyle = color
+      traceRoundRect(ctx, x, y, w, h, radius)
+      ctx.fill()
+    }
+
+    for (let i = 0; i < count; i++) {
+      const bar = bars[i]
+      // 整体随音乐伸长的同时，每根条按自己的相位小幅错落起伏
+      const wobble = 1 + amp * bar.jitter * Math.sin(now * 9.5 + bar.phase)
+      const scale = (1 + anim.bounce * bar.gain * 0.55) * wobble
+      const h = Math.max(minHeight, bar.height * trackHeight) * scale
+      const y = centerY - h / 2
+      const x = i * pitch
+      const right = x + barWidth
+
+      if (right <= cut) {
+        // 完全落在已播放区
+        fillBar(x, y, barWidth, h, theme.cyan)
+      } else if (x >= cut) {
+        // 完全落在未播放区
+        fillBar(x, y, barWidth, h, theme.gray)
+      } else {
+        // 跨越分界：整条画灰色，再裁剪出已播放部分叠青色（圆角自然被切断）
+        fillBar(x, y, barWidth, h, theme.gray)
+        ctx.save()
+        ctx.beginPath()
+        ctx.rect(x, 0, cut - x, cssH)
+        ctx.clip()
+        fillBar(x, y, barWidth, h, theme.cyan)
+        ctx.restore()
+      }
+    }
   }, [])
 
-  // 波形条数据变化时同步到 ref，缓存 DOM 节点并重排布局
-  // 用 useLayoutEffect 让 left/width 在浏览器绘制前写入，避免首帧错位
+  // 波形条数据变化时重绘
+  // 用 useLayoutEffect 让 canvas 在浏览器绘制前完成重绘，避免闪烁
   useLayoutEffect(() => {
     waveBarsRef.current = waveBars
-    const root = waveRootRef.current
-    if (!root) return
-    waveNodesRef.current = Array.from(root.querySelectorAll('.wave-layer .wave-bar'))
-    syncWaveLayout()
-  }, [waveBars, syncWaveLayout])
+    drawWave()
+  }, [waveBars, drawWave])
 
   // 生成唯一播放器ID
   const playerId = useMemo(() => generatePlayerId(), [])
@@ -424,19 +494,14 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
     const root = waveRootRef.current
     if (!root) return
 
-    const reduceMotion = typeof window !== 'undefined'
-      && typeof window.matchMedia === 'function'
-      && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    // 复位：清掉逐条 transform，回到静态波形
-    const resetTransform = () => {
-      waveNodesRef.current.forEach((el) => { el.style.transform = '' })
-    }
+    const anim = waveAnimRef.current
 
     if (!isPlaying && !isDragging) {
-      waveAnimRef.current.bounce = 0
-      root.style.setProperty('--wave-bounce', '0')
-      resetTransform()
+      // 静止态：回到静态波形（不抖动、不伸长）
+      anim.bounce = 0
+      anim.time = 0
+      anim.amp = 0
+      drawWave()
       return
     }
 
@@ -448,12 +513,13 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
       const t = isDragging ? waveTimeRef.current : (audio ? audio.currentTime : 0)
 
       if (duration > 0) {
-        const percent = Math.max(0, Math.min(100, (t / duration) * 100))
-        root.style.setProperty('--wave-progress', `${percent}%`)
+        const percent = Math.max(0, Math.min(1, t / duration))
+        waveProgressRef.current = percent
+        root.style.setProperty('--wave-progress', `${(percent * 100).toFixed(3)}%`)
       }
 
       let target = 0
-      if (isPlaying && !reduceMotion) {
+      if (isPlaying && !anim.reduce) {
         const data = waveDataRef.current
         if (data) {
           // 真实响度包络
@@ -464,31 +530,45 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
         }
       }
 
-      const state = waveAnimRef.current
       // 起音快、衰减慢，贴近真实音乐的律动
-      const factor = target > state.bounce ? 0.5 : 0.12
-      state.bounce += (target - state.bounce) * factor
-      root.style.setProperty('--wave-bounce', state.bounce.toFixed(3))
+      const factor = target > anim.bounce ? 0.5 : 0.12
+      anim.bounce += (target - anim.bounce) * factor
+      anim.time = performance.now() / 1000
+      anim.amp = anim.reduce ? 0 : 0.18
 
-      // 逐条抖动：整体随音乐伸长的同时，每根条按自己的相位小幅错落起伏
-      const bars = waveBarsRef.current
-      const nodes = waveNodesRef.current
-      if (bars.length && nodes.length) {
-        const now = performance.now() / 1000
-        const amp = reduceMotion ? 0 : 0.18
-        for (let i = 0; i < bars.length; i++) {
-          const bar = bars[i]
-          const wobble = 1 + amp * bar.jitter * Math.sin(now * 9.5 + bar.phase)
-          const scale = (1 + state.bounce * bar.gain * 0.55) * wobble
-          const node = nodes[i]
-          if (node) node.style.transform = `translateY(-50%) scaleY(${scale.toFixed(3)})`
-        }
-      }
+      drawWave()
     }
 
     raf = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(raf)
-  }, [isPlaying, isDragging, duration])
+  }, [isPlaying, isDragging, duration, drawWave])
+
+  // 跟随系统「减少动态效果」设置，运行时切换也能立即生效
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const onChange = () => {
+      waveAnimRef.current.reduce = query.matches
+      drawWave()
+    }
+    onChange()
+    query.addEventListener('change', onChange)
+    return () => query.removeEventListener('change', onChange)
+  }, [drawWave])
+
+  // 主题切换（<html data-theme>）时重新读取波形颜色
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+    const observer = new MutationObserver(() => {
+      waveThemeRef.current.dirty = true
+      drawWave()
+    })
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'class', 'style']
+    })
+    return () => observer.disconnect()
+  }, [drawWave])
 
   // 播放/暂停
   const togglePlay = useCallback(() => {
@@ -532,28 +612,41 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
       // 因此观感与 200% 缩放、1080p 屏幕时保持一致
       const count = Math.floor((width * getDevicePixelRatio()) / WAVE_PHYSICAL_PITCH)
       if (count !== waveCountRef.current) applyWaveBars(count)
-      // 宽度变化后重新对齐每根条的位置与背景
-      syncWaveLayout()
+      // 宽度变化后重绘波形
+      drawWave()
     })
     observer.observe(el)
     return () => observer.disconnect()
-  }, [applyWaveBars, syncWaveLayout])
+  }, [applyWaveBars, drawWave])
 
   // 浏览器页面缩放改变时 devicePixelRatio 会变化（CSS 宽度未必变），
-  // 这里额外监听一次，用新的缩放比重算条数
+  // 这里用分辨率媒体查询监听，按新的缩放比重算条数并重绘
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+    let query = null
+    const watch = () => {
+      if (query) query.removeEventListener('change', onZoomChange)
+      query = window.matchMedia(`(resolution: ${getDevicePixelRatio()}dppx)`)
+      query.addEventListener('change', onZoomChange)
+    }
     const onZoomChange = () => {
       const el = progressBarRef.current
-      if (!el) return
-      const width = el.getBoundingClientRect().width
-      if (!width) return
-      const count = Math.floor((width * getDevicePixelRatio()) / WAVE_PHYSICAL_PITCH)
-      if (count !== waveCountRef.current) applyWaveBars(count)
-      syncWaveLayout()
+      if (el) {
+        const width = el.getBoundingClientRect().width
+        if (width) {
+          const count = Math.floor((width * getDevicePixelRatio()) / WAVE_PHYSICAL_PITCH)
+          if (count !== waveCountRef.current) applyWaveBars(count)
+        }
+      }
+      drawWave()
+      // 缩放比已变，重新订阅新的分辨率条件
+      watch()
     }
-    window.addEventListener('resize', onZoomChange)
-    return () => window.removeEventListener('resize', onZoomChange)
-  }, [applyWaveBars, syncWaveLayout])
+    watch()
+    return () => {
+      if (query) query.removeEventListener('change', onZoomChange)
+    }
+  }, [applyWaveBars, drawWave])
 
   const getTimeFromX = useCallback((clientX) => {
     if (!progressBarRef.current) return 0
@@ -844,15 +937,7 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
               onTouchStart={handleDragStart}
             >
               <div className="wave-track" ref={waveRootRef}>
-                <div className="wave-layer">
-                  {waveBars.map((bar, index) => (
-                    <span
-                      key={index}
-                      className="wave-bar"
-                      style={{ height: `${bar.height * 100}%`, '--bar-gain': bar.gain }}
-                    ></span>
-                  ))}
-                </div>
+                <canvas className="wave-canvas" ref={waveCanvasRef} aria-hidden="true"></canvas>
                 <span className="wave-cursor"></span>
               </div>
             </div>

@@ -210,9 +210,8 @@
     transition: none;
   }
 
-  /* 波形不再随音乐律动伸缩（保留居中位移） */
-  .c-player .controls .c-center .time .wave-bar {
-    transform: translateY(-50%);
+  /* 波形不再随音乐律动伸缩（由 JS 读取该媒体特性后停止抖动绘制） */
+  .c-player .controls .c-center .time .wave-canvas {
     will-change: auto;
   }
 }
@@ -410,7 +409,6 @@
   flex: 1;
   min-width: 0;
   --wave-progress: 0%;
-  --wave-bounce: 0;
 }
 
 .c-player .controls .c-center .time .wave-track {
@@ -418,35 +416,18 @@
   inset: 0;
 }
 
-/* 波形层：条形绝对定位，left/width 由 JS 按统一步距精确计算，
-   避免 flex 均分时的小数宽度累积误差导致间隙忽宽忽窄 */
-.c-player .controls .c-center .time .wave-layer {
+/* 波形层：全部条形由一张 canvas 绘制。
+   画布高度取轨道高度的两倍并垂直居中，
+   这样条形随音乐伸长/抖动超出轨道时也不会被画布裁掉。 */
+.c-player .controls .c-center .time .wave-canvas {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.c-player .controls .c-center .time .wave-bar {
-  position: absolute;
+  left: 0;
   top: 50%;
-  min-height: 2px;
-  border-radius: 1px;
-  /* 每根条的增益，由 JS 逐条写入；此处给出默认值 */
-  --bar-gain: 0;
-  background-color: var(--border-strong);
-  /* 每根条的背景是一张「与轨道等宽」的渐变图，JS 按该条的横向偏移对齐，
-     于是蓝/灰分界精确落在播放进度处。
-     蓝色与灰色是同一条形，只是着色不同，所以永远完全重合，不会露灰边。 */
-  background-image: linear-gradient(
-    90deg,
-    var(--tag-cyan) 0 var(--wave-progress),
-    var(--border-strong) var(--wave-progress) 100%
-  );
-  background-repeat: no-repeat;
-  transform-origin: center center;
-  /* 播放时由 JS 逐条写入 transform（整体伸长 + 每根条独立相位的抖动），
-     这里只提供暂停时的静态形态 */
-  transform: translateY(-50%) scaleY(calc(1 + var(--wave-bounce) * 0.55));
+  /* canvas 是替换元素，必须显式给宽高（left/right 不会拉伸它） */
+  width: 100%;
+  height: 200%;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 /* 播放头 */
