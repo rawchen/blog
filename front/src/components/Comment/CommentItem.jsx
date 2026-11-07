@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Md5 from 'md5'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDesktop } from '@fortawesome/free-solid-svg-icons'
@@ -100,6 +100,32 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain, replyTo, can
   const { browser, os } = parseUserAgent(userAgent)
   const isReplying = replyTo?.id === id
 
+  // 头像放大预览
+  const [previewVisible, setPreviewVisible] = useState(false)
+  const hideTimerRef = useRef(null)
+
+  useEffect(() => {
+    return () => {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+    }
+  }, [])
+
+  const showAvatarPreview = () => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current)
+      hideTimerRef.current = null
+    }
+    setPreviewVisible(true)
+  }
+
+  const hideAvatarPreview = () => {
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current)
+    hideTimerRef.current = setTimeout(() => {
+      setPreviewVisible(false)
+      hideTimerRef.current = null
+    }, 150)
+  }
+
   // 根据浏览器类型选择图标
   const getBrowserIcon = () => {
     if (!browser) return null
@@ -134,13 +160,23 @@ function CommentItem({ comment, onReply, depth = 1, gravatarDomain, replyTo, can
       <div id={`comment-${id}`}>
         <div className="comment-view">
           <div className="comment-header">
-            <img
-              className="avatar"
-              src={displayAvatar}
-              alt={displayName}
-              width="40"
-              height="40"
-            />
+            <span
+              className="avatar-wrapper"
+              onMouseEnter={showAvatarPreview}
+              onMouseLeave={hideAvatarPreview}
+            >
+              <img
+                className="avatar"
+                src={displayAvatar}
+                alt={displayName}
+                width="40"
+                height="40"
+              />
+              <span className={`avatar-preview${previewVisible ? ' avatar-preview-show' : ''}`}>
+                <img className="avatar-preview-img" src={displayAvatar} alt={displayName} />
+                <span className="avatar-preview-name">{displayName}</span>
+              </span>
+            </span>
             <span className={`comment-author ${isAuthor ? 'comment-by-author' : ''}`}>
               {comment.website ? (
                 <a href={comment.website} target="_blank" rel="noopener noreferrer">
