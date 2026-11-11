@@ -126,6 +126,8 @@ public class MusicServiceImpl implements MusicService {
                         if (urlVo != null && StrUtil.isNotBlank(urlVo.getUrl())) {
                             vo.setUrl(urlVo.getUrl());
                         }
+                        // 歌词链接（前端播放器直接按该地址拉取 LRC 文本）
+                        vo.setLrc("/api/music/lyric/" + vo.getId() + "/text");
                     }
                     if (vo != null) {
                         list.add(vo);

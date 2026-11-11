@@ -1,5 +1,6 @@
 package com.rawchen.blog.controller;
 
+import cn.hutool.core.util.StrUtil;
 import com.rawchen.blog.common.R;
 import com.rawchen.blog.service.MusicService;
 import com.rawchen.blog.vo.MusicLyricVO;
@@ -8,8 +9,19 @@ import com.rawchen.blog.vo.MusicVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
@@ -26,6 +38,13 @@ public class MusicController {
 
     @Autowired
     private MusicService musicService;
+
+    /**
+     * 音频下载时使用的 UA / Referer（网易云 CDN 有防盗链校验）
+     */
+    private static final String DOWNLOAD_USER_AGENT =
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36";
+    private static final String DOWNLOAD_REFERER = "https://music.163.com/";
 
     @ApiOperation("搜索歌曲")
     @GetMapping("/search")
@@ -107,6 +126,91 @@ public class MusicController {
         if (vo != null && vo.getUrl() != null && vo.getUrl().startsWith("http://")) {
             vo.setUrl(vo.getUrl().replace("http://", "https://"));
         }
+    }
+
+    /**
+     * 歌曲下载
+     *
+     * 前端直接拿到的是网易云 CDN 地址，跨域且无法控制文件名，
+     * 这里由服务端代理转发音频流，并以附件形式返回，
+     * 对外表现为「点击即可下载 mp3」。
+     *
+     * @param id   歌曲ID
+     * @param br   码率（kbps），默认 320
+     * @param name 文件名（不含扩展名），为空时使用歌曲ID
+     */
+    @ApiOperation("下载歌曲")
+    @GetMapping("/download/{id}")
+    public ResponseEntity<StreamingResponseBody> download(
+            @PathVariable String id,
+            @RequestParam(defaultValue = "320") Integer br,
+            @RequestParam(required = false) String name) {
+
+        MusicUrlVO urlVo = musicService.url(id, br);
+        if (urlVo == null || StrUtil.isBlank(urlVo.getUrl())) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        String audioUrl = urlVo.getUrl().replace("http://", "https://");
+        String fileName = buildDownloadFileName(name, id);
+
+        StreamingResponseBody body = outputStream -> {
+            HttpURLConnection connection = null;
+            try {
+                connection = (HttpURLConnection) new URL(audioUrl).openConnection();
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(15000);
+                connection.setReadTimeout(60000);
+                connection.setInstanceFollowRedirects(true);
+                connection.setRequestProperty("User-Agent", DOWNLOAD_USER_AGENT);
+                connection.setRequestProperty("Referer", DOWNLOAD_REFERER);
+
+                int responseCode = connection.getResponseCode();
+                if (responseCode != HttpURLConnection.HTTP_OK) {
+                    throw new IOException("音频拉取失败: " + responseCode);
+                }
+
+                try (InputStream inputStream = connection.getInputStream()) {
+                    byte[] buffer = new byte[8192];
+                    int length;
+                    while ((length = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, length);
+                    }
+                    outputStream.flush();
+                }
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+        };
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(ContentDisposition.attachment()
+                .filename(fileName, StandardCharsets.UTF_8)
+                .build());
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setCacheControl("no-store");
+
+        return ResponseEntity.ok().headers(headers).body(body);
+    }
+
+    /**
+     * 构造下载文件名：过滤非法字符并补上 mp3 扩展名
+     */
+    private String buildDownloadFileName(String name, String id) {
+        String safeName = name == null ? "" : name.trim();
+        safeName = safeName.replaceAll("[\\\\/:*?\"<>|\\r\\n]", "_");
+        if (StrUtil.isBlank(safeName)) {
+            safeName = "music-" + id;
+        }
+        if (safeName.length() > 80) {
+            safeName = safeName.substring(0, 80);
+        }
+        if (!safeName.toLowerCase().endsWith(".mp3")) {
+            safeName = safeName + ".mp3";
+        }
+        return safeName;
     }
 
     /**

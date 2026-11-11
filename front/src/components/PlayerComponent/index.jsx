@@ -84,7 +84,18 @@ const LyricIcon = () => (
   </svg>
 )
 
-const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay }) {
+const PlayerComponent = React.memo(function PlayerComponent({
+  id,
+  type,
+  autoplay,
+  // 受控模式：由外部传入歌曲列表，跳过 meting 请求
+  songs: controlledSongs,
+  // 受控模式：指定要播放的歌曲下标（配合 playToken 可重复触发同一首）
+  playIndex,
+  playToken = 0,
+  // 当前歌曲变化回调（songs, index）
+  onSongChange
+}) {
   const containerRef = useRef(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -131,6 +142,10 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
   const waveProgressRef = useRef(0)
   // 主题色缓存：--tag-cyan / --border-strong 跟随 data-theme 变化
   const waveThemeRef = useRef({ cyan: '', gray: '', dirty: true })
+  // 受控播放：记录上一次处理过的 playToken，用于识别「重复播放同一首」
+  const lastPlayTokenRef = useRef(playToken)
+  // 当前歌曲回调：避免同一首歌重复通知外部
+  const lastNotifiedRef = useRef(null)
 
   useEffect(() => {
     volumeRef.current = volume
@@ -258,6 +273,14 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
 
   // 加载音乐数据
   useEffect(() => {
+    // 受控模式：直接使用外部传入的歌曲列表
+    if (controlledSongs) {
+      setError(null)
+      setLoading(false)
+      setSongs(controlledSongs)
+      return
+    }
+
     if (!id) return
 
     const loadPlayer = async () => {
@@ -287,7 +310,39 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
     }
 
     loadPlayer()
-  }, [id, type])
+  }, [id, type, controlledSongs])
+
+  // 受控模式：歌曲列表整体切换时回到第一首
+  useEffect(() => {
+    if (!controlledSongs) return
+    setCurrentIndex(0)
+  }, [controlledSongs])
+
+  // 受控模式：由外部指定播放位置
+  useEffect(() => {
+    if (!controlledSongs || !controlledSongs.length) return
+    if (typeof playIndex !== 'number') return
+    if (playIndex < 0 || playIndex >= controlledSongs.length) return
+
+    const tokenChanged = lastPlayTokenRef.current !== playToken
+    lastPlayTokenRef.current = playToken
+
+    if (playIndex !== currentIndex || tokenChanged) {
+      setCurrentIndex(playIndex)
+      setIsPlaying(true)
+      playerManager.notifyPlay(playerId)
+    }
+  }, [playIndex, playToken, controlledSongs, currentIndex, playerId])
+
+  // 当前歌曲变化时通知外部（用于列表高亮等）
+  useEffect(() => {
+    const song = songs[currentIndex]
+    if (!song) return
+    const notifyKey = `${song.id}-${currentIndex}`
+    if (lastNotifiedRef.current === notifyKey) return
+    lastNotifiedRef.current = notifyKey
+    if (onSongChange) onSongChange(song, currentIndex)
+  }, [songs, currentIndex, onSongChange])
 
   // 创建音频元素
   useEffect(() => {
@@ -875,7 +930,7 @@ const PlayerComponent = React.memo(function PlayerComponent({ id, type, autoplay
 
   const currentLyricIndex = getCurrentLyricIndex()
 
-  if (!id) return null
+  if (!id && !(controlledSongs && controlledSongs.length)) return null
 
   return (
     <div className={`c-player ${isPlaying ? 'playing' : ''}`}>

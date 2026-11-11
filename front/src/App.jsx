@@ -17,6 +17,8 @@ import NotFoundPage from './pages/NotFound'
 const ArticleDetail = lazy(() => import('./pages/Article'))
 const FriendsPage = lazy(() => import('./pages/Friends'))
 const PageDetail = lazy(() => import('./pages/Page'))
+// 音乐搜索页（波形播放器较重，懒加载）
+const MsouPage = lazy(() => import('./pages/Msou'))
 
 // 后台页面 - 懒加载，访客不会加载
 const AdminLayout = lazy(() => import('./layouts/AdminLayout'))
@@ -141,6 +143,15 @@ function App() {
         <Route path="archive" element={<Archive />} />
         <Route path="search" element={<SearchPage />} />
         <Route path="timeline" element={<TimelinePage />} />
+        {/* 音乐搜索 / 播放 / 下载（需放在 :slug 动态路由之前） */}
+        <Route
+            path="msou"
+            element={
+              <Suspense fallback={<div className="loading">加载中...</div>}>
+                <MsouPage />
+              </Suspense>
+            }
+        />
         {/* 动态路由：文章ID或页面slug，使用*匹配评论分页路径 */}
         <Route path=":slug/*" element={<DynamicRoute />} />
         <Route path="*" element={<NotFoundPage />} />

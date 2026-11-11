@@ -1,0 +1,452 @@
+/* ============================================================
+ *  /msou 音乐搜索页
+ * ============================================================ */
+
+.msou-page {
+  padding-top: 70px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 40px;
+  color: var(--text-primary);
+}
+
+/* ---------------- Hero ---------------- */
+.msou-hero {
+  padding: 34px 0 22px;
+  text-align: center;
+}
+
+.msou-hero-title {
+  margin: 0 0 10px;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.msou-hero-desc {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+/* ---------------- 布局 ---------------- */
+.msou-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 20px;
+  align-items: start;
+}
+
+.msou-main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.msou-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: sticky;
+  top: 84px;
+}
+
+/* ---------------- 卡片 ---------------- */
+.msou-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.msou-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.msou-card-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.msou-count {
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+
+.msou-source-label {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ---------------- 搜索 ---------------- */
+.msou-search-form,
+.msou-playlist-form {
+  display: flex;
+  gap: 10px;
+}
+
+.msou-search-input {
+  flex: 1;
+  min-width: 0;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 19px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.msou-search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.msou-search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.msou-hot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 0.82rem;
+}
+
+.msou-hot-label {
+  color: var(--text-muted);
+}
+
+.msou-hot-tag {
+  border: 1px solid var(--border-light);
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  border-radius: 12px;
+  padding: 2px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.msou-hot-tag:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* ---------------- 按钮 ---------------- */
+.msou-btn {
+  border: 1px solid var(--border-strong);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-radius: 16px;
+  padding: 0 16px;
+  height: 34px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.msou-btn:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.msou-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.msou-btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  height: 38px;
+  padding: 0 22px;
+}
+
+.msou-btn-primary:hover:not(:disabled) {
+  color: #fff;
+  filter: brightness(1.08);
+  border-color: var(--accent);
+}
+
+.msou-link-btn {
+  background: none;
+  border: none;
+  color: var(--link-color);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.msou-link-btn:hover {
+  color: var(--accent);
+}
+
+/* ---------------- 歌曲列表 ---------------- */
+.msou-song-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.msou-song-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.msou-song-item:last-child {
+  border-bottom: none;
+}
+
+.msou-song-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.msou-song-item.active {
+  background: var(--accent-soft);
+}
+
+.msou-song-item.active .msou-song-name {
+  color: var(--accent);
+}
+
+.msou-song-index {
+  width: 22px;
+  flex: none;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.msou-song-cover {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border-radius: 6px;
+  object-fit: cover;
+  background: var(--bg-muted);
+}
+
+.msou-song-cover-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.msou-song-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.msou-song-name {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.msou-song-meta {
+  margin-top: 3px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.msou-dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+  opacity: 0.6;
+}
+
+.msou-song-actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
+.msou-btn-play,
+.msou-btn-download {
+  height: 28px;
+  padding: 0 12px;
+  font-size: 0.78rem;
+  border-radius: 14px;
+}
+
+.msou-btn-download:hover:not(:disabled) {
+  color: var(--success);
+  border-color: var(--success);
+}
+
+/* ---------------- 空状态 ---------------- */
+.msou-empty {
+  color: var(--text-tertiary);
+  font-size: 0.86rem;
+  text-align: center;
+  padding: 26px 10px;
+  line-height: 1.9;
+}
+
+.msou-player-empty {
+  padding: 40px 10px;
+}
+
+/* ---------------- 播放器 ---------------- */
+.msou-player-card .c-player {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.msou-player-card .c-player .lyric {
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  background: var(--bg-subtle);
+}
+
+.msou-player-card .c-player .list {
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+}
+
+.msou-player-card .c-player .list .li {
+  border-radius: 6px;
+}
+
+.msou-player-card .c-player .list .li.active {
+  background: var(--accent-soft);
+}
+
+/* ---------------- 说明 ---------------- */
+.msou-tips ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  line-height: 2;
+}
+
+/* ---------------- 音符图标 ---------------- */
+.msou-icon-note {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  color: var(--accent);
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z'/%3E%3C/svg%3E") center/contain no-repeat;
+  mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+
+/* ---------------- 响应式 ---------------- */
+@media (max-width: 1080px) {
+  .msou-layout {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}
+
+@media (max-width: 900px) {
+  .msou-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .msou-aside {
+    position: static;
+    order: -1;
+  }
+
+  .msou-player-card .c-player .controls .c-center {
+    display: flex;
+  }
+}
+
+@media (max-width: 600px) {
+  .msou-page {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .msou-hero {
+    padding: 22px 0 16px;
+  }
+
+  .msou-hero-title {
+    font-size: 1.5rem;
+  }
+
+  .msou-card {
+    padding: 14px 12px;
+  }
+
+  .msou-search-form,
+  .msou-playlist-form {
+    flex-wrap: wrap;
+  }
+
+  .msou-search-input {
+    height: 36px;
+  }
+
+  .msou-song-index {
+    display: none;
+  }
+
+  .msou-song-cover {
+    width: 36px;
+    height: 36px;
+  }
+
+  .msou-song-actions {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .msou-btn-play,
+  .msou-btn-download {
+    height: 24px;
+    padding: 0 10px;
+    font-size: 0.72rem;
+  }
+}
