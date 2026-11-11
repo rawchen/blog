@@ -133,14 +133,6 @@ function Header() {
             >
               标签
             </Link>
-            {/* 音乐搜索页（搜索 / 播放 / 下载） */}
-            <Link
-                to="/msou"
-                className={location.pathname.startsWith('/msou') ? 'current' : ''}
-            >
-              音乐
-            </Link>
-
             {/* 动态页面导航 */}
             {publicPages.map(page => (
                 <Link
@@ -199,7 +191,6 @@ function Header() {
             <ul>
               {/*<li><Link to="/">首页</Link></li>*/}
               <li><Link to="/category">分类</Link></li>
-              <li><Link to="/msou">音乐</Link></li>
               {publicPages.map(page => (
                 <li key={page.id}>
                   <Link to={`/${page.slug}`}>{page.title}</Link>

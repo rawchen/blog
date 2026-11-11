@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import './index.css'
 import playerManager, { generatePlayerId } from './playerManager'
 import { getStoredVolume, setStoredVolume, subscribeVolumeChange } from '../../utils/playerVolume'
+import { normalizeSongs, toHttps } from '../../utils/musicUtil'
 import {
   analyzeAudioWaveform,
   bucketPeaks,
@@ -147,6 +148,12 @@ const PlayerComponent = React.memo(function PlayerComponent({
   // 当前歌曲回调：避免同一首歌重复通知外部
   const lastNotifiedRef = useRef(null)
 
+  // 受控歌曲列表：统一把封面 / 播放地址升级为 https（避免混合内容被拦截）
+  const controlledSongList = useMemo(
+    () => (controlledSongs ? normalizeSongs(controlledSongs) : null),
+    [controlledSongs]
+  )
+
   useEffect(() => {
     volumeRef.current = volume
   }, [volume])
@@ -274,10 +281,10 @@ const PlayerComponent = React.memo(function PlayerComponent({
   // 加载音乐数据
   useEffect(() => {
     // 受控模式：直接使用外部传入的歌曲列表
-    if (controlledSongs) {
+    if (controlledSongList) {
       setError(null)
       setLoading(false)
-      setSongs(controlledSongs)
+      setSongs(controlledSongList)
       return
     }
 
@@ -299,7 +306,8 @@ const PlayerComponent = React.memo(function PlayerComponent({
           throw new Error('未找到音乐')
         }
 
-        const songList = Array.isArray(data) ? data : [data]
+        // 统一升级为 https，避免混合内容被浏览器拦截
+        const songList = normalizeSongs(Array.isArray(data) ? data : [data])
         setSongs(songList)
         setLoading(false)
       } catch (err) {
@@ -310,19 +318,19 @@ const PlayerComponent = React.memo(function PlayerComponent({
     }
 
     loadPlayer()
-  }, [id, type, controlledSongs])
+  }, [id, type, controlledSongList])
 
   // 受控模式：歌曲列表整体切换时回到第一首
   useEffect(() => {
-    if (!controlledSongs) return
+    if (!controlledSongList) return
     setCurrentIndex(0)
-  }, [controlledSongs])
+  }, [controlledSongList])
 
   // 受控模式：由外部指定播放位置
   useEffect(() => {
-    if (!controlledSongs || !controlledSongs.length) return
+    if (!controlledSongList || !controlledSongList.length) return
     if (typeof playIndex !== 'number') return
-    if (playIndex < 0 || playIndex >= controlledSongs.length) return
+    if (playIndex < 0 || playIndex >= controlledSongList.length) return
 
     const tokenChanged = lastPlayTokenRef.current !== playToken
     lastPlayTokenRef.current = playToken
@@ -332,7 +340,7 @@ const PlayerComponent = React.memo(function PlayerComponent({
       setIsPlaying(true)
       playerManager.notifyPlay(playerId)
     }
-  }, [playIndex, playToken, controlledSongs, currentIndex, playerId])
+  }, [playIndex, playToken, controlledSongList, currentIndex, playerId])
 
   // 当前歌曲变化时通知外部（用于列表高亮等）
   useEffect(() => {
@@ -403,7 +411,7 @@ const PlayerComponent = React.memo(function PlayerComponent({
             const response = await fetch(`/api/music/url/${currentSong.id}?br=320`)
             const data = await response.json()
             if (data && data.data && data.data.url) {
-              songUrl = data.data.url
+              songUrl = toHttps(data.data.url)
               // 更新歌曲URL缓存
               setSongs(prev => prev.map((s, i) =>
                 i === currentIndex ? { ...s, url: songUrl } : s

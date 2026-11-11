@@ -8,6 +8,8 @@
  * 4. 若拉取/解码失败（跨域、离线、解码器不支持），退化为伪随机波形，保证播放器不报错。
  */
 
+import { toHttps } from '../../utils/musicUtil'
+
 export const WAVE_PEAK_COUNT = 600
 
 // 分析用的帧长与步长（采样点）
@@ -206,13 +208,13 @@ export async function resolveAnalysisUrl(song) {
       if (response.ok) {
         const data = await response.json()
         const url = data?.data?.url
-        if (url) return url
+        if (url) return toHttps(url)
       }
     } catch (err) {
       // 忽略，回退到播放地址
     }
   }
-  return song?.url || ''
+  return toHttps(song?.url || '')
 }
 
 /**

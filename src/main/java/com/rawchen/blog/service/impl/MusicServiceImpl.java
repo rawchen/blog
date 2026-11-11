@@ -184,7 +184,7 @@ public class MusicServiceImpl implements MusicService {
             JSONArray data = result.getJSONArray("data");
             if (data != null && !data.isEmpty()) {
                 JSONObject urlInfo = data.getJSONObject(0);
-                vo.setUrl(urlInfo.getStr("url"));
+                vo.setUrl(toHttps(urlInfo.getStr("url")));
                 vo.setSize(urlInfo.getLong("size"));
                 vo.setBr(urlInfo.getInt("br") != null ? urlInfo.getInt("br") / 1000 : br);
             }
@@ -309,6 +309,22 @@ public class MusicServiceImpl implements MusicService {
     }
 
     /**
+     * 将 http 链接升级为 https
+     *
+     * 网易云返回的封面 / 音频地址默认是 http，站点为 https 时会被浏览器
+     * 作为混合内容拦截，这里统一在出口处升级为 https。
+     */
+    private String toHttps(String url) {
+        if (StrUtil.isBlank(url)) {
+            return url;
+        }
+        if (url.startsWith("http://")) {
+            return "https://" + url.substring("http://".length());
+        }
+        return url;
+    }
+
+    /**
      * 将网易云音乐歌曲JSON转换为MusicVO
      */
     private MusicVO convertSongJsonToVO(JSONObject song) {
@@ -362,7 +378,7 @@ public class MusicServiceImpl implements MusicService {
                     picUrl = "https://p3.music.126.net/" + NetEaseCryptoUtil.encryptId(String.valueOf(picIdObj)) + "/" + picIdObj + ".jpg";
                 }
             }
-            vo.setPic(picUrl);
+            vo.setPic(toHttps(picUrl));
         }
 
         return vo;

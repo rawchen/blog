@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { message } from 'antd'
 import PlayerComponent from '../../components/PlayerComponent'
 import { searchMusic, getMusicPlaylist, buildMusicDownloadUrl } from '../../api/music'
+import { normalizeSongs } from '../../utils/musicUtil'
 import './index.css'
 
 // 空数组需要保持引用稳定，避免触发播放器内部副作用
@@ -45,7 +46,7 @@ const Msou = () => {
     setSearching(true)
     try {
       const res = await searchMusic(kw, 30)
-      const list = Array.isArray(res?.data) ? res.data : []
+      const list = Array.isArray(res?.data) ? normalizeSongs(res.data) : []
       setResults(list)
       setSearched(true)
       if (!list.length) {
@@ -68,7 +69,7 @@ const Msou = () => {
     setPlaylistLoading(true)
     try {
       const res = await getMusicPlaylist(id)
-      const list = Array.isArray(res?.data) ? res.data : []
+      const list = Array.isArray(res?.data) ? normalizeSongs(res.data) : []
       setPlaylistSongs(list)
       if (!list.length) {
         message.info('歌单为空或不存在')

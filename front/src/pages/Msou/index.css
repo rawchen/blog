@@ -4,7 +4,7 @@
 
 .msou-page {
   padding-top: 70px;
-  max-width: 1200px;
+  max-width: 1280px;
   margin: 0 auto;
   padding-left: 20px;
   padding-right: 20px;
@@ -36,9 +36,10 @@
 }
 
 /* ---------------- 布局 ---------------- */
+/* 搜索列收窄、播放器列加宽（3:7），保证波形进度条完整可见 */
 .msou-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 400px;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 7fr);
   gap: 20px;
   align-items: start;
 }
@@ -341,6 +342,42 @@
   background: transparent;
 }
 
+/* 纵向布局：波形进度条独占一整行，避免被左右控件挤压 */
+.msou-player-card .c-player .controls {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    "left   right"
+    "center center";
+  height: auto;
+  padding: 10px 14px 12px;
+  gap: 10px 12px;
+  align-items: center;
+}
+
+.msou-player-card .c-player .controls .c-left {
+  grid-area: left;
+  justify-self: start;
+  min-width: 0;
+}
+
+/* 播放器变宽后，歌曲信息区同步放宽，长歌名可以完整显示 */
+.msou-player-card .c-player .controls .c-left .music-description .music-meta {
+  width: 18em;
+}
+
+.msou-player-card .c-player .controls .c-right {
+  grid-area: right;
+  justify-self: end;
+  justify-content: flex-end;
+}
+
+.msou-player-card .c-player .controls .c-center {
+  grid-area: center;
+  width: 100%;
+  padding: 0;
+}
+
 .msou-player-card .c-player .lyric {
   border: 1px solid var(--border-light);
   border-radius: 8px;
@@ -381,9 +418,9 @@
 }
 
 /* ---------------- 响应式 ---------------- */
-@media (max-width: 1080px) {
+@media (max-width: 1180px) {
   .msou-layout {
-    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-columns: minmax(220px, 3fr) minmax(0, 7fr);
   }
 }
 
@@ -395,10 +432,6 @@
   .msou-aside {
     position: static;
     order: -1;
-  }
-
-  .msou-player-card .c-player .controls .c-center {
-    display: flex;
   }
 }
 
@@ -448,5 +481,14 @@
     height: 24px;
     padding: 0 10px;
     font-size: 0.72rem;
+  }
+
+  /* 小屏下压缩歌曲信息，给波形留出空间 */
+  .msou-player-card .c-player .controls .c-left .music-description .music-meta {
+    width: 6em;
+  }
+
+  .msou-player-card .c-player .controls {
+    padding: 8px 10px 10px;
   }
 }
