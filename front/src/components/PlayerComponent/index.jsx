@@ -443,6 +443,15 @@ const PlayerComponent = React.memo(function PlayerComponent({
     }
   }, [currentIndex, songs])
 
+  // 播放状态变为「播放中」时确保音频真正开始/恢复播放
+  // （切歌之外的路径（如列表里点击当前这首）不会触发上面的 src 变化）
+  useEffect(() => {
+    if (!isPlaying) return
+    const audio = audioRef.current
+    if (!audio || !audio.src) return
+    audio.play().catch(() => {})
+  }, [isPlaying, currentIndex])
+
   // 自动播放
   useEffect(() => {
     if (autoplay === 'true' && songs.length > 0 && audioRef.current) {
