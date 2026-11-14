@@ -315,6 +315,7 @@ const Msou = () => {
                 songs={playerSongs}
                 playIndex={playIndex}
                 playToken={playToken}
+                autoLyricOnPlay
                 onSongChange={handleSongChange}
               />
             ) : (

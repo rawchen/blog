@@ -94,6 +94,8 @@ const PlayerComponent = React.memo(function PlayerComponent({
   // 受控模式：指定要播放的歌曲下标（配合 playToken 可重复触发同一首）
   playIndex,
   playToken = 0,
+  // 播放时默认展开歌词并收起播放列表（歌曲列表已在页面其它位置展示）
+  autoLyricOnPlay = false,
   // 当前歌曲变化回调（songs, index）
   onSongChange
 }) {
@@ -143,8 +145,12 @@ const PlayerComponent = React.memo(function PlayerComponent({
   const waveProgressRef = useRef(0)
   // 主题色缓存：--tag-cyan / --border-strong 跟随 data-theme 变化
   const waveThemeRef = useRef({ cyan: '', gray: '', dirty: true })
-  // 受控播放：记录上一次处理过的 playToken，用于识别「重复播放同一首」
-  const lastPlayTokenRef = useRef(playToken)
+  // 受控播放：记录外部已经应用过的下标与令牌，
+  // 用于识别「外部真正发起的一次播放」，避免内部列表点击后被回退
+  const appliedPlayIndexRef = useRef(null)
+  const appliedPlayTokenRef = useRef(null)
+  // 自动展开歌词：记录已自动展开过的歌曲，避免同一首反复被强制展开
+  const autoLyricSongRef = useRef(null)
   // 当前歌曲回调：避免同一首歌重复通知外部
   const lastNotifiedRef = useRef(null)
 
@@ -332,15 +338,20 @@ const PlayerComponent = React.memo(function PlayerComponent({
     if (typeof playIndex !== 'number') return
     if (playIndex < 0 || playIndex >= controlledSongList.length) return
 
-    const tokenChanged = lastPlayTokenRef.current !== playToken
-    lastPlayTokenRef.current = playToken
+    const indexChanged = appliedPlayIndexRef.current !== playIndex
+    const tokenChanged = appliedPlayTokenRef.current !== playToken
+    appliedPlayIndexRef.current = playIndex
+    appliedPlayTokenRef.current = playToken
 
-    if (playIndex !== currentIndex || tokenChanged) {
-      setCurrentIndex(playIndex)
-      setIsPlaying(true)
-      playerManager.notifyPlay(playerId)
-    }
-  }, [playIndex, playToken, controlledSongList, currentIndex, playerId])
+    // 只有外部真正指定了新目标时才切换歌曲：
+    // 若把 currentIndex 作为触发条件，播放列表内部点击后会被回退到
+    // 上一次外部指定的下标（表现为「点哪首都在播第一首」）
+    if (!indexChanged && !tokenChanged) return
+
+    setCurrentIndex(playIndex)
+    setIsPlaying(true)
+    playerManager.notifyPlay(playerId)
+  }, [playIndex, playToken, controlledSongList, playerId])
 
   // 当前歌曲变化时通知外部（用于列表高亮等）
   useEffect(() => {
@@ -937,6 +948,23 @@ const PlayerComponent = React.memo(function PlayerComponent({
   }
 
   const currentLyricIndex = getCurrentLyricIndex()
+
+  // 播放时默认展开歌词、收起播放列表
+  // （搜索页里歌曲列表已在左侧展示，右侧再挂一份播放列表属于重复）
+  useEffect(() => {
+    if (!autoLyricOnPlay || !isPlaying) return
+    if (!lyrics.length) return
+
+    const song = songs[currentIndex]
+    const key = song?.id ?? currentIndex
+    // 同一首只自动展开一次，用户手动收起后不再被强制展开
+    if (autoLyricSongRef.current === key) return
+    autoLyricSongRef.current = key
+
+    setShowLyric(true)
+    setShowList(false)
+    playerManager.expandLyric(playerId)
+  }, [autoLyricOnPlay, isPlaying, lyrics.length, songs, currentIndex, playerId])
 
   if (!id && !(controlledSongs && controlledSongs.length)) return null
 

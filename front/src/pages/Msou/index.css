@@ -36,10 +36,10 @@
 }
 
 /* ---------------- 布局 ---------------- */
-/* 搜索列收窄、播放器列加宽（3:7），保证波形进度条完整可见 */
+/* 搜索列收窄、播放器列加宽（4:6），保证波形进度条完整可见 */
 .msou-layout {
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 7fr);
+  grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
   gap: 20px;
   align-items: start;
 }
